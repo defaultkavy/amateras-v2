@@ -55,10 +55,17 @@ export class Lobby {
     }
 
     async init() {
-        this.categoryChannel = <CategoryChannel>await this.#_guild.get.channels.fetch(this.#categoryChannel)
-        this.voiceChannel = <VoiceChannel>await this.#_guild.get.channels.fetch(this.#voiceChannel)
-        this.textChannel = <TextChannel>await this.#_guild.get.channels.fetch(this.#textChannel)
-        this.infoChannel = <TextChannel>await this.#_guild.get.channels.fetch(this.#infoChannel)
+        try {
+            this.categoryChannel = <CategoryChannel>await this.#_guild.get.channels.fetch(this.#categoryChannel)
+            this.voiceChannel = <VoiceChannel>await this.#_guild.get.channels.fetch(this.#voiceChannel)
+            this.textChannel = <TextChannel>await this.#_guild.get.channels.fetch(this.#textChannel)
+            this.infoChannel = <TextChannel>await this.#_guild.get.channels.fetch(this.#infoChannel)
+        } catch {
+            console.error(`Channel is deleted.`)
+            this.state = 'CLOSED'
+            await this.save()
+            return false
+        }
         if (this.voiceChannel.deleted && this.textChannel.deleted) {
             this.state = 'CLOSED'
         }
@@ -89,6 +96,7 @@ export class Lobby {
             }
         }
         await this.save()
+        return true
     }
 
     async save() {
@@ -102,7 +110,7 @@ export class Lobby {
         data.vFolder = this.#vFolder
         data.guild = this.#_guild.id
         data.messages = {}
-        for (const id of this.messages.keys()) {
+        if (this.state !== 'CLOSED') for (const id of this.messages.keys()) {
             data.messages[id] = this.messages.get(id)!.id
         }
         const lobby = <_GuildData>await this.#collection.findOne({ owner: this.owner.id } )
@@ -114,10 +122,12 @@ export class Lobby {
     }
 
     async close() {
-        if (!this.textChannel.deleted) await this.textChannel.delete()
-        if (!this.voiceChannel.deleted) await this.voiceChannel.delete()
-        if (!this.infoChannel.deleted) await this.infoChannel.delete()
-        if (!this.categoryChannel.deleted) this.categoryChannel.delete()
+        try {
+            if (!this.textChannel.deleted) await this.textChannel.delete()
+            if (!this.voiceChannel.deleted) await this.voiceChannel.delete()
+            if (!this.infoChannel.deleted) await this.infoChannel.delete()
+            if (!this.categoryChannel.deleted) await this.categoryChannel.delete()
+        } catch { }
         this.state = 'CLOSED'
         await this.save()
         this.#manager.cache.delete(this.owner.id)

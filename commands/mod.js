@@ -132,6 +132,20 @@ function execute(interaction, amateras) {
                     }
                 }
                 break;
+            case 'unset':
+                if (!options[0].options)
+                    return;
+                for (const subcmd1 of options[0].options) {
+                    switch (subcmd1.name) {
+                        case 'lobby':
+                            const _guild = amateras.guilds.cache.get(interaction.guild.id);
+                            if (_guild)
+                                yield _guild.closeLobbyManager();
+                            interaction.reply({ content: '设定完成', ephemeral: true });
+                            break;
+                    }
+                }
+                break;
             case 'vtuber':
                 if (!options[0].options)
                     return;

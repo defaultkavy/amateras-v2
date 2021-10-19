@@ -31,9 +31,16 @@ export class LobbyManager {
     }
 
     async init() {
-        const channel = await this.#_guild.get.channels.fetch(this.#channel)
-        if (!channel) {
-            console.error('channel is ' + channel)
+        let channel
+        try {
+            channel = await this.#_guild.get.channels.fetch(this.#channel)
+            if (!channel) {
+                console.error('channel is ' + channel)
+                return
+            }
+        } catch {
+            console.error('Lobby Channel is deleted. Lobby function close.')
+            this.#_guild.closeLobbyManager()
             return
         }
         this.channel = <TextChannel>channel
@@ -43,12 +50,16 @@ export class LobbyManager {
                 if (lobbyData) {
                     const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
                     this.cache.set(lobbyId, lobby)
-                    await lobby.init()
-                    this.#resolve.set(lobby.categoryChannel.id, lobby)
+                    if (await lobby.init()) this.#resolve.set(lobby.categoryChannel.id, lobby)
+                    else this.cache.delete(lobbyId)
                 }
             }
         }
-        if (this.#message) this.message = await this.channel.messages.fetch(this.#message)
+        if (this.#message) try {
+            this.message = await this.channel.messages.fetch(this.#message)
+        } catch {
+            console.error('Lobby Message is deleted.')
+        }
         if (!this.message) await this.sendInitMessage()
         else await this.updateInitMessage()
         await this.#_guild.save()

@@ -423,6 +423,18 @@
                     ]
                 },
                 {
+                    "name": "unset",
+                    "description": "天照设定",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "lobby",
+                            "description": "房间设定",
+                            "type": 1
+                        }
+                    ]
+                },
+                {
                     "name": "vtuber",
                     "description": "VTuber 设定",
                     "type": 2,

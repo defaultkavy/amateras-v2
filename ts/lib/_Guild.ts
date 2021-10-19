@@ -62,4 +62,21 @@ export class _Guild {
             await this.lobbies.init()
         }
     }
+
+    async closeLobbyManager() {
+        if (this.lobbies) {
+            if (this.lobbies.cache.size !== 0) {
+                for (const lobby of this.lobbies.cache.values()) {
+                    await lobby.close()
+                }
+            }
+            if (this.lobbies.message) {
+                try { this.lobbies.message.delete() } catch { }
+            }
+        }
+        this.lobbies = undefined
+        this.#lobbies = undefined
+        await this.save()
+        console.log(`Guild ${this.id} Lobby Function is close.`)
+    }
 }
