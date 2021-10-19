@@ -1,0 +1,1 @@
+{"version":3,"file":"SettingsChannel.js","sourceRoot":"","sources":["../ts/lib/SettingsChannel.ts"],"names":[],"mappings":";;;;;;;;;;AAEA,yCAAsC;AAGtC,MAAa,eAAgB,SAAQ,mBAAQ;IAEzC,YAAY,IAAkB,EAAE,MAAc,EAAE,KAAY,EAAE,QAAkB;QAC5E,KAAK,CAAC,IAAI,EAAE,UAAU,EAAE,MAAM,EAAE,KAAK,EAAE,QAAQ,CAAC,CAAA;QAFpD,4CAAmB;QAGf,uBAAA,IAAI,6BAAa,QAAQ,MAAA,CAAA;IAC7B,CAAC;CAsBJ;AA3BD,0CA2BC"}

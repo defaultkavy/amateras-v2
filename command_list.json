@@ -1,0 +1,548 @@
+{
+    "commands": [
+        {
+            "name": "ping",
+            "description": "Replies with pong!"
+        },
+        {
+            "name": "menu",
+            "description": "灵魂拷问"
+        },
+        {
+            "name": "oppai",
+            "description": "你在看哪里呢？"
+        },
+        {
+            "name": "player",
+            "description": "个人信息管理",
+            "options": [
+                {
+                    "name": "edit",
+                    "description": "修改你的个人简介。天照会好好记得的！",
+                    "type": "1",
+                    "options": [
+                        {
+                            "name": "intro",
+                            "description": "简介内容。",
+                            "type": 3,
+                            "required": false
+                        },
+                        {
+                            "name": "color",
+                            "description": "更改颜色。",
+                            "type": 3,
+                            "required": false,
+                            "choices": [
+                                {
+                                    "name": "Red",
+                                    "value": "#FF5050"
+                                },
+                                {
+                                    "name": "Green",
+                                    "value": "#50FF50"
+                                },
+                                {
+                                    "name": "Blue",
+                                    "value": "#5050FF"
+                                },
+                                {
+                                    "name": "Yellow",
+                                    "value": "#FFFF50"
+                                },
+                                {
+                                    "name": "Orange",
+                                    "value": "#FF9950"
+                                },
+                                {
+                                    "name": "Purple",
+                                    "value": "#9950FF"
+                                },
+                                {
+                                    "name": "Pink",
+                                    "value": "#FF5099"
+                                },
+                                {
+                                    "name": "Aqua",
+                                    "value": "#50FFFF"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "twitter",
+                            "description": "输入你的 Twitter ID",
+                            "type": 3,
+                            "required": false
+                        },
+                        {
+                            "name": "youtube",
+                            "description": "输入你的 YouTube Channel ID（频道网址中类似 UC12xGOiKVMyvOGTbRLf8sjg 的编号）",
+                            "type": 3,
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "info",
+                    "description": "展示你的个人名片。",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "user",
+                            "description": "展示某个用户的名片",
+                            "type": 6,
+                            "required": false
+                        },
+                        {
+                            "name": "share",
+                            "description": "是否要分享？",
+                            "type": 5,
+                            "required": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "vtuber",
+            "description": "VTuber 管理",
+            "options": [
+                {
+                    "name": "image",
+                    "description": "图片管理",
+                    "type": "2",
+                    "options": [
+                        {
+                            "name": "add",
+                            "description": "添加图片",
+                            "type": "1",
+                            "options": [
+                                {
+                                    "name": "url",
+                                    "description": "输入图片网址",
+                                    "type": 3,
+                                    "required": true
+                                },
+                                {
+                                    "name": "folder",
+                                    "description": "选择文件夹（预设值为'default'，输入不存在的文件夹编号将会自动创建新文件夹）",
+                                    "type": 3,
+                                    "required": false
+                                }
+                            ]
+                        },
+                        {
+                            "name": "set",
+                            "description": "更改图片文件夹属性",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "id",
+                                    "description": "目标文件夹的ID",
+                                    "type": 3,
+                                    "required": true
+                                },
+                                {
+                                    "name": "name",
+                                    "description": "更改文件夹名称",
+                                    "type": 3,
+                                    "required": false
+                                },
+                                {
+                                    "name": "newid",
+                                    "description": "更改文件夹ID",
+                                    "type": 3,
+                                    "required": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "info",
+                    "description": "展示你的 VTuber 名片",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "share",
+                            "description": "是否要分享？",
+                            "type": 5,
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "edit",
+                    "description": "编辑你的 VTuber 名片",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "name",
+                            "description": "编辑你的名字",
+                            "type": 3,
+                            "required": false
+                        },
+                        {
+                            "name": "intro",
+                            "description": "编辑你的简介",
+                            "type": 3,
+                            "required": false
+                        },
+                        {
+                            "name": "avatar",
+                            "description": "输入你的头像图片链接",
+                            "type": 3,
+                            "required": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "coin",
+            "description": "管理个人资产。",
+            "options": [
+                {
+                    "name": "give",
+                    "description": "转移资产。",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "user",
+                            "description": "用户名",
+                            "type": 6,
+                            "required": true
+                        },
+                        {
+                            "name": "amount",
+                            "description": "数量",
+                            "type": 4,
+                            "required": true
+                        },
+                        {
+                            "name": "message",
+                            "description": "给对方留言",
+                            "type": 3,
+                            "required": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "mission",
+            "description": "公会委托",
+            "options": [
+                {
+                    "name": "list",
+                    "description": "你的委托列表。",
+                    "type": 1,
+                    "required": false
+                },
+                {
+                    "name": "push",
+                    "description": "发布委托。",
+                    "type": 1,
+                    "required": false,
+                    "options": [
+                        {
+                            "name": "title",
+                            "description": "委托标题",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "pay",
+                            "description": "委托报酬",
+                            "type": 4,
+                            "required": true
+                        },
+                        {
+                            "name": "info",
+                            "description": "委托注释",
+                            "type": 3,
+                            "required": false
+                        },
+                        {
+                            "name": "expire",
+                            "description": "委托期限（预设为7天）",
+                            "type": 4,
+                            "required": false
+                        },
+                        {
+                            "name": "persons",
+                            "description": "委托人数上限（预设为1人）",
+                            "type": 4,
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "close",
+                    "description": "结算你的委托。",
+                    "type": 1,
+                    "required": false
+                },
+                {
+                    "name": "cancel",
+                    "description": "取消你的委托请求。",
+                    "type": 1,
+                    "required": false
+                },
+                {
+                    "name": "quit",
+                    "description": "放弃委托。",
+                    "type": 1,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "item",
+            "description": "管理物品",
+            "options": [
+                {
+                    "name": "create",
+                    "description": "创建物品",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "name",
+                            "description": "物品名称",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "info",
+                            "description": "物品介绍",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "url",
+                            "description": "输入物品的链接",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "image",
+                            "description": "输入物品图片的链接",
+                            "type": 3,
+                            "required": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "reward",
+            "description": "查看你的奖励详情"
+        },
+        {
+            "name": "mod",
+            "description": "管理",
+            "default_permission": false,
+            "options": [
+                {
+                    "name": "player",
+                    "description": "管理玩家",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "aka",
+                            "description": "修改玩家称号",
+                            "type": 1,
+                            "required": false,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "更改哪一个用户？",
+                                    "type": 6,
+                                    "required": true
+                                },
+                                {
+                                    "name": "content",
+                                    "description": "称号",
+                                    "type": 3,
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "coin",
+                    "description": "货币管理",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "set",
+                            "description": "修改玩家资产。",
+                            "type": 1,
+                            "required": false,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "更改哪一个用户？",
+                                    "type": 6,
+                                    "required": true
+                                },
+                                {
+                                    "name": "amount",
+                                    "description": "数量",
+                                    "type": 4,
+                                    "required": true
+                                },
+                                {
+                                    "name": "reason",
+                                    "description": "修改的理由",
+                                    "type": 3,
+                                    "required": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "setup",
+                    "description": "天照设定",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "lobby",
+                            "description": "房间设定",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "channel",
+                                    "description": "选择频道",
+                                    "type": 7,
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "vtuber",
+                    "description": "VTuber 设定",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "set",
+                            "description": "将玩家设定为 VTuber",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "玩家",
+                                    "type": 6,
+                                    "required": true
+                                }
+                            ]
+                        },
+                        {
+                            "name": "unset",
+                            "description": "取消玩家的 VTuber 设定",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "玩家",
+                                    "type": 6,
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Angry",
+            "type": 3,
+            "default_permission": false
+        },
+        {
+            "name": "Undo",
+            "type": 3,
+            "default_permission": true
+        },
+        {
+            "name": "Info",
+            "type": 2,
+            "default_permission": true
+        },
+        {
+            "name": "Share",
+            "type": 2,
+            "default_permission": true
+        },
+        {
+            "name": "Invite",
+            "type": 2,
+            "default_permission": true
+        },
+        {
+            "name": "Toggle",
+            "type": 2,
+            "default_permission": false
+        }
+    ],
+
+    "global_commands": [
+        {
+            "name": "mission",
+            "description": "公会委托",
+            "options": [
+                {
+                    "name": "list",
+                    "description": "你的委托列表。",
+                    "type": 1,
+                    "required": false
+                },
+                {
+                    "name": "close",
+                    "description": "结算你的委托。",
+                    "type": 2,
+                    "required": false,
+                    "options": [
+                        {
+                            "name": "settle",
+                            "description": "完成你的委托结算。",
+                            "type": 1,
+                            "required": false,
+                            "options": [
+                                {
+                                    "name": "review",
+                                    "description": "你对这次委托的评价。",
+                                    "type": 3,
+                                    "required": false
+                                },
+                                {
+                                    "name": "rate",
+                                    "description": "对这次委托打个分数吧！（1分 - 5分）",
+                                    "type": 4,
+                                    "required": false
+                                }
+                            ]
+                        },
+                        {
+                            "name": "cancel",
+                            "description": "取消你的委托请求。",
+                            "type": 1,
+                            "required": false,
+                            "options": [
+                                {
+                                    "name": "reason",
+                                    "description": "取消委托的理由？",
+                                    "type": 3,
+                                    "required": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
