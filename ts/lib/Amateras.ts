@@ -224,7 +224,8 @@ export default class Amateras {
 
     private messageReactionAdd() {
         this.client.on('messageReactionAdd', async (reaction, user) => {
-            if (!reaction.message.guild || !reaction.message.author || !user.bot) return
+            await reaction.message.fetch()
+            if (!reaction.message.guild || !reaction.message.author || user.bot) return
             const reactedPlayer = await this.players.fetch(reaction.message.author.id)
             const reactPlayer = await this.players.fetch(user.id)
             const reward = reactedPlayer.rewards.get('reacted')

@@ -11,8 +11,8 @@ let { bot } = require('./bot_config.json')
 // Create Bot Client
 // Client Options - Partials: Cache message and reaction.
 const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS],
-    partials: ['MESSAGE', 'REACTION']
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+    partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
 // Database Client
 const mongo = new MongoClient('mongodb://localhost:27017/')
