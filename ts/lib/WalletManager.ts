@@ -1,6 +1,4 @@
 import Amateras from "./Amateras"
-import { Player } from "./Player"
-import { cmd } from "./terminal"
 import Wallet from "./Wallet"
 
 export default class WalletManager {
@@ -9,22 +7,21 @@ export default class WalletManager {
     cache: Map<string, Wallet>
     constructor(amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db?.collection('wallets')
+        this.#collection = amateras.db.collection('wallets')
         this.cache = new Map()
     }
     async fetch(id: string): Promise<Wallet | undefined> {
-        const walletData = await <Promise<WalletData | null>>this.#collection?.findOne({ id: id })
-        if (walletData) {
-            if (this.cache.get(id)) {
-                const wallet = this.cache.get(id)!
-                return wallet
-            }
-            this.cache.set(id, new Wallet(walletData, this.#amateras))
-            const wallet = this.cache.get(id)
-            await wallet!.init()
+        const wallet = this.cache.get(id)
+        if (wallet) {
             return wallet
         } else {
-            return undefined
+            const walletData = <WalletData>await this.#collection.findOne({id: id})
+            if (walletData) {
+                const wallet = new Wallet(walletData, this.#amateras)
+                this.cache.set(wallet.id, wallet)
+                await wallet.init()
+                return wallet
+            }
         }
     }
 
