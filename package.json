@@ -1,0 +1,14 @@
+{
+  "name": "amateras-v2",
+  "version": "1.0.0",
+  "description": "Discord Bot for Isekai Guild",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "defaultkavy",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^13.1.0"
+  }
+}
