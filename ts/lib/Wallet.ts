@@ -1,6 +1,6 @@
 import Transaction from "./Transaction";
 import Amateras from "./Amateras";
-import { cloneObj, cmd, idGenerator } from "./terminal";
+import { cloneObj, idGenerator } from "./terminal";
 import { Player } from "./Player";
 
 export default class Wallet {
@@ -39,7 +39,7 @@ export default class Wallet {
         receiverWallet.balance += amount;
         await receiverWallet.save()
         const transaction = await this.#amateras.transactions.create({sender: this.id, receiver: receiver, amount: amount, note: note, devote: devote})
-        cmd.log(`${this.id} transfer ${amount}G to ${receiver}`)
+        console.log(`${this.id} transfer ${amount}G to ${receiver}`)
         return {status:{ success: true, message: `Transfer success.`}, transaction: transaction}
     }
 
