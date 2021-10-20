@@ -12,7 +12,7 @@ export default class Wallet {
     balance: number;
     constructor(wallet: WalletData, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db?.collection('wallets')
+        this.#collection = amateras.db.collection('wallets')
         this.id = wallet.id
         this.#owner = wallet.owner
         this.owner = <Player>{};
@@ -20,7 +20,7 @@ export default class Wallet {
     }
 
     async init() {
-        this.owner = await this.#amateras.players!.fetch(this.#owner)
+        this.owner = await this.#amateras.players.fetch(this.#owner)
     }
 
     /**

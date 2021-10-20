@@ -20,7 +20,6 @@ export class TransactionManager {
         const transaction = new Transaction(data, this.#amateras)
         this.cache.set(transaction.id, transaction)
         await transaction.init()
-        console.debug(transaction.receiver)
         if (transaction.devote) transaction.receiver.owner.expUp(transaction.amount)
         return transaction
     }

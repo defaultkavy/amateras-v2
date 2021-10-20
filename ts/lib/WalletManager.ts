@@ -38,7 +38,8 @@ export default class WalletManager {
         }, this.#amateras)
 
         this.cache.set(wallet.id, wallet)
-        wallet.save()
+        await wallet.init()
+        await wallet.save()
         return {status: {success: true, message: `Create Wallet success.`}, wallet: wallet}
     }
 }
