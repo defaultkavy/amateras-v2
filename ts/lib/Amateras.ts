@@ -207,7 +207,7 @@ export default class Amateras {
 
     private messageCreate() {
         this.client.on('messageCreate', async (message: Message) => {
-            console.log(true, `message received: ${message.author.username} - ${message.content}`)
+            //console.log(true, `message received: ${message.author.username} - ${message.content}`)
             if (!message.guild || message.system) return
             const player = await this.players.fetch(message.author.id)
             const reward = player.rewards.get('message')
