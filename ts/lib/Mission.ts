@@ -212,16 +212,23 @@ export class Mission {
             agent.missions.accepted.active.remove(this)
             agent.missions.accepted.achieve.add(this)
             await this.#amateras.me!.wallets[0].transfer(agent.wallets[0].id, this.pay, `Mission payment.`, true)
-            console.log(agent.id)
             const user = await this.#amateras.client.users.fetch(agent.id)
             user.send(`**通知**\n你完成了 ${ownerMember?.displayName} 的委托，得到了${this.pay}G的报酬金。`)
             .catch(async () => {
                 
             })
         }
-        
+        if (this.agents.length < this.persons) {
+            await this.#amateras.me!.wallets[0].transfer(this.owner.wallets[0].id, (this.persons - this.agents.length) * this.pay, `Mission payment remains.`, false)
+            const owner = await this.#amateras.client.users.fetch(this.owner.id)
+            owner.send(`**通知**\n委托剩余报酬${(this.persons - this.agents.length) * this.pay}G已退回到你的户口。`)
+            .catch(async () => {
+                
+            })
+        }
         this.missionMessageUpdate('COMPLETED')
     }
+
     async cancel() {
         const guild = this.message.guild
         if (!guild) {
@@ -240,6 +247,9 @@ export class Mission {
         this.#amateras.me?.wallets[0].transfer(this.owner.wallets[0].id, this.pay, 'Mission Cancel Refund.', false)
         const owner = await this.#amateras.client.users.fetch(this.owner.id)
         owner.send(`**通知**\n你取消了委托，${this.pay}G已退回到你的户口。`)
+        .catch(async () => {
+            
+        })
         for (const agent of this.agents) {
             agent.missions.accepted.active.remove(this)
             agent.missions.accepted.achieve.add(this)
