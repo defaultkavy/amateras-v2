@@ -20,7 +20,7 @@ const mongodb_1 = require("mongodb");
 const Amateras_1 = __importDefault(require("./lib/Amateras"));
 const terminal_1 = require("./lib/terminal");
 // Client config
-let { bot } = require('./bot_config.json');
+let config = require('./bot_config.json');
 // Create Bot Client
 // Client Options - Partials: Cache message and reaction.
 const client = new discord_js_1.Client({
@@ -28,7 +28,7 @@ const client = new discord_js_1.Client({
     partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
 // Database Client
-const mongo = new mongodb_1.MongoClient('mongodb://localhost:27017/');
+const mongo = new mongodb_1.MongoClient('mongodb://localhost:27017/', { auth: { username: config.db.user, password: config.db.pwd } });
 let db;
 // Connect to DB
 databaseInit(init);
@@ -46,7 +46,7 @@ function init() {
         // Create Bot info object
         terminal_1.cmd.sys('Amateras Starting up...');
         // Client login with token, edit token from bot_config.json
-        client.login(bot.token);
+        client.login(config.bot.token);
         // Client Ready
         client.once('ready', () => __awaiter(this, void 0, void 0, function* () {
             terminal_1.cmd.sys('Ready');
