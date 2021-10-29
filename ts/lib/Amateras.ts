@@ -63,7 +63,7 @@ export default class Amateras {
         const appCmds = await guild.commands.fetch()
         appCmds?.forEach(appcmd => {
             if (appcmd.name === 'Angry' ||
-                appcmd.name === 'Toggle') {
+                appcmd.name === 'Toggle' || appcmd.name === 'VTuber') {
                 appcmd.permissions.add({
                     permissions: [
                         {
