@@ -9,19 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const layout_1 = require("../lib/layout");
 exports.default = execute;
 function execute(interaction, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interaction.targetId);
         if (!player)
             return console.error('Player not exist');
-        if (!player.v)
+        if (!player.v) {
             yield player.setVTuber();
-        else
+            interaction.reply({ content: `VTuber Set.`, ephemeral: true });
+        }
+        else {
             yield player.unsetVTuber();
+            interaction.reply({ content: `VTuber Unset`, ephemeral: true });
+        }
         yield player.save();
-        yield interaction.reply({ content: `Change to ${layout_1.Gender[player.gender]}`, ephemeral: true });
     });
 }
 //# sourceMappingURL=VTuber.js.map
