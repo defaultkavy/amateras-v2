@@ -498,6 +498,11 @@
             "name": "Toggle",
             "type": 2,
             "default_permission": false
+        },
+        {
+            "name": "VTuber",
+            "type": 2,
+            "default_permission": false
         }
     ],
 
