@@ -1,6 +1,5 @@
 import { ContextMenuInteraction } from 'discord.js';
 import Amateras from '../lib/Amateras';
-import { cmd } from '../lib/terminal';
 
 export default execute
 async function execute(interaction: ContextMenuInteraction, amateras: Amateras) {
@@ -12,6 +11,6 @@ async function execute(interaction: ContextMenuInteraction, amateras: Amateras) 
         let player = await amateras.players.fetch(interaction.targetId);
         player.sendInfo(interaction, true)
     } else {
-        cmd.err('interaction.guild is not defined.')
+        console.error('interaction.guild is not defined.')
     }
 }

@@ -59,7 +59,7 @@ function v_set_folder_button(interact, amateras, options) {
             if (!guild)
                 return console.error('guild is ' + guild);
             const channel = interact.channel;
-            const lobby = yield guild.lobbies.fetchByCategory(channel.parent.id);
+            const lobby = yield guild.lobby.fetchByCategory(channel.parent.id);
             if (interact.customId === '#v_set_default_folder')
                 set = yield player.v.imageFolders.setDefault(interact2.values[0]);
             if (interact.customId === '#v_set_once_folder') {

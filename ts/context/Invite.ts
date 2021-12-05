@@ -5,11 +5,11 @@ export default async function Invite(interact: ContextMenuInteraction, amateras:
     if (!interact.guild) return
     const _guild = amateras.guilds.cache.get(interact.guild.id)
     if (!_guild) return
-    if (!_guild.lobbies) {
+    if (!_guild.lobby) {
         return
     }
 
-    const lobby = await _guild.lobbies.fetch(interact.user.id)
+    const lobby = await _guild.lobby.fetch(interact.user.id)
     if (lobby && lobby.state === 'OPEN') {
         if (lobby.member.has(interact.targetId)) {
             lobby.removeMember(interact.targetId)

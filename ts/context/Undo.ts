@@ -1,6 +1,5 @@
 import { ContextMenuInteraction } from 'discord.js';
 import Amateras from '../lib/Amateras';
-import { cmd } from '../lib/terminal';
 
 export default execute
 async function execute(interaction: ContextMenuInteraction, amateras: Amateras) {
@@ -21,6 +20,6 @@ async function execute(interaction: ContextMenuInteraction, amateras: Amateras) 
             interaction.reply({content: '你无法撤销此讯息。', ephemeral: true})
         }
     } else {
-        cmd.err('interaction.guild is not defined. Undo.js => execute()')
+        console.error('interaction.guild is not defined. Undo.js => execute()')
     }
 }

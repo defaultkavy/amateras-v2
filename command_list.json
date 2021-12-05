@@ -334,6 +334,65 @@
             ]
         },
         {
+            "name": "waifu",
+            "description": "角色指令",
+            "options": [
+                {
+                    "name": "create",
+                    "description": "申请创建角色",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "name",
+                            "description": "角色名称",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "info",
+                            "description": "角色介绍",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "url",
+                            "description": "输入角色资料的链接（如：萌娘百科、角色个人主页）",
+                            "type": 3,
+                            "required": true
+                        },
+                        {
+                            "name": "age",
+                            "description": "输入角色的年龄",
+                            "type": 4,
+                            "required": true
+                        },
+                        {
+                            "name": "gender",
+                            "description": "选择角色性别",
+                            "type": 3,
+                            "required": true,
+                            "choices": [
+                                {
+                                    "name": "女",
+                                    "value": "Female"
+                                },
+                                {
+                                    "name": "男",
+                                    "value": "Male"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "avatar",
+                            "description": "输入角色图片的链接",
+                            "type": 3,
+                            "required": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "reward",
             "description": "查看你的奖励详情"
         },
@@ -403,34 +462,54 @@
                     ]
                 },
                 {
-                    "name": "setup",
-                    "description": "天照设定",
+                    "name": "forum",
+                    "description": "将此频道开启论坛模式",
                     "type": 2,
                     "options": [
                         {
-                            "name": "lobby",
-                            "description": "房间设定",
-                            "type": 1,
-                            "options": [
-                                {
-                                    "name": "channel",
-                                    "description": "选择频道",
-                                    "type": 7,
-                                    "required": true
-                                }
-                            ]
+                            "name": "setup",
+                            "description": "设定频道为论坛频道",
+                            "type": 1
+                        },
+                        {
+                            "name": "unset",
+                            "description": "将此频道关闭论坛模式",
+                            "type": 1
                         }
                     ]
                 },
                 {
-                    "name": "unset",
-                    "description": "天照设定",
+                    "name": "lobby",
+                    "description": "房间系统设定",
                     "type": 2,
                     "options": [
                         {
-                            "name": "lobby",
-                            "description": "房间设定",
+                            "name": "setup",
+                            "description": "设定频道为房间大厅频道",
                             "type": 1
+                        },
+                        {
+                            "name": "unset",
+                            "description": "关闭房间系统",
+                            "type": 1
+                        },
+                        {
+                            "name": "permission",
+                            "description": "查看/设定创建房间的权限",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "role",
+                                    "description": "身份组选择",
+                                    "type": 8,
+                                    "required": true
+                                },
+                                {
+                                    "name": "switch",
+                                    "description": "权限开关",
+                                    "type": 5
+                                }
+                            ]
                         }
                     ]
                 },
@@ -466,6 +545,52 @@
                             ]
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "name": "lobby",
+            "description": "房间选项",
+            "options": [
+                {
+                    "name": "create",
+                    "description": "创建你的房间（仅限中文V）",
+                    "type": 1
+                },
+                {
+                    "name": "close",
+                    "description": "关闭你的房间（此请求将会关闭你的房间，房间成员也将会解散）",
+                    "type": 1
+                },
+                {
+                    "name": "invite",
+                    "description": "邀请玩家加入你的房间（快捷输入/invite）",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "user",
+                            "description": "邀请对象",
+                            "type": 6,
+                            "required": true
+                        }
+                    ]
+                },
+                {
+                    "name": "exit",
+                    "description": "退出当前房间（退出后需要房主重新邀请才能进入）",
+                    "type": 1
+                }
+            ]
+        },
+        {
+            "name": "invite",
+            "description": "邀请玩家加入你的房间",
+            "options": [
+                {
+                    "name": "user",
+                    "description": "邀请对象",
+                    "type": 6,
+                    "required": true
                 }
             ]
         },

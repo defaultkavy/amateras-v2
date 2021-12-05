@@ -2,7 +2,7 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Player } from "./Player";
-import { cloneObj, cmd, idGenerator, removeArrayItem } from "./terminal";
+import { cloneObj, idGenerator, removeArrayItem } from "./terminal";
 
 export class Mission {
     #amateras: Amateras;

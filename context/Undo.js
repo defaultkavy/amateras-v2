@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const terminal_1 = require("../lib/terminal");
 exports.default = execute;
 function execute(interaction, amateras) {
     var _a, _b;
@@ -34,7 +33,7 @@ function execute(interaction, amateras) {
             }
         }
         else {
-            terminal_1.cmd.err('interaction.guild is not defined. Undo.js => execute()');
+            console.error('interaction.guild is not defined. Undo.js => execute()');
         }
     });
 }

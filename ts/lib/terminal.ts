@@ -8,41 +8,6 @@ export function emoji(name: string, amateras: Amateras): GuildEmoji | undefined 
     return amateras.client.emojis.cache.find(emoji => emoji.name === name)
 }
 
-export class cmd implements CMD {
-    /**
-     * Show debug message on terminal.
-     * Example: DEBUG Your message
-     * @param {string} content The message you want to show on terminal.
-     */
-    static debug(content: string) {
-        console.log('DEBUG', content)
-    }
-    /**
-     * Show log message on terminal.
-     * Example: LOG Your message
-     * @param {string} content The message you want to show on terminal.
-     */
-    static log(content: string) {
-        console.log('LOG', content)
-    }
-    /**
-     * Show system message on terminal.
-     * Example: Your message
-     * @param {string} content The message you want to show on terminal.
-     */
-    static sys(content: string) {
-        console.log(content)
-    }
-    /**
-     * Show error message on terminal.
-     * Example: ERR Your message
-     * @param {string} content The message you want to show on terminal.
-     */
-     static err(content: string) {
-        console.log(false, content)
-    }
-}
-
 export function cloneObj(obj: any, keys?: string[]) {
     let result: any = {};
     for (const i in obj) {
@@ -111,4 +76,22 @@ export function checkImage(image_url: string) {
     console.log(http.status)
     if (http.status !== 200) return false;
     return true
+}
+
+export function wordCounter(txt: string, max: number) {
+    let wordsCount = 0
+    let result = ''
+    for (const char of txt) {
+        if (char.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/)) {
+            wordsCount += 2
+        } else {
+            wordsCount += 1
+        }
+        if (wordsCount > max) {
+            return result + "..."
+        } else {
+            result += char
+        }
+    }
+    return result
 }

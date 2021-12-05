@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const terminal_1 = require("../lib/terminal");
 exports.default = execute;
 function execute(interaction, amateras) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         const options = interaction.options.data;
+        const _guild = amateras.guilds.cache.get(interaction.guild.id);
         const moder = (_a = interaction.guild) === null || _a === void 0 ? void 0 : _a.members.cache.get(interaction.user.id);
         switch (options[0].name) {
             case 'player':
@@ -66,7 +66,7 @@ function execute(interaction, amateras) {
                                         if (ssubcmd.value && typeof ssubcmd.value === 'string') {
                                             const fetch = yield amateras.wallets.fetch((yield amateras.players.fetch(ssubcmd.value)).wallets[0].id);
                                             if (!fetch) {
-                                                terminal_1.cmd.err(`Wallet not exist. (mod.js)`);
+                                                console.error(`Wallet not exist. `);
                                                 interaction.reply({ content: '命令无法使用：Wallet 不存在。', ephemeral: true });
                                                 return;
                                             }
@@ -101,47 +101,96 @@ function execute(interaction, amateras) {
                     }
                 }
                 break;
-            case 'setup':
+            case 'lobby':
                 if (!options[0].options)
+                    return;
+                const lobbyChannel = interaction.channel;
+                if (!_guild)
                     return;
                 for (const subcmd1 of options[0].options) {
                     switch (subcmd1.name) {
-                        case 'lobby':
-                            if (!subcmd1.options)
-                                return;
-                            let channelId = '';
-                            for (const subcmd2 of subcmd1.options) {
-                                switch (subcmd2.name) {
-                                    case 'channel':
-                                        if (typeof subcmd2.value === 'string') {
-                                            channelId = subcmd2.value;
-                                        }
-                                        break;
-                                }
-                            }
-                            const channel = yield interaction.guild.channels.fetch(channelId);
-                            if (channel && channel.type === 'GUILD_TEXT') {
-                                const _guild = amateras.guilds.cache.get(interaction.guild.id);
-                                if (_guild)
-                                    _guild.setupLobbyManager(channel);
+                        case 'setup':
+                            if (lobbyChannel && lobbyChannel.type === 'GUILD_TEXT') {
+                                _guild.setupLobbyManager(lobbyChannel);
+                                interaction.reply({ content: '房间频道设定完成', ephemeral: true });
                             }
                             else {
                                 interaction.reply({ content: '错误：必须是文字频道', ephemeral: true });
                             }
                             break;
+                        case 'unset':
+                            if ((yield _guild.closeLobbyManager()) === 100) {
+                                interaction.reply({ content: '房间系统已关闭', ephemeral: true });
+                            }
+                            else {
+                                interaction.reply({ content: '错误：房间系统未开启', ephemeral: true });
+                            }
+                            break;
+                        case 'permission':
+                            if (!subcmd1.options)
+                                return;
+                            if (!(_guild === null || _guild === void 0 ? void 0 : _guild.lobby))
+                                return;
+                            let role = '';
+                            let boolean = null;
+                            for (const subcmd2 of subcmd1.options) {
+                                switch (subcmd2.name) {
+                                    case 'role':
+                                        role = subcmd2.value;
+                                        break;
+                                    case 'switch':
+                                        boolean = subcmd2.value;
+                                        break;
+                                }
+                            }
+                            if (boolean === null) {
+                                interaction.reply({ content: `${_guild.get.roles.cache.get(role)}创建房间权限：${(_guild === null || _guild === void 0 ? void 0 : _guild.lobby.permissions.includes(role)) ? '开' : '关'}`, ephemeral: true });
+                            }
+                            else if (boolean === true) {
+                                yield (_guild === null || _guild === void 0 ? void 0 : _guild.lobby.permissionAdd(role));
+                                interaction.reply({ content: `${_guild.get.roles.cache.get(role)}开启创建房间权限`, ephemeral: true });
+                            }
+                            else if (boolean === false) {
+                                yield (_guild === null || _guild === void 0 ? void 0 : _guild.lobby.permissionRemove(role));
+                                interaction.reply({ content: `${_guild.get.roles.cache.get(role)}关闭创建房间权限`, ephemeral: true });
+                            }
+                            break;
                     }
                 }
                 break;
-            case 'unset':
+            case 'forum':
                 if (!options[0].options)
+                    return;
+                const forumChannel = interaction.channel;
+                if (!_guild)
                     return;
                 for (const subcmd1 of options[0].options) {
                     switch (subcmd1.name) {
-                        case 'lobby':
-                            const _guild = amateras.guilds.cache.get(interaction.guild.id);
-                            if (_guild)
-                                yield _guild.closeLobbyManager();
-                            interaction.reply({ content: '设定完成', ephemeral: true });
+                        case 'setup':
+                            if (forumChannel && forumChannel.type === 'GUILD_TEXT') {
+                                if ((yield ((_d = _guild.forums) === null || _d === void 0 ? void 0 : _d.create(forumChannel))) === 101) {
+                                    interaction.reply({ content: '错误：此频道论坛模式未关闭', ephemeral: true });
+                                }
+                                else {
+                                    interaction.reply({ content: '论坛模式已开启', ephemeral: true });
+                                }
+                            }
+                            else {
+                                interaction.reply({ content: '错误：必须是文字频道', ephemeral: true });
+                            }
+                            break;
+                        case 'unset':
+                            if (forumChannel && forumChannel.type === 'GUILD_TEXT') {
+                                if ((yield ((_e = _guild.forums) === null || _e === void 0 ? void 0 : _e.closeForum(forumChannel))) === 101) {
+                                    interaction.reply({ content: '错误：此频道论坛模式未开启', ephemeral: true });
+                                }
+                                else {
+                                    interaction.reply({ content: '论坛模式已关闭', ephemeral: true });
+                                }
+                            }
+                            else {
+                                interaction.reply({ content: '错误：必须是文字频道', ephemeral: true });
+                            }
                             break;
                     }
                 }

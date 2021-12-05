@@ -2,7 +2,7 @@ import { BaseGuildTextChannel, ButtonInteraction, CategoryChannel, Channel, Guil
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Lobby } from "./Lobby";
-import { cloneObj } from "./terminal";
+import { cloneObj, removeArrayItem } from "./terminal";
 import { _Channel } from "./_Channel";
 import { _Guild } from "./_Guild";
 
@@ -10,24 +10,26 @@ export class LobbyManager {
     #amateras: Amateras;
     #collection: Collection;
     #_guild: _Guild;
-    #lobby: string[];
+    #lobbies: string[];
     #channel: string;
     channel: TextChannel;
     cache: Map<string, Lobby>
     #message?: string;
     message?: Message;
     #resolve: Map<string, Lobby>
+    permissions: string[]
     constructor(data: LobbyManagerData, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('lobbies')
         this.#_guild = _guild
         this.#channel = data.channel
         this.channel = <TextChannel>{}
-        this.#lobby = data.lobby
+        this.#lobbies = data.lobbies
         this.cache = new Map
         this.#message = data.message
         this.message
         this.#resolve = new Map
+        this.permissions = data.permissions ? data.permissions : []
     }
 
     async init() {
@@ -44,8 +46,8 @@ export class LobbyManager {
             return
         }
         this.channel = <TextChannel>channel
-        if (this.#lobby && this.#lobby.length !== 0) {
-            for (const lobbyId of this.#lobby) {
+        if (this.#lobbies && this.#lobbies.length !== 0) {
+            for (const lobbyId of this.#lobbies) {
                 const lobbyData = <LobbyData>await this.#collection.findOne({owner: lobbyId, state: "OPEN"})
                 if (lobbyData) {
                     const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
@@ -108,10 +110,17 @@ export class LobbyManager {
         return 
     }
 
-    async create(interact: ButtonInteraction) {
-        const member = await this.#_guild.get.members.fetch(interact.user.id)
+    async create(id: string) {
+        const member = await this.#_guild.get.members.fetch(id)
+        for (let i = 0; i < this.permissions.length; i++) {
+            if (member.roles.cache.has(this.permissions[i])) {
+                break;
+            } else if (i === this.permissions.length - 1) {
+                return 101
+            }
+        }
         const ownerPermission: OverwriteResolvable = {
-            id: interact.user.id,
+            id: id,
             allow: 'VIEW_CHANNEL'
         }
         const otherPermission: OverwriteResolvable = {
@@ -135,7 +144,7 @@ export class LobbyManager {
         textChannel.lockPermissions()
         voiceChannel.lockPermissions()
         const data: LobbyData = {
-            owner: interact.user.id,
+            owner: id,
             member: [],
             vFolder: {},
             categoryChannel: category.id,
@@ -149,15 +158,19 @@ export class LobbyManager {
         const lobby = new Lobby(data, this.#_guild, this, this.#amateras)
         this.cache.set(data.owner, lobby)
         await lobby.init()
+        await lobby.save()
         await this.#_guild.save()
         await this.updateInitMessage()
+        lobby.textChannel.send({content: `${member}创建了房间`})
         if (lobby.owner.v) lobby.owner.v.sendInfoLobby(lobby)
+
+        return lobby
     }
 
     toData() {
         const data = cloneObj(this, ['cache'])
         data.channel = this.#channel
-        data.lobby = Array.from(this.cache.keys())
+        data.lobbies = Array.from(this.cache.keys())
         data.message = this.#message
         return data
     }
@@ -202,5 +215,16 @@ export class LobbyManager {
             ]
         }
         return embed
+    }
+
+    async permissionAdd(id: string) {
+        if (this.permissions.includes(id)) return
+        this.permissions.push(id)
+        await this.#_guild.save()
+    }
+
+    async permissionRemove(id: string) {
+        this.permissions = removeArrayItem(this.permissions, id)
+        await this.#_guild.save()
     }
 }

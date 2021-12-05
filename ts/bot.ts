@@ -5,7 +5,8 @@ import { Db, MongoClient } from 'mongodb';
 
 // AMATERAS Library
 import Amateras from './lib/Amateras';
-import { cmd, idGenerator } from './lib/terminal'
+import cmd from './lib/cmd';
+import color from './lib/cmd';
 // Client config
 let config = require('./bot_config.json')
 // Create Bot Client
@@ -15,26 +16,28 @@ const client = new Client({
     partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
 // Database Client
-const mongo = new MongoClient('mongodb://localhost:27017/', {auth: {username: config.db.user, password: config.db.pwd}})
+const mongo = new MongoClient('mongodb://isekai.live:27017/', {auth: {username: config.db.user, password: config.db.pwd}})
 let db: Db
 // Connect to DB
 databaseInit(init)
 async function databaseInit(callback: () => void) {
-    cmd.sys('Connecting to MongoDB...')
+    console.log(cmd.Cyan, 'Connecting to MongoDB...')
+    console.time('| MongoDB Connected')
     await mongo.connect()
-    cmd.sys('MongoDB Connected')
+    console.timeEnd('| MongoDB Connected')
     db = mongo.db('Amateras')
     callback()
 }
 
 async function init() {
     // Create Bot info object
-    cmd.sys('Amateras Starting up...')
+    console.log(cmd.Cyan, 'Connecting to Discord...')
+    console.time('| Connected')
     // Client login with token, edit token from bot_config.json
     client.login(config.bot.token);
     // Client Ready
     client.once('ready', async () => {
-        cmd.sys('Ready');
+        console.timeEnd('| Connected');
         const { commands, global_commands } = require('./command_list.json')
         const amateras = new Amateras(client, {db: db, commands: commands, globalCommands: global_commands})
         await amateras.init()

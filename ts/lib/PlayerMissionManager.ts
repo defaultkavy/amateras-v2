@@ -2,7 +2,7 @@ import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Mission } from "./Mission";
 import { Player } from "./Player";
-import { cloneObj, cmd, removeArrayItem } from "./terminal";
+import { removeArrayItem } from "./terminal";
 
 export class PlayerMissionManager {
     #amateras: Amateras

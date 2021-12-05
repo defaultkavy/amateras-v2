@@ -18,7 +18,7 @@ const discord_js_1 = require("discord.js");
 const mongodb_1 = require("mongodb");
 // AMATERAS Library
 const Amateras_1 = __importDefault(require("./lib/Amateras"));
-const terminal_1 = require("./lib/terminal");
+const cmd_1 = __importDefault(require("./lib/cmd"));
 // Client config
 let config = require('./bot_config.json');
 // Create Bot Client
@@ -28,15 +28,16 @@ const client = new discord_js_1.Client({
     partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
 // Database Client
-const mongo = new mongodb_1.MongoClient('mongodb://localhost:27017/', { auth: { username: config.db.user, password: config.db.pwd } });
+const mongo = new mongodb_1.MongoClient('mongodb://isekai.live:27017/', { auth: { username: config.db.user, password: config.db.pwd } });
 let db;
 // Connect to DB
 databaseInit(init);
 function databaseInit(callback) {
     return __awaiter(this, void 0, void 0, function* () {
-        terminal_1.cmd.sys('Connecting to MongoDB...');
+        console.log(cmd_1.default.Cyan, 'Connecting to MongoDB...');
+        console.time('| MongoDB Connected');
         yield mongo.connect();
-        terminal_1.cmd.sys('MongoDB Connected');
+        console.timeEnd('| MongoDB Connected');
         db = mongo.db('Amateras');
         callback();
     });
@@ -44,12 +45,13 @@ function databaseInit(callback) {
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         // Create Bot info object
-        terminal_1.cmd.sys('Amateras Starting up...');
+        console.log(cmd_1.default.Cyan, 'Connecting to Discord...');
+        console.time('| Connected');
         // Client login with token, edit token from bot_config.json
         client.login(config.bot.token);
         // Client Ready
         client.once('ready', () => __awaiter(this, void 0, void 0, function* () {
-            terminal_1.cmd.sys('Ready');
+            console.timeEnd('| Connected');
             const { commands, global_commands } = require('./command_list.json');
             const amateras = new Amateras_1.default(client, { db: db, commands: commands, globalCommands: global_commands });
             yield amateras.init();

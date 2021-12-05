@@ -158,13 +158,21 @@ interface MissionDateData {
 
 interface _GuildData {
     id: string;
-    channels: _ChannelManagerData | undefined;
-    lobbies?: LobbyManagerData
+    // channels: _ChannelManagerData | undefined;
+    lobby?: LobbyManagerData;
+    forums?: ForumManagerData;
+}
+
+interface ForumManagerData {
+    forums: string[];
+}
+
+interface ForumData {
+    id: string;
+    state: "OPEN" | "CLOSED"
 }
 
 interface _ChannelManagerData {
-    settings?: _ChannelData
-    notify?: _ChannelData
     lobby?: string[]
 }
 
@@ -174,8 +182,9 @@ interface _ChannelData {
 
 interface LobbyManagerData {
     channel: string;
-    lobby: string[];
+    lobbies: string[];
     message?: string;
+    permissions: string[]
 }
 
 interface LobbyData {
@@ -239,4 +248,18 @@ interface TransactionObj {
 interface TransactionData extends TransactionObj {
     id: string;
     date: Date;
+}
+
+interface _CharacterObj {
+    name: string;
+    description: string;
+    url: string;
+    avatar?: string;
+    gender: 'Male' | 'Female';
+    age: number;
+}
+
+interface _CharacterData extends _CharacterObj {
+    id: string;
+    
 }

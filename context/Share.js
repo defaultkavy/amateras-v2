@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const terminal_1 = require("../lib/terminal");
 exports.default = execute;
 function execute(interaction, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -22,7 +21,7 @@ function execute(interaction, amateras) {
             player.sendInfo(interaction, true);
         }
         else {
-            terminal_1.cmd.err('interaction.guild is not defined.');
+            console.error('interaction.guild is not defined.');
         }
     });
 }

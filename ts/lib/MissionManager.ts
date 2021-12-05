@@ -2,7 +2,7 @@ import { CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageB
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Mission } from "./Mission";
-import { cloneObj, cmd } from "./terminal";
+import { cloneObj } from "./terminal";
 
 export default class MissionManager {
     #amateras: Amateras

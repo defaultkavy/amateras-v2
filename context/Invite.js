@@ -16,10 +16,10 @@ function Invite(interact, amateras) {
         const _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
-        if (!_guild.lobbies) {
+        if (!_guild.lobby) {
             return;
         }
-        const lobby = yield _guild.lobbies.fetch(interact.user.id);
+        const lobby = yield _guild.lobby.fetch(interact.user.id);
         if (lobby && lobby.state === 'OPEN') {
             if (lobby.member.has(interact.targetId)) {
                 lobby.removeMember(interact.targetId);

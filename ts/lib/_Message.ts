@@ -1,7 +1,7 @@
 import { BaseGuildTextChannel, Channel, DMChannel, Guild, Message, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
-import { cloneObj, cmd } from "./terminal";
+import { cloneObj } from "./terminal";
 
 export class _Message {
     #amateras: Amateras

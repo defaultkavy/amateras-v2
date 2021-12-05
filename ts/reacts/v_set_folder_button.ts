@@ -46,7 +46,7 @@ export default async function v_set_folder_button(interact: ButtonInteraction, a
         const guild = amateras.guilds.cache.get(interact.guild!.id)
         if (!guild) return console.error('guild is ' + guild)
         const channel = <GuildChannel>interact.channel
-        const lobby = await guild.lobbies!.fetchByCategory(channel.parent!.id)
+        const lobby = await guild.lobby!.fetchByCategory(channel.parent!.id)
         if (interact.customId === '#v_set_default_folder') set = await player.v!.imageFolders.setDefault(interact2.values[0])
         if (interact.customId === '#v_set_once_folder') {
             if (!lobby) return console.error('lobby is ' + lobby)

@@ -1,6 +1,5 @@
 import { ColorResolvable, CommandInteraction, MessageEmbedOptions } from 'discord.js';
 import Amateras from '../lib/Amateras';
-import { cmd } from '../lib/terminal';
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {
@@ -68,7 +67,7 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                     player.sendInfo(interaction, share)
                 }
             } else {
-                cmd.err('interaction.guild is not defined. player.js => execute()')
+                console.error('interaction.guild is not defined. player.js => execute()')
             }
             break;
         

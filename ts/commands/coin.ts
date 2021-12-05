@@ -1,6 +1,5 @@
 import { CommandInteraction } from 'discord.js';
 import Amateras from '../lib/Amateras';
-import { cmd } from '../lib/terminal';
 import Wallet from '../lib/Wallet';
 
 export default execute

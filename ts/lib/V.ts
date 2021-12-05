@@ -139,7 +139,6 @@ export class V {
         const action = new MessageActionRow()
         const action2 = new MessageActionRow()
         let comp: MessageActionRow[] = []
-        console.debug(folder, image)
         if (folder && image) {
             if (!share || inLobby) {
                 const set_default_button = new MessageButton()
@@ -204,7 +203,6 @@ export class V {
         if (image) {
             embed.setImage(image.url)
             if (folder) {
-                console.debug(folder.toArray().indexOf(image) + 1)
                 embed.addField(`${folder.name ? folder.name : '未命名'}`, `${ folder.toArray().indexOf(image) + 1 } / ${ folder.toArray().length }`, true)
             }
         }

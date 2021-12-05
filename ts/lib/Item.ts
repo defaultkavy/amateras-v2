@@ -2,7 +2,7 @@ import { CommandInteraction, Message, MessageEmbed, MessageEmbedOptions } from "
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Player } from "./Player";
-import { checkImage, cloneObj, cmd, idGenerator, validURL } from "./terminal";
+import { checkImage, cloneObj, idGenerator, validURL } from "./terminal";
 
 export class Item {
     #amateras: Amateras;

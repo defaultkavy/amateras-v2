@@ -1,7 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import Amateras from "../lib/Amateras";
 import { Mission } from "../lib/Mission";
-import { cmd, missionInfoEmbed } from "../lib/terminal";
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {

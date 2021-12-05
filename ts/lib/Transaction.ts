@@ -1,6 +1,6 @@
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
-import { cloneObj, cmd, idGenerator } from "./terminal";
+import { cloneObj, idGenerator } from "./terminal";
 import Wallet from "./Wallet";
 
 export default class Transaction {

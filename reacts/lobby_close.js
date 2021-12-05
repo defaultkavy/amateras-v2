@@ -16,7 +16,7 @@ function lobby_close(interact, amateras) {
         const _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return console.error('_guild is' + _guild);
-        const lobby = yield _guild.lobbies.fetch(interact.user.id);
+        const lobby = yield _guild.lobby.fetch(interact.user.id);
         if (lobby) {
             yield lobby.close();
             interact.reply({ content: '房间已关闭~', ephemeral: true });

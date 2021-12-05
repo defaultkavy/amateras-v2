@@ -95,7 +95,6 @@ export class Lobby {
                 this.messages.set(v, _message)
             }
         }
-        await this.save()
         return true
     }
 
@@ -139,6 +138,8 @@ export class Lobby {
         this.member.set(player.id, player)
         this.#member.push(id)
         player.joinLobby(this)
+        const member = await this.textChannel.guild.members.fetch(id)
+        this.textChannel.send({content: `${member}加入了房间`})
         if (player.v) await player.v.sendInfoLobby(this)
         this.categoryChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
         await this.save()
@@ -155,6 +156,7 @@ export class Lobby {
         this.#member = removeArrayItem(this.#member, id)
         this.categoryChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
         this.deleteMessage(id)
+        this.textChannel.send({content: `${member}退出了房间`})
         await this.save()
     }
 

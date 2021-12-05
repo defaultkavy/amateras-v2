@@ -1,5 +1,5 @@
 import { commandBuilder } from "./commandsBuilder";
-import { Client, Message, MessageFlags } from 'discord.js';
+import { Client, MessageFlags } from 'discord.js';
 import fs from 'fs';
 import { Db } from "mongodb";
 import { PlayerManager } from "./PlayerManager";
@@ -11,6 +11,8 @@ import { _GuildManager } from "./_GuildManager";
 import { ItemManager } from "./ItemManager";
 import { RewardManager } from "./RewardManager";
 import { TransactionManager } from "./TransactionManager";
+import { _CharacterManager } from "./_CharacterManager";
+import cmd from "./cmd";
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {
@@ -28,6 +30,7 @@ export default class Amateras {
     me: Player;
     rewards: RewardManager;
     transactions: TransactionManager;
+    characters: _CharacterManager;
     constructor(client: Client, options: { db: Db, commands?: Command[], globalCommands: Command[] }) {
         this.client = client;
         this.id = client.user!.id;
@@ -43,16 +46,23 @@ export default class Amateras {
         this.guilds = new _GuildManager(this)
         this.rewards = new RewardManager(this)
         this.transactions = new TransactionManager(this)
+        this.characters = new _CharacterManager(this)
     }
 
     async init() {
+        console.log(cmd.Cyan, 'Command Deploying...')
+        console.time('| Command Deployed')
         await this.setCommands()
+        console.timeEnd('| Command Deployed')
+        console.log(cmd.Cyan, 'Amateras System Initializing...')
+        console.time('| System Initialized')
         await this.guilds.init()
+        console.timeEnd('| System Initialized')
         this.interactionCreate();
-        this.messageCreate()
-        this.messageReactionAdd()
+        this.eventHandler()
         this.setTimer()
         this.me = await this.players.fetch(this.id)
+        console.log(cmd.Yellow, 'Amateras Ready.')
     }
 
     async setCommands(): Promise<void> {
@@ -205,34 +215,17 @@ export default class Amateras {
         })
     }
 
-    private messageCreate() {
-        this.client.on('messageCreate', async (message: Message) => {
-            //console.log(true, `message received: ${message.author.username} - ${message.content}`)
-            if (!message.guild || message.system) return
-            const player = await this.players.fetch(message.author.id)
-            const reward = player.rewards.get('message')
-            if (reward) reward.add()
-            if (message.type === 'REPLY') {
-                const repliedMessage = await message.channel.messages.fetch(message.reference!.messageId!)
-                if (message.author.id === repliedMessage.author.id) return
-                const repliedPlayer = await this.players.fetch(repliedMessage.author.id)
-                const repliedReward = repliedPlayer.rewards.get('replied')
-                if (repliedReward) repliedReward.add()
-            }
-        })
-    }
+    private eventHandler() {
+        const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
-    private messageReactionAdd() {
-        this.client.on('messageReactionAdd', async (reaction, user) => {
-            await reaction.message.fetch()
-            if (!reaction.message.guild || !reaction.message.author || user.bot) return
-            const reactedPlayer = await this.players.fetch(reaction.message.author.id)
-            const reactPlayer = await this.players.fetch(user.id)
-            const reward = reactedPlayer.rewards.get('reacted')
-            const reward2 = reactPlayer.rewards.get('react')
-            if (reward) reward.add()
-            if (reward2) reward2.add()
-        })
+        for (const file of eventFiles) {
+            const event = require(`../events/${file}`);
+            if (event.once) {
+                this.client.once(event.name, (...args) => event.execute(...args, this));
+            } else {
+                this.client.on(event.name, (...args) => event.execute(...args, this));
+            }
+        }
     }
 
     private setTimer() {

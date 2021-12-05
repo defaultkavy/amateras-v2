@@ -1,7 +1,6 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import Amateras from './Amateras';
-import { cmd } from './terminal';
 
 export async function commandBuilder(amateras: Amateras) {
     const rest = new REST({ version: '9' }).setToken(amateras.client.token!);
@@ -14,7 +13,6 @@ export async function commandBuilder(amateras: Amateras) {
             );
         }
 
-        cmd.sys('Deploy commands Success')
     } catch(err) {
         console.error(err);
     }
@@ -29,7 +27,6 @@ export async function commandGlobalBuilder(amateras: Amateras) {
             { body: [] },
         );
 
-        cmd.sys('Deploy global commands Success')
     } catch(err) {
         console.error(err);
     }

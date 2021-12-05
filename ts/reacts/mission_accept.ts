@@ -1,6 +1,5 @@
 import { ButtonInteraction } from "discord.js";
 import Amateras from "../lib/Amateras";
-import { cmd } from "../lib/terminal";
 
 export default async function mission_accept(interaction: ButtonInteraction, amateras: Amateras) {
     const player = await amateras.players.fetch(interaction.user.id)

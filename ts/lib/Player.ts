@@ -4,7 +4,7 @@ import { Gender } from "./layout";
 import { Lobby } from "./Lobby";
 import { PlayerMissionManager } from "./PlayerMissionManager";
 import { Reward } from "./Reward";
-import { cloneObj, cmd, removeArrayItem } from "./terminal";
+import { cloneObj, removeArrayItem } from "./terminal";
 import { V } from "./V";
 import Wallet from "./Wallet";
 
@@ -145,7 +145,7 @@ export class Player {
             await this.save()
         } else {
             if (!Array.isArray(this.#walletsId)) {
-                cmd.log(`this.#walletsId: ${this.#walletsId}`)
+                console.log(`this.#walletsId: ${this.#walletsId}`)
                 return []
             }
             for (const walletId of this.#walletsId) {

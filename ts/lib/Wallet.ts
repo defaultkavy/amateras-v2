@@ -39,6 +39,7 @@ export default class Wallet {
         receiverWallet.balance += amount;
         await receiverWallet.save()
         const transaction = await this.#amateras.transactions.create({sender: this.id, receiver: receiver, amount: amount, note: note, devote: devote})
+        await transaction.save()
         console.log(`${this.id} transfer ${amount}G to ${receiver}`)
         return {status:{ success: true, message: `Transfer success.`}, transaction: transaction}
     }

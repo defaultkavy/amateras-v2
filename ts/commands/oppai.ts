@@ -8,7 +8,7 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
         return
     }
     const player = await amateras.players.fetch(interaction.user.id)
-    await interaction.reply(interaction.user.id === interaction.guild?.ownerId
+    await interaction.reply(interaction.user.id === '318714557105307648'
         ? '💢 让你碰了吗？！' 
         : player.gender === 2
         ? '贴贴 ♥️'

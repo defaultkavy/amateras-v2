@@ -11,13 +11,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = execute;
 function execute(interaction, amateras) {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        if (interaction.user.id !== ((_a = interaction.guild) === null || _a === void 0 ? void 0 : _a.ownerId)) {
+        if (interaction.user.id !== '318714557105307648') {
             yield interaction.reply({ content: '此功能无法使用。', ephemeral: true });
             return;
         }
-        const targetMessage = yield ((_b = interaction.channel) === null || _b === void 0 ? void 0 : _b.messages.fetch(interaction.targetId));
+        const targetMessage = yield ((_a = interaction.channel) === null || _a === void 0 ? void 0 : _a.messages.fetch(interaction.targetId));
         yield (targetMessage === null || targetMessage === void 0 ? void 0 : targetMessage.reply('😡'));
         yield interaction.reply({ content: 'Sent.', ephemeral: true });
     });
