@@ -1,4 +1,4 @@
-import { CategoryChannel, Message, PermissionOverwrites, TextChannel, VoiceChannel } from "discord.js";
+import { CategoryChannel, Message, OverwriteResolvable, PermissionOverwrites, TextChannel, VoiceChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { LobbyManager } from "./LobbyManager";
@@ -55,11 +55,12 @@ export class Lobby {
     }
 
     async init() {
+        
         try {
-            this.categoryChannel = <CategoryChannel>await this.#_guild.get.channels.fetch(this.#categoryChannel)
-            this.voiceChannel = <VoiceChannel>await this.#_guild.get.channels.fetch(this.#voiceChannel)
-            this.textChannel = <TextChannel>await this.#_guild.get.channels.fetch(this.#textChannel)
-            this.infoChannel = <TextChannel>await this.#_guild.get.channels.fetch(this.#infoChannel)
+            this.categoryChannel = <CategoryChannel> this.#_guild.get.channels.cache.get(this.#categoryChannel)
+            this.voiceChannel = <VoiceChannel> this.#_guild.get.channels.cache.get(this.#voiceChannel)
+            this.textChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#textChannel)
+            this.infoChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#infoChannel)
         } catch {
             console.error(`Channel is deleted.`)
             this.state = 'CLOSED'
@@ -76,6 +77,28 @@ export class Lobby {
             this.member.set(memberId, member)
             member.joinLobby(this)
         }
+
+        this.categoryChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+            VIEW_CHANNEL: true,
+            MANAGE_CHANNELS: true
+        })
+        
+        this.infoChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+            VIEW_CHANNEL: true,
+            MANAGE_CHANNELS: false
+        })
+
+        this.textChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+            VIEW_CHANNEL: true,
+            MANAGE_CHANNELS: false
+        })
+        
+        this.voiceChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+            VIEW_CHANNEL: true,
+            MANAGE_CHANNELS: false
+        })
+
+        //VImage
         if (this.#vFolder && Object.entries(this.#vFolder).length !== 0) {
             for (const folderOwner in this.#vFolder) {
                 const player = this.member.get(folderOwner)
@@ -125,6 +148,11 @@ export class Lobby {
             if (!this.textChannel.deleted) await this.textChannel.delete()
             if (!this.voiceChannel.deleted) await this.voiceChannel.delete()
             if (!this.infoChannel.deleted) await this.infoChannel.delete()
+            if (this.categoryChannel.children.size !== 0) {
+                for (const channel of this.categoryChannel.children.entries()) {
+                    if (!channel[1].deleted) await channel[1].delete()
+                }
+            }
             if (!this.categoryChannel.deleted) await this.categoryChannel.delete()
         } catch { }
         this.state = 'CLOSED'
