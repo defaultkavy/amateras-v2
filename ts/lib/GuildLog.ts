@@ -22,18 +22,7 @@ export class GuildLog {
     }
 
     async init() {
-        if (this.#channelId) {
-            const channel = await this.#_guild.get.channels.fetch(this.#channelId)
-            if (channel && channel.type === 'GUILD_TEXT') {
-                this.channel = channel
-            } else channelCreate(this)
-        } else channelCreate(this)
-
-        async function channelCreate(log: GuildLog) {
-            log.channel = await log.create()
-            log.#channelId = log.channel.id
-        }
-
+        await this.fetchChannel()
         await this.fetchMessage()
     }
 
@@ -48,12 +37,10 @@ export class GuildLog {
     }
 
     async send(content: string) {
+        await this.fetchChannel()
         const fetch = await this.fetchMessage()
         if (fetch === 101 || fetch === 404) {
             await this.newMessage()
-        }
-        if (this.channel.deleted) {
-            await this.init()
         }
         const date = new Date
         const time = `# ${date.toLocaleString('en-ZA')}\n`
@@ -75,7 +62,7 @@ export class GuildLog {
         return `${user.username}(${user.id})`
     }
     
-    async newMessage() {
+    private async newMessage() {
         const format = 'py\n'
         this.message = await this.channel.send({
             content: `\`\`\`${format}${this.messageCount}\`\`\``
@@ -92,10 +79,27 @@ export class GuildLog {
                 this.#messageId = message.id
                 return message
             } catch {
-                console.error('Log message is not exist.')
                 return 404
             }
         } else return 101
+    }
+
+    private async fetchChannel() {
+        if (this.#channelId) {
+            try {
+                const channel = await this.#_guild.get.channels.fetch(this.#channelId)
+                if (channel && channel.type === 'GUILD_TEXT') {
+                    this.channel = channel
+                } else await this.channelCreate()
+            } catch {
+                await this.channelCreate()
+            }
+        } else await this.channelCreate()
+    }
+
+    private async channelCreate() {
+        this.channel = await this.create()
+        this.#channelId = this.channel.id
     }
 
     toData() {
