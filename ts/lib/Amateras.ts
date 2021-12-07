@@ -89,6 +89,11 @@ export default class Amateras {
                 appcmd.permissions.add({
                     permissions: [
                         {
+                            id: guild?.ownerId!,
+                            type: 2,
+                            permission: true
+                        },
+                        {
                             id: '744160642994274376',
                             type: 1,
                             permission: true

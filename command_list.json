@@ -545,6 +545,26 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "name": "message",
+                    "description": "讯息管理",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "delete",
+                            "description": "讯息批量删除",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "amount",
+                                    "description": "数量（不可大过100）",
+                                    "type": 4,
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         },

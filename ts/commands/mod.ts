@@ -1,4 +1,4 @@
-import { Channel, CommandInteraction } from 'discord.js';
+import { Channel, CommandInteraction, TextChannel } from 'discord.js';
 import Amateras from '../lib/Amateras';
 import { Player } from '../lib/Player';
 import Wallet from '../lib/Wallet';
@@ -208,6 +208,32 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                         const player_v = await amateras.players.fetch(userId_v)
                         await player_v.unsetVTuber()
                         interaction.reply({ content: '设定完成', ephemeral: true })
+                        
+                    break;
+                }
+            }
+        break;
+
+        case 'message':
+            if (!options[0].options) return
+            for (const subcmd1 of options[0].options) {
+                switch (subcmd1.name) {
+                    case 'delete':
+                        if (!subcmd1.options) return;
+                        let amount: number = 1
+                        for (const subcmd2 of subcmd1.options) {
+                            switch (subcmd2.name) {
+                                case 'amount':
+                                    amount = <number>subcmd2.value
+                                break;
+                            }
+                        }
+                        if (amount < 1 || amount > 100) {
+                            interaction.reply({ content: '请输入大于1且小于100的数字', ephemeral: true })
+                        } else {
+                            (<TextChannel>interaction.channel).bulkDelete(amount)
+                        }
+                        interaction.reply({ content: '已删除完毕', ephemeral: true })
                         
                     break;
                 }
