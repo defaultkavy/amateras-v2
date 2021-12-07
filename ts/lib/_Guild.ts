@@ -1,8 +1,9 @@
-import { BaseGuildTextChannel, Guild, TextChannel } from "discord.js";
+import { Guild, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { ForumManager } from "./ForumManager";
 import { LobbyManager } from "./LobbyManager";
+import { GuildLog } from "./GuildLog";
 import { cloneObj } from "./terminal";
 import { _ChannelManager } from "./_ChannelManager";
 
@@ -10,28 +11,29 @@ export class _Guild {
     #amateras: Amateras;
     #collection: Collection;
     id: string;
-    // #channels: _ChannelManagerData | undefined;
-    // channels: _ChannelManager;
     get: Guild;
-    #lobby: LobbyManagerData | undefined;
+    #log?: LogData;
+    log: GuildLog;
+    #lobby?: LobbyManagerData;
     lobby?: LobbyManager;
-    #forums: ForumManagerData | undefined;
-    forums?: ForumManager;
+    #forums?: ForumManagerData;
+    forums: ForumManager;
 
     constructor(data: _GuildData, guild: Guild, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = this.#amateras.db.collection('guilds')
         this.get = guild
         this.id = data.id
-        // this.#channels = data.channels
-        // this.channels = <_ChannelManager>{}
+        this.#log = data.log
+        this.log = <GuildLog>{}
         this.#lobby = data.lobby
         this.#forums = data.forums
+        this.forums = <ForumManager>{}
     }
 
     async init() {
-        // this.channels = new _ChannelManager(this.#channels, this.get, this, this.#amateras)
-        // await this.channels.init()
+        this.log = new GuildLog(this.#log, this, this.#amateras)
+        await this.log.init()
         if (this.#lobby) {
             this.lobby = new LobbyManager(this.#lobby, this, this.#amateras)
             console.time('| Lobby loaded')
@@ -42,14 +44,12 @@ export class _Guild {
         console.time('| Forum loaded')
         await this.forums.init()
         console.timeEnd('| Forum loaded')
+        await this.save()
     }
 
     async save() {
         const data = cloneObj(this, ['get'])
-        // data.channels = {
-        //     settings: this.channels.settings?.data,
-        //     notify: this.channels.notify?.data
-        // }
+        data.log = this.log ? this.log.toData() : undefined
         data.lobby = this.lobby ? this.lobby.toData() : undefined
         data.forums = this.forums ? this.forums.toData() : undefined
         const guild = await this.#collection.findOne({ id: this.id })

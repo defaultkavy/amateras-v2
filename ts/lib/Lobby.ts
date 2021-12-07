@@ -159,6 +159,7 @@ export class Lobby {
         await this.save()
         this.#manager.cache.delete(this.owner.id)
         await this.#manager.updateInitMessage()
+        this.#_guild.log.send(`${await this.#_guild.log.name(this.owner.id)} 关闭了房间`)
     }
 
     async addMember(id: string) {

@@ -158,7 +158,7 @@ interface MissionDateData {
 
 interface _GuildData {
     id: string;
-    // channels: _ChannelManagerData | undefined;
+    log?: LogData;
     lobby?: LobbyManagerData;
     forums?: ForumManagerData;
 }
@@ -198,6 +198,12 @@ interface LobbyData {
     state: 'OPEN' | 'CLOSED';
     guild: string;
     messages: {[keys: string]: string};
+}
+
+interface LogData {
+    channel?: string;
+    message?: string;
+    messageCount?: number;
 }
 
 interface ItemObj {

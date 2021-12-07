@@ -52,6 +52,7 @@ export class Reward {
             this.count = 0
             this.times += 1
             await this.#amateras.me.wallets[0].transfer(this.owner.wallets[0].id, this.pay, `Reward complete: ${ this.name }`, true)
+            this.#amateras.log.send(`${await this.#amateras.log.name(this.owner.id)} 获得奖励 ${this.pay}G`)
         }
         await this.save()
     }

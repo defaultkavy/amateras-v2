@@ -13,6 +13,7 @@ import { RewardManager } from "./RewardManager";
 import { TransactionManager } from "./TransactionManager";
 import { _CharacterManager } from "./_CharacterManager";
 import cmd from "./cmd";
+import { Log } from "./Log";
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {
@@ -31,6 +32,7 @@ export default class Amateras {
     rewards: RewardManager;
     transactions: TransactionManager;
     characters: _CharacterManager;
+    log: Log
     constructor(client: Client, options: { db: Db, commands?: Command[], globalCommands: Command[] }) {
         this.client = client;
         this.id = client.user!.id;
@@ -47,6 +49,7 @@ export default class Amateras {
         this.rewards = new RewardManager(this)
         this.transactions = new TransactionManager(this)
         this.characters = new _CharacterManager(this)
+        this.log = new Log(this)
     }
 
     async init() {
