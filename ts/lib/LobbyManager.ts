@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, ButtonInteraction, CategoryChannel, Channel, Guild, Message, MessageActionRow, MessageButton, MessageEmbedOptions, OverwriteResolvable, PermissionOverwrites, TextChannel } from "discord.js";
+import { Message, MessageActionRow, MessageButton, MessageEmbedOptions, OverwriteResolvable, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Lobby } from "./Lobby";
@@ -64,7 +64,6 @@ export class LobbyManager {
         }
         if (!this.message) await this.sendInitMessage()
         else await this.updateInitMessage()
-        await this.#_guild.save()
     }
 
     async setup(channel: TextChannel) {
@@ -162,6 +161,7 @@ export class LobbyManager {
         await this.#_guild.save()
         await this.updateInitMessage()
         lobby.textChannel.send({content: `${member}创建了房间`})
+        this.#_guild.log.send(`${await this.#_guild.log.name(id)} 创建了房间`)
         if (lobby.owner.v) lobby.owner.v.sendInfoLobby(lobby)
 
         return lobby
