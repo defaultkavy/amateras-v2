@@ -121,11 +121,11 @@ export class LobbyManager {
         }
         const ownerPermission: OverwriteResolvable = {
             id: id,
-            allow: 'VIEW_CHANNEL'
+            allow: ['VIEW_CHANNEL', 'MANAGE_CHANNELS']
         }
         const otherPermission: OverwriteResolvable = {
             id: this.#_guild.get.roles.everyone,
-            deny: 'VIEW_CHANNEL'
+            deny: ['VIEW_CHANNEL']
         }
         const category = await this.#_guild.get.channels.create(member.displayName + '的房间', {
             type: 'GUILD_CATEGORY',
