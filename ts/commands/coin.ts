@@ -54,7 +54,7 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                     interaction.reply({ content: `请输入有效数字。`, ephemeral: true })
                     return
                 }
-                senderWallets[0].transfer(receiverWallets[0].id, amount, `/coin give: ${message!}`, false)
+                await senderWallets[0].transfer(receiverWallets[0].id, amount, `/coin give: ${message!}`, false)
                 const members = interaction.guild?.members.cache
                 interaction.reply({ content: `${members?.get(senderWallets[0].owner.id)} 汇给 ${members?.get(receiverWallets[0].owner.id)} ${amount!}G${message! ? '\n> ' + message! : ''}`, ephemeral: false })
                 amateras.log.send(`${await amateras.log.name(senderWallets[0].owner.id)} 汇给 ${await amateras.log.name(receiverWallets[0].owner.id)} ${amount!}G${message! ? '\n> ' + message! : ''}`)

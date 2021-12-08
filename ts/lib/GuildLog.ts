@@ -50,7 +50,7 @@ export class GuildLog {
         if (resultContent.length > 2000) {
             this.messageCount += 1
             await this.newMessage()
-            resultContent = '```' + time + this.message!.content.slice(3, this.message!.content.length - 3) + `\n` + time + content + `\`\`\``
+            resultContent = '```' + this.message!.content.slice(3, this.message!.content.length - 3) + `\n` + time + content + `\`\`\``
         }
         this.message!.edit({
             content: resultContent
