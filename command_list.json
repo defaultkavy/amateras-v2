@@ -398,69 +398,9 @@
         },
         {
             "name": "mod",
-            "description": "管理",
+            "description": "伺服器管理",
             "default_permission": false,
             "options": [
-                {
-                    "name": "player",
-                    "description": "管理玩家",
-                    "type": 2,
-                    "options": [
-                        {
-                            "name": "aka",
-                            "description": "修改玩家称号",
-                            "type": 1,
-                            "required": false,
-                            "options": [
-                                {
-                                    "name": "user",
-                                    "description": "更改哪一个用户？",
-                                    "type": 6,
-                                    "required": true
-                                },
-                                {
-                                    "name": "content",
-                                    "description": "称号",
-                                    "type": 3,
-                                    "required": true
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "coin",
-                    "description": "货币管理",
-                    "type": 2,
-                    "options": [
-                        {
-                            "name": "set",
-                            "description": "修改玩家资产。",
-                            "type": 1,
-                            "required": false,
-                            "options": [
-                                {
-                                    "name": "user",
-                                    "description": "更改哪一个用户？",
-                                    "type": 6,
-                                    "required": true
-                                },
-                                {
-                                    "name": "amount",
-                                    "description": "数量",
-                                    "type": 4,
-                                    "required": true
-                                },
-                                {
-                                    "name": "reason",
-                                    "description": "修改的理由",
-                                    "type": 3,
-                                    "required": false
-                                }
-                            ]
-                        }
-                    ]
-                },
                 {
                     "name": "forum",
                     "description": "将此频道开启论坛模式",
@@ -561,6 +501,73 @@
                                     "description": "数量（不可大过100）",
                                     "type": 4,
                                     "required": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "sys",
+            "description": "系统管理",
+            "default_permission": false,
+            "options": [
+                {
+                    "name": "player",
+                    "description": "管理玩家",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "aka",
+                            "description": "修改玩家称号",
+                            "type": 1,
+                            "required": false,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "更改哪一个用户？",
+                                    "type": 6,
+                                    "required": true
+                                },
+                                {
+                                    "name": "content",
+                                    "description": "称号",
+                                    "type": 3,
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "coin",
+                    "description": "货币管理",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "set",
+                            "description": "修改玩家资产。",
+                            "type": 1,
+                            "required": false,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "更改哪一个用户？",
+                                    "type": 6,
+                                    "required": true
+                                },
+                                {
+                                    "name": "amount",
+                                    "description": "数量",
+                                    "type": 4,
+                                    "required": true
+                                },
+                                {
+                                    "name": "reason",
+                                    "description": "修改的理由",
+                                    "type": 3,
+                                    "required": false
                                 }
                             ]
                         }
