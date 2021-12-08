@@ -11,96 +11,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = execute;
 function execute(interaction, amateras) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         const options = interaction.options.data;
         const _guild = amateras.guilds.cache.get(interaction.guild.id);
         const moder = (_a = interaction.guild) === null || _a === void 0 ? void 0 : _a.members.cache.get(interaction.user.id);
         switch (options[0].name) {
-            case 'player':
-                if (options[0].options) {
-                    for (const subcmd of options[0].options) {
-                        switch (subcmd.name) {
-                            case 'aka':
-                                let player, aka, reason;
-                                for (const input of subcmd.options) {
-                                    switch (input.name) {
-                                        case 'user':
-                                            if (typeof input.value !== 'string')
-                                                return;
-                                            player = yield amateras.players.fetch(input.value);
-                                            break;
-                                        case 'content':
-                                            if (typeof input.value !== 'string')
-                                                return;
-                                            aka = input.value;
-                                            break;
-                                        case 'reason':
-                                            if (input.value && typeof input.value === 'string') {
-                                                reason = input.value;
-                                            }
-                                            break;
-                                    }
-                                }
-                                const lastAka = player.aka;
-                                player.aka = aka ? aka : null;
-                                yield player.save();
-                                const target = (_b = interaction.guild) === null || _b === void 0 ? void 0 : _b.members.cache.get(player.id);
-                                interaction.reply({ content: `${moder} 修改了 ${target} 的称号：${lastAka ? lastAka : '无'} => ${aka}${reason ? '\n> ' + reason : ''}` });
-                                break;
-                        }
-                    }
-                }
-                else {
-                    interaction.reply({ content: '请选择输入选项。', ephemeral: true });
-                }
-                break;
-            case 'coin':
-                for (const subcmd of options[0].options) {
-                    switch (subcmd.name) {
-                        case 'set':
-                            let wallet, amount, reason;
-                            for (const ssubcmd of subcmd.options) {
-                                switch (ssubcmd.name) {
-                                    case 'user':
-                                        if (ssubcmd.value && typeof ssubcmd.value === 'string') {
-                                            const fetch = yield amateras.wallets.fetch((yield amateras.players.fetch(ssubcmd.value)).wallets[0].id);
-                                            if (!fetch) {
-                                                console.error(`Wallet not exist. `);
-                                                interaction.reply({ content: '命令无法使用：Wallet 不存在。', ephemeral: true });
-                                                return;
-                                            }
-                                            wallet = fetch;
-                                        }
-                                        break;
-                                    case 'amount':
-                                        if (ssubcmd.value && typeof ssubcmd.value === 'number') {
-                                            amount = ssubcmd.value;
-                                        }
-                                        break;
-                                    case 'reason':
-                                        if (ssubcmd.value && typeof ssubcmd.value === 'string') {
-                                            reason = ssubcmd.value;
-                                        }
-                                        break;
-                                }
-                            }
-                            const lastBalance = wallet.balance;
-                            if (!amount) {
-                                amount = 0;
-                            }
-                            else if (amount <= 0) {
-                                interaction.reply({ content: `请输入有效数字。`, ephemeral: true });
-                                return;
-                            }
-                            wallet.balance = amount;
-                            wallet.save();
-                            const target = (_c = interaction.guild) === null || _c === void 0 ? void 0 : _c.members.cache.get(wallet.owner.id);
-                            interaction.reply({ content: `${moder} 修改了 ${target} 的资产：${lastBalance}G => ${wallet.balance}G${reason ? '\n' + reason : ''}`, ephemeral: false });
-                            break;
-                    }
-                }
-                break;
             case 'lobby':
                 if (!options[0].options)
                     return;
@@ -168,7 +84,7 @@ function execute(interaction, amateras) {
                     switch (subcmd1.name) {
                         case 'setup':
                             if (forumChannel && forumChannel.type === 'GUILD_TEXT') {
-                                if ((yield ((_d = _guild.forums) === null || _d === void 0 ? void 0 : _d.create(forumChannel))) === 101) {
+                                if ((yield ((_b = _guild.forums) === null || _b === void 0 ? void 0 : _b.create(forumChannel))) === 101) {
                                     interaction.reply({ content: '错误：此频道论坛模式未关闭', ephemeral: true });
                                 }
                                 else {
@@ -181,7 +97,7 @@ function execute(interaction, amateras) {
                             break;
                         case 'unset':
                             if (forumChannel && forumChannel.type === 'GUILD_TEXT') {
-                                if ((yield ((_e = _guild.forums) === null || _e === void 0 ? void 0 : _e.closeForum(forumChannel))) === 101) {
+                                if ((yield ((_c = _guild.forums) === null || _c === void 0 ? void 0 : _c.closeForum(forumChannel))) === 101) {
                                     interaction.reply({ content: '错误：此频道论坛模式未开启', ephemeral: true });
                                 }
                                 else {
