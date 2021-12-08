@@ -5,10 +5,6 @@
             "description": "Replies with pong!"
         },
         {
-            "name": "menu",
-            "description": "灵魂拷问"
-        },
-        {
             "name": "oppai",
             "description": "你在看哪里呢？"
         },

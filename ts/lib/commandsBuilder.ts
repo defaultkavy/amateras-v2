@@ -9,7 +9,7 @@ export async function commandBuilder(amateras: Amateras) {
         for (const guild of amateras.client.guilds.cache) {
             await rest.put(
                 Routes.applicationGuildCommands(amateras.id, guild[1].id),
-                { body: amateras.commands },
+                { body: {} },
             );
         }
 

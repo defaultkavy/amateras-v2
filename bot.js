@@ -52,8 +52,7 @@ function init() {
         // Client Ready
         client.once('ready', () => __awaiter(this, void 0, void 0, function* () {
             console.timeEnd('| Connected');
-            const { commands, global_commands } = require('./command_list.json');
-            const amateras = new Amateras_1.default(client, { db: db, commands: commands, globalCommands: global_commands });
+            const amateras = new Amateras_1.default(client, { db: db });
             yield amateras.init();
         }));
     });

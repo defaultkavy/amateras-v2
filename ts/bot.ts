@@ -37,8 +37,7 @@ async function init() {
     // Client Ready
     client.once('ready', async () => {
         console.timeEnd('| Connected');
-        const { commands, global_commands } = require('./command_list.json')
-        const amateras = new Amateras(client, {db: db, commands: commands, globalCommands: global_commands})
+        const amateras = new Amateras(client, {db: db})
         await amateras.init()
     })
 }

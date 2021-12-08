@@ -1,13 +1,8 @@
 interface Command {
     name: string;
     description: string;
-}
-
-class CMD {
-    static debug: (content: string) => void;
-    static log: (content: string) => void;
-    static sys: (content: string) => void;
-    static err: (content: string) => void;
+    type: number;
+    options: Command[];
 }
 
 interface PlayerData {
@@ -161,6 +156,17 @@ interface _GuildData {
     log?: LogData;
     lobby?: LobbyManagerData;
     forums?: ForumManagerData;
+    commands?: GuildCommandManagerData;
+}
+
+interface GuildCommandManagerData {
+    commands: {[key: string]: string}
+}
+
+interface GuildCommandData {
+    id: string;
+    name: string;
+    permissions: import('discord.js').ApplicationCommandPermissionData[]
 }
 
 interface ForumManagerData {
