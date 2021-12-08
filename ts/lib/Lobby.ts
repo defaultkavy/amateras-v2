@@ -1,4 +1,4 @@
-import { CategoryChannel, Message, OverwriteResolvable, PermissionOverwrites, TextChannel, VoiceChannel } from "discord.js";
+import { CategoryChannel, TextChannel, VoiceChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { LobbyManager } from "./LobbyManager";
@@ -171,6 +171,9 @@ export class Lobby {
         this.textChannel.send({content: `${member}加入了房间`})
         if (player.v) await player.v.sendInfoLobby(this)
         this.categoryChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
+        this.textChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
+        this.voiceChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
+        this.infoChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
         await this.save()
     }
 
@@ -184,6 +187,9 @@ export class Lobby {
         if (player) player.leaveLobby(this)
         this.#member = removeArrayItem(this.#member, id)
         this.categoryChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
+        this.textChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
+        this.voiceChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
+        this.infoChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
         this.deleteMessage(id)
         this.textChannel.send({content: `${member}退出了房间`})
         await this.save()
