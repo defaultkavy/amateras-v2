@@ -15,7 +15,7 @@ export class ForumManager {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('forums')
         this.#_guild = _guild
-        this.#forums = data ? data.forums : undefined
+        this.#forums = data ? data.list : undefined
         this.cache = new Map()
     }
     
@@ -63,7 +63,9 @@ export class ForumManager {
     }
 
     toData() {
-        return Array.from(this.cache.keys())
+        const data = cloneObj(this, ['cache'])
+        data.list = Array.from(this.cache.keys())
+        return data
     }
 
     async closeForum(channel: TextChannel) {

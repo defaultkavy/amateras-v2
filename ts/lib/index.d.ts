@@ -164,7 +164,7 @@ interface _GuildData {
 }
 
 interface ForumManagerData {
-    forums: string[];
+    list: string[];
 }
 
 interface ForumData {
