@@ -1,7 +1,5 @@
-import { Channel, CommandInteraction, TextChannel } from 'discord.js';
+import { CommandInteraction, TextChannel } from 'discord.js';
 import Amateras from '../lib/Amateras';
-import { Player } from '../lib/Player';
-import Wallet from '../lib/Wallet';
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {

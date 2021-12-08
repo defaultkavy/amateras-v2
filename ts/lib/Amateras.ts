@@ -14,13 +14,14 @@ import { TransactionManager } from "./TransactionManager";
 import { _CharacterManager } from "./_CharacterManager";
 import cmd from "./cmd";
 import { Log } from "./Log";
+import { CommandManager } from "./CommandManager";
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {
     client: Client;
     id: string;
     guilds: _GuildManager;
-    commands?: Command[];
+    //commands: CommandManager;
     globalCommands?: Command[];
     db: Db;
     players: PlayerManager;
@@ -33,12 +34,11 @@ export default class Amateras {
     transactions: TransactionManager;
     characters: _CharacterManager;
     log: Log
-    constructor(client: Client, options: { db: Db, commands?: Command[], globalCommands: Command[] }) {
+    constructor(client: Client, options: { db: Db }) {
         this.client = client;
         this.id = client.user!.id;
-        this.commands = options.commands;
-        this.globalCommands = options.globalCommands
         this.db = options.db;
+        //this.commands = new CommandManager(this);
         this.players = new PlayerManager(this)
         this.wallets = new WalletManager(this)
         this.missions = new MissionManager(this)
@@ -53,60 +53,19 @@ export default class Amateras {
     }
 
     async init() {
-        console.log(cmd.Cyan, 'Command Deploying...')
-        console.time('| Command Deployed')
-        await this.setCommands()
-        console.timeEnd('| Command Deployed')
         console.log(cmd.Cyan, 'Amateras System Initializing...')
         console.time('| System Initialized')
+        console.time('| Guilds Initialized')
         await this.guilds.init()
+        console.timeEnd('| Guilds Initialized')
+        console.time('| Global Command Deployed')
+        //await this.commands.init()
+        console.timeEnd('| Global Command Deployed')
         console.timeEnd('| System Initialized')
         this.eventHandler()
         this.setTimer()
         this.me = await this.players.fetch(this.id)
         console.log(cmd.Yellow, 'Amateras Ready.')
-    }
-
-    async setCommands(): Promise<void> {
-        if (this.commands) await commandBuilder(this);
-        //if (this.globalCommands) await commandGlobalBuilder(this)
-        await this.client.application?.fetch()
-        const guild = await this.client.guilds.fetch('744127668064092160')
-        const appCmds = await guild.commands.fetch()
-        appCmds?.forEach(appcmd => {
-            if (appcmd.name === 'Angry' ||
-                appcmd.name === 'Toggle' || appcmd.name === 'VTuber') {
-                appcmd.permissions.add({
-                    permissions: [
-                        {
-                            id: guild?.ownerId!,
-                            type: 2,
-                            permission: true
-                        }
-                    ]
-                })
-            } else if (appcmd.name === 'mod') {
-                appcmd.permissions.add({
-                    permissions: [
-                        {
-                            id: guild?.ownerId!,
-                            type: 2,
-                            permission: true
-                        },
-                        {
-                            id: '744160642994274376',
-                            type: 1,
-                            permission: true
-                        },
-                        {
-                            id: '877863354809585704',
-                            type: 1,
-                            permission: true
-                        }
-                    ]
-                })
-            }
-        })
     }
 
     private eventHandler() {

@@ -6,34 +6,39 @@ import { LobbyManager } from "./LobbyManager";
 import { GuildLog } from "./GuildLog";
 import { cloneObj } from "./terminal";
 import { _ChannelManager } from "./_ChannelManager";
+import { GuildCommandManager } from "./GuildCommandManager";
 
 export class _Guild {
     #amateras: Amateras;
     #collection: Collection;
     id: string;
     get: Guild;
-    #log?: LogData;
     log: GuildLog;
     #lobby?: LobbyManagerData;
     lobby?: LobbyManager;
     #forums?: ForumManagerData;
     forums: ForumManager;
+    commands: GuildCommandManager;
 
     constructor(data: _GuildData, guild: Guild, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = this.#amateras.db.collection('guilds')
         this.get = guild
         this.id = data.id
-        this.#log = data.log
-        this.log = <GuildLog>{}
+        this.commands = new GuildCommandManager(data.commands, this, this.#amateras)
+        this.log = new GuildLog(data.log, this, this.#amateras)
         this.#lobby = data.lobby
         this.#forums = data.forums
         this.forums = <ForumManager>{}
     }
 
     async init() {
-        this.log = new GuildLog(this.#log, this, this.#amateras)
+        console.time('| Guild Command deployed')
+        await this.commands.init()
+        console.timeEnd('| Guild Command deployed')
+        console.time('| Guild Log Channel loaded')
         await this.log.init()
+        console.timeEnd('| Guild Log Channel loaded')
         if (this.#lobby) {
             this.lobby = new LobbyManager(this.#lobby, this, this.#amateras)
             console.time('| Lobby loaded')
@@ -49,6 +54,7 @@ export class _Guild {
 
     async save() {
         const data = cloneObj(this, ['get'])
+        data.commands = this.commands.toData()
         data.log = this.log ? this.log.toData() : undefined
         data.lobby = this.lobby ? this.lobby.toData() : undefined
         data.forums = this.forums ? this.forums.toData() : undefined
