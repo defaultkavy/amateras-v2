@@ -1,4 +1,3 @@
-import { commandBuilder } from "./commandsBuilder";
 import { Client, MessageFlags } from 'discord.js';
 import fs from 'fs';
 import { Db } from "mongodb";
@@ -14,7 +13,6 @@ import { TransactionManager } from "./TransactionManager";
 import { _CharacterManager } from "./_CharacterManager";
 import cmd from "./cmd";
 import { Log } from "./Log";
-import { CommandManager } from "./CommandManager";
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {

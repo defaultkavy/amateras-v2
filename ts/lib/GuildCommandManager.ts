@@ -33,13 +33,13 @@ export class GuildCommandManager {
             for (const appCommand of appCommands) {
                 const data = <GuildCommandData | null>await this.#collection.findOne({id: appCommand[0]})
                 const command = new GuildCommand(data, appCommand[1], this.#_guild, this.#amateras)
-                this.cache.set(appCommand[0], command)
+                this.cache.set(appCommand[1].name, command)
                 await command.init()
             }
         } else {
             for (const appCommand of appCommands) {
                 const command = new GuildCommand(null, appCommand[1], this.#_guild, this.#amateras)
-                this.cache.set(appCommand[0], command)
+                this.cache.set(appCommand[1].name, command)
                 await command.init()
             }
         }

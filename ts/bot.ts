@@ -6,6 +6,7 @@ import { Db, MongoClient } from 'mongodb';
 // AMATERAS Library
 import Amateras from './lib/Amateras';
 import cmd from './lib/cmd';
+import { removeArrayItem } from './lib/terminal';
 // Client config
 let config = require('./bot_config.json')
 // Create Bot Client

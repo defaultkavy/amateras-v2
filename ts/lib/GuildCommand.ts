@@ -1,7 +1,7 @@
 import { ApplicationCommand, ApplicationCommandPermissionData, ApplicationCommandPermissions } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
-import { arrayEqual, arrayHasObj, cloneObj, idGenerator } from "./terminal";
+import { arrayEqual, arrayHasObj, cloneObj, idGenerator, removeArrayItem } from "./terminal";
 import { _Guild } from "./_Guild";
 
 export class GuildCommand {
@@ -50,6 +50,7 @@ export class GuildCommand {
             await this.save()
         } else {
             if (!this.#data) {
+                console.debug('save command')
                 await this.save()
             }
         }
@@ -77,5 +78,70 @@ export class GuildCommand {
         // If fetched permission is empty array, will cause error
         try { permission = await this.get.permissions.fetch({}) } catch {}
         return permission
+    }
+
+    async permissionEnable(id: string, type: 'USER' | 'ROLE') {
+        console.debug(true)
+        if (arrayHasObj(this.permissions, {id: id, type: type, permission: true})) {
+            return 105 // Already exist
+        } 
+        removeArrayItem(this.permissions, {id: id, type: type, permission: false})
+        
+        this.permissions.push({
+            id: id,
+            type: type,
+            permission: true
+        })
+
+        console.debug(this.permissions)
+        
+        try {
+            await this.get.permissions.set({
+                permissions: this.permissions
+            })
+            await this.save()
+            return 100 // Success
+        } catch(err) {
+            console.debug(err)
+            throw 101 // Failed
+        }
+    }
+    
+    async permissionDisable(id: string, type: 'USER' | 'ROLE') {
+        if (arrayHasObj(this.permissions, {id: id, type: type, permission: false})) {
+            return 105 // Already exist
+        }
+        removeArrayItem(this.permissions, {id: id, type: type, permission: true})
+        
+        this.permissions.push({
+            id: id,
+            type: type,
+            permission: false
+        })
+            
+        try {
+            await this.get.permissions.set({
+                permissions: this.permissions
+            })
+            await this.save()
+            return 100 // Success
+        } catch(err) {
+            console.debug(err)
+            throw 101 // Failed
+        }
+    }
+
+    hasPermission(id: string) {
+        for (const permission of this.permissions) {
+            if (permission.id === id) {
+                if (permission.permission) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+        if (this.get.defaultPermission) return true
+        else return false
     }
 }

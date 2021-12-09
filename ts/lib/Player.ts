@@ -28,6 +28,7 @@ export class Player {
     joinedLobbies: Map<string, Lobby>;
     #rewards?: string[];
     rewards: Map<string, Reward>;
+    get?: User
     /**
      * @namespace
      * @param player The player data object.
@@ -56,6 +57,7 @@ export class Player {
     }
 
     async init() {
+        this.get = await this.#amateras.client.users.fetch(this.id)
         this.wallets = await this.walletInit()
         this.missions = {
             accepted: {
@@ -309,5 +311,14 @@ export class Player {
 
     leaveLobby(lobby: Lobby) {
         this.joinedLobbies.delete(lobby.categoryChannel.id)
+    }
+
+    mention() {
+        if (!this.get) return this.id
+        let result: User | string = this.get
+        if (!result) {
+            result = this.get.username
+        }
+        return result
     }
 }
