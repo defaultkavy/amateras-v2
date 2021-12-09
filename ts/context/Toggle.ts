@@ -9,6 +9,7 @@ async function execute(interaction: ContextMenuInteraction, amateras: Amateras) 
         return
     }
     const player = await amateras.players.fetch(interaction.targetId)
+    if (player === 404) return
     if (player.gender === 1) {
         player.gender = 2
     } else {

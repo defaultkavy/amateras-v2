@@ -13,6 +13,8 @@ function mission_accept(interaction, amateras) {
     var _a, _b, _c, _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interaction.user.id);
+        if (player === 404)
+            return;
         if (!player) {
             console.error(`Player "${interaction.user.id}(${interaction.user.username})" not found. (mission_accept.js)`);
             return;

@@ -57,7 +57,12 @@ export class Player {
     }
 
     async init() {
-        this.get = await this.#amateras.client.users.fetch(this.id)
+        try {
+            this.get = await this.#amateras.client.users.fetch(this.id)
+        } catch(err) {
+            console.error(err)
+            return 404
+        }
         this.wallets = await this.walletInit()
         this.missions = {
             accepted: {
@@ -74,7 +79,7 @@ export class Player {
             const vData = <VData>await this.#amateras.db.collection('v').findOne({id: this.id})
             if (!vData) return console.error('vData is ' + vData)
             this.v = new V(vData, this, this.#amateras)
-            this.v.init()
+            await this.v.init()
         }
         for (const type in this.#missions) {
             for (const status in this.#missions[type]) {
@@ -98,6 +103,8 @@ export class Player {
                 if (reward) this.rewards.set(reward.name, reward)
             }
         }
+
+        return 100
     }
 
     /**

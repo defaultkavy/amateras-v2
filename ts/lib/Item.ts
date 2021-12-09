@@ -34,7 +34,9 @@ export class Item {
     }
 
     async init() {
-        this.creator = await this.#amateras.players.fetch(this.#creator)
+        const player = await this.#amateras.players.fetch(this.#creator)
+        if (player === 404) return
+        this.creator = player
         if (this.#message) {
             const _message = await this.#amateras.messages.fetch(this.#message)
             if (_message) {

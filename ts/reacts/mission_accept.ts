@@ -3,6 +3,7 @@ import Amateras from "../lib/Amateras";
 
 export default async function mission_accept(interaction: ButtonInteraction, amateras: Amateras) {
     const player = await amateras.players.fetch(interaction.user.id)
+    if (player === 404) return
     if (!player) {
         console.error(`Player "${interaction.user.id}(${interaction.user.username})" not found. (mission_accept.js)`)
         return

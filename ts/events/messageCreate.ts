@@ -6,9 +6,10 @@ module.exports = {
     name: 'messageCreate',
     once: false,
     async execute(message: Message, amateras: Amateras) {
-        if (!message.guild || message.system ||message.author.bot) return
+        if (message.system || message.author.bot || !message.guild ) return
 
         const player = await amateras.players.fetch(message.author.id)
+        if (player === 404) return
         const _guild = amateras.guilds.cache.get(message.guild.id)
         //Reward
         const reward = player.rewards.get('message')
@@ -17,6 +18,7 @@ module.exports = {
             const repliedMessage = await message.channel.messages.fetch(message.reference!.messageId!)
             if (message.author.id === repliedMessage.author.id) return
             const repliedPlayer = await amateras.players.fetch(repliedMessage.author.id)
+            if (repliedPlayer === 404) return
             const repliedReward = repliedPlayer.rewards.get('replied')
             if (repliedReward) repliedReward.add()
         }

@@ -70,10 +70,13 @@ export class Lobby {
         if (this.voiceChannel.deleted && this.textChannel.deleted) {
             this.state = 'CLOSED'
         }
-        this.owner = await this.#amateras.players.fetch(this.#owner)
+        const player = await this.#amateras.players.fetch(this.#owner)
+        if (player === 404) return
+        this.owner = player
         this.owner.joinLobby(this)
         for (const memberId of this.#member) {
             const member = await this.#amateras.players.fetch(memberId)
+            if (member === 404) continue
             this.member.set(memberId, member)
             member.joinLobby(this)
         }
@@ -164,6 +167,7 @@ export class Lobby {
 
     async addMember(id: string) {
         const player = await this.#amateras.players.fetch(id)
+        if (player === 404) return
         this.member.set(player.id, player)
         this.#member.push(id)
         player.joinLobby(this)

@@ -8,6 +8,7 @@ export default async function v_info_page_button(interact: ButtonInteraction, am
         return
     }
     const player = await amateras.players.fetch(interact.user.id)
+    if (player === 404) return
     const param = interact.customId.split('#')[0]
     const folderId = param.split('$')[0]
     let message: Message | undefined = undefined

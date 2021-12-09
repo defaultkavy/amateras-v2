@@ -12,11 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = execute;
 function execute(interaction, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!amateras.players) {
-            interaction.reply({ content: '命令无法使用：资料库不存在。', ephemeral: true });
-            return;
-        }
         const player = yield amateras.players.fetch(interaction.user.id);
+        if (player === 404)
+            return;
         yield interaction.reply(interaction.user.id === '318714557105307648'
             ? '💢 让你碰了吗？！'
             : player.gender === 2

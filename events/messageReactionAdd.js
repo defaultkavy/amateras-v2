@@ -15,10 +15,14 @@ module.exports = {
     execute(reaction, user, amateras) {
         return __awaiter(this, void 0, void 0, function* () {
             yield reaction.message.fetch();
-            if (!reaction.message.guild || !reaction.message.author || user.bot)
+            if (user.bot || !reaction.message.guild || !reaction.message.author)
                 return;
             const reactedPlayer = yield amateras.players.fetch(reaction.message.author.id);
+            if (reactedPlayer === 404)
+                return;
             const reactPlayer = yield amateras.players.fetch(user.id);
+            if (reactPlayer === 404)
+                return;
             const reward = reactedPlayer.rewards.get('reacted');
             const reward2 = reactPlayer.rewards.get('react');
             if (reward)

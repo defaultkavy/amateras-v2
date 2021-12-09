@@ -13,6 +13,8 @@ const terminal_1 = require("../lib/terminal");
 function item(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
+        if (player === 404)
+            return;
         if (!player.v) {
             interact.reply({ content: 'VTuber 限定功能。', ephemeral: true });
             return;

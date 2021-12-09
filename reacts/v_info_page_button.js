@@ -17,6 +17,8 @@ function v_info_page_button(interact, amateras, options) {
             return;
         }
         const player = yield amateras.players.fetch(interact.user.id);
+        if (player === 404)
+            return;
         const param = interact.customId.split('#')[0];
         const folderId = param.split('$')[0];
         let message = undefined;

@@ -9,6 +9,7 @@ export default async function v_set_folder_button(interact: ButtonInteraction, a
         return
     }
     const player = await amateras.players.fetch(interact.user.id)
+    if (player === 404) return
     let message: Message | undefined = undefined
     if (!options) message = await interact.channel!.messages.fetch(interact.message.id)
     

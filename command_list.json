@@ -450,39 +450,6 @@
                     ]
                 },
                 {
-                    "name": "vtuber",
-                    "description": "VTuber 设定",
-                    "type": 2,
-                    "options": [
-                        {
-                            "name": "set",
-                            "description": "将玩家设定为 VTuber",
-                            "type": 1,
-                            "options": [
-                                {
-                                    "name": "user",
-                                    "description": "玩家",
-                                    "type": 6,
-                                    "required": true
-                                }
-                            ]
-                        },
-                        {
-                            "name": "unset",
-                            "description": "取消玩家的 VTuber 设定",
-                            "type": 1,
-                            "options": [
-                                {
-                                    "name": "user",
-                                    "description": "玩家",
-                                    "type": 6,
-                                    "required": true
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
                     "name": "message",
                     "description": "讯息管理",
                     "type": 2,
@@ -524,73 +491,6 @@
                             "description": "开关",
                             "type": 5,
                             "required": false
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "sys",
-            "description": "系统管理",
-            "default_permission": false,
-            "options": [
-                {
-                    "name": "player",
-                    "description": "管理玩家",
-                    "type": 2,
-                    "options": [
-                        {
-                            "name": "aka",
-                            "description": "修改玩家称号",
-                            "type": 1,
-                            "required": false,
-                            "options": [
-                                {
-                                    "name": "user",
-                                    "description": "更改哪一个用户？",
-                                    "type": 6,
-                                    "required": true
-                                },
-                                {
-                                    "name": "content",
-                                    "description": "称号",
-                                    "type": 3,
-                                    "required": true
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "name": "coin",
-                    "description": "货币管理",
-                    "type": 2,
-                    "options": [
-                        {
-                            "name": "set",
-                            "description": "修改玩家资产。",
-                            "type": 1,
-                            "required": false,
-                            "options": [
-                                {
-                                    "name": "user",
-                                    "description": "更改哪一个用户？",
-                                    "type": 6,
-                                    "required": true
-                                },
-                                {
-                                    "name": "amount",
-                                    "description": "数量",
-                                    "type": 4,
-                                    "required": true
-                                },
-                                {
-                                    "name": "reason",
-                                    "description": "修改的理由",
-                                    "type": 3,
-                                    "required": false
-                                }
-                            ]
                         }
                     ]
                 }
@@ -681,52 +581,97 @@
 
     "global_commands": [
         {
-            "name": "mission",
-            "description": "公会委托",
+            "name": "sys",
+            "description": "系统管理",
             "options": [
                 {
-                    "name": "list",
-                    "description": "你的委托列表。",
-                    "type": 1,
-                    "required": false
-                },
-                {
-                    "name": "close",
-                    "description": "结算你的委托。",
+                    "name": "player",
+                    "description": "管理玩家",
                     "type": 2,
-                    "required": false,
                     "options": [
                         {
-                            "name": "settle",
-                            "description": "完成你的委托结算。",
+                            "name": "aka",
+                            "description": "修改玩家称号",
                             "type": 1,
                             "required": false,
                             "options": [
                                 {
-                                    "name": "review",
-                                    "description": "你对这次委托的评价。",
-                                    "type": 3,
-                                    "required": false
+                                    "name": "user",
+                                    "description": "更改哪一个用户？",
+                                    "type": 6,
+                                    "required": true
                                 },
                                 {
-                                    "name": "rate",
-                                    "description": "对这次委托打个分数吧！（1分 - 5分）",
+                                    "name": "content",
+                                    "description": "称号",
+                                    "type": 3,
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "coin",
+                    "description": "货币管理",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "set",
+                            "description": "修改玩家资产。",
+                            "type": 1,
+                            "required": false,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "更改哪一个用户？",
+                                    "type": 6,
+                                    "required": true
+                                },
+                                {
+                                    "name": "amount",
+                                    "description": "数量",
                                     "type": 4,
+                                    "required": true
+                                },
+                                {
+                                    "name": "reason",
+                                    "description": "修改的理由",
+                                    "type": 3,
                                     "required": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "vtuber",
+                    "description": "VTuber 设定",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "set",
+                            "description": "将玩家设定为 VTuber",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "玩家",
+                                    "type": 6,
+                                    "required": true
                                 }
                             ]
                         },
                         {
-                            "name": "cancel",
-                            "description": "取消你的委托请求。",
+                            "name": "unset",
+                            "description": "取消玩家的 VTuber 设定",
                             "type": 1,
-                            "required": false,
                             "options": [
                                 {
-                                    "name": "reason",
-                                    "description": "取消委托的理由？",
-                                    "type": 3,
-                                    "required": false
+                                    "name": "user",
+                                    "description": "玩家",
+                                    "type": 6,
+                                    "required": true
                                 }
                             ]
                         }

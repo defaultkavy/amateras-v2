@@ -9,6 +9,7 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
         return
     }
     const player = await amateras.players.fetch(interaction.user.id)
+    if (player === 404) return
     for (const subcmd0 of interaction.options.data) {
         switch (subcmd0.name) {
             case 'give':
@@ -23,7 +24,9 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                     switch (subcmd1.name) {
                         case 'user': 
                             if (subcmd1.value && typeof subcmd1.value === 'string') {
-                                receiverWallets = (await amateras.players.fetch(subcmd1.value)).wallets
+                                const receiver = await amateras.players.fetch(subcmd1.value)
+                                if (receiver === 404) return
+                                receiverWallets = receiver.wallets
                             }
                         break;
                         case 'amount':

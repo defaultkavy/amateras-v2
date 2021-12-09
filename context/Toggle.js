@@ -18,6 +18,8 @@ function execute(interaction, amateras) {
             return;
         }
         const player = yield amateras.players.fetch(interaction.targetId);
+        if (player === 404)
+            return;
         if (player.gender === 1) {
             player.gender = 2;
         }

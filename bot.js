@@ -28,7 +28,7 @@ const client = new discord_js_1.Client({
     partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
 // Database Client
-const mongo = new mongodb_1.MongoClient('mongodb://isekai.live:27017/', { auth: { username: config.db.user, password: config.db.pwd } });
+const mongo = new mongodb_1.MongoClient(config.db.host, { auth: { username: config.db.user, password: config.db.pwd } });
 let db;
 // Connect to DB
 databaseInit(init);
@@ -52,7 +52,7 @@ function init() {
         // Client Ready
         client.once('ready', () => __awaiter(this, void 0, void 0, function* () {
             console.timeEnd('| Connected');
-            const amateras = new Amateras_1.default(client, { db: db });
+            const amateras = new Amateras_1.default(client, db, config.system.admin);
             yield amateras.init();
         }));
     });
