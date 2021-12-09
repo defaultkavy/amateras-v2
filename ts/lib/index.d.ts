@@ -151,6 +151,16 @@ interface MissionDateData {
     missions: string[]
 }
 
+interface CommandManagerData {
+    commands: {[key: string]: string}
+}
+
+interface CommandData {
+    id: string;
+    name: string;
+    permissions: import('discord.js').ApplicationCommandPermissionData[]
+}
+
 interface _GuildData {
     id: string;
     log?: LogData;
