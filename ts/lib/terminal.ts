@@ -51,9 +51,17 @@ export function idGenerator(length: number) {
 }
 
 export function removeArrayItem<T>(arr: Array<T>, value: T): Array<T> { 
-    const index = arr.indexOf(value);
-    if (index > -1) {
-      arr.splice(index, 1);
+    if (value instanceof Number || value instanceof String) {
+        const index = arr.indexOf(value);
+        if (index > -1) {
+          arr.splice(index, 1);
+        }
+    } else if (value instanceof Object) {
+        for (let i = 0; i < arr.length; i++) {
+            if (objectEqual(arr[i], value)) {
+                arr.splice(i, 1)
+            }
+        }
     }
     return arr;
   }

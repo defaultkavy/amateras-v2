@@ -3,15 +3,16 @@ import Amateras from '../lib/Amateras';
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {
-    const options = interaction.options.data
+    const subcmd0 = interaction.options.data[0]
     const _guild = amateras.guilds.cache.get(interaction.guild!.id)
-    const moder = interaction.guild?.members.cache.get(interaction.user.id)
-    switch (options[0].name) {
+    if (!_guild) return interaction.reply({ content: 'Unknown _Guild', ephemeral: true })
+
+    switch (subcmd0.name) {
         case 'lobby':
-            if (!options[0].options) return
+            if (!subcmd0.options) return
             const lobbyChannel = interaction.channel
             if (!_guild) return
-            for (const subcmd1 of options[0].options) {
+            for (const subcmd1 of subcmd0.options) {
                 switch (subcmd1.name) {
                     case 'setup':
                         if (lobbyChannel && lobbyChannel.type === 'GUILD_TEXT') {
@@ -58,10 +59,10 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
         break;
 
         case 'forum':
-            if (!options[0].options) return
+            if (!subcmd0.options) return
             const forumChannel = interaction.channel
             if (!_guild) return
-            for (const subcmd1 of options[0].options) {
+            for (const subcmd1 of subcmd0.options) {
                 switch (subcmd1.name) {
                     case 'setup':
                         if (forumChannel && forumChannel.type === 'GUILD_TEXT') {
@@ -90,8 +91,8 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
         break;
 
         case 'vtuber':
-            if (!options[0].options) return
-            for (const subcmd1 of options[0].options) {
+            if (!subcmd0.options) return
+            for (const subcmd1 of subcmd0.options) {
                 switch (subcmd1.name) {
                     case 'set':
                         if (!subcmd1.options) return;
@@ -132,8 +133,8 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
         break;
 
         case 'message':
-            if (!options[0].options) return
-            for (const subcmd1 of options[0].options) {
+            if (!subcmd0.options) return
+            for (const subcmd1 of subcmd0.options) {
                 switch (subcmd1.name) {
                     case 'delete':
                         if (!subcmd1.options) return;
@@ -156,5 +157,56 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                 }
             }
         break;
+        
+        case 'permission':
+            if (!subcmd0.options) return
+            let user: string | undefined, role: string | undefined, enable: boolean | undefined
+            for (const subcmd1 of subcmd0.options) {
+                switch (subcmd1.name) {
+                    case 'user':
+                        user = <string>subcmd1.value
+                    break;
+                    case 'role':
+                        role = <string>subcmd1.value
+                    break;
+                    case 'enable':
+                        enable = <boolean>subcmd1.value
+                    break;
+                }
+            }
+            if (user) {
+                // For user permission
+                let player = await amateras.players.fetch(user)
+                // Check parameter Enable filled / No -> Reply permission status
+                if (enable === undefined) {
+                    return interaction.reply({content: `${player.mention()} mod 权限：${_guild.commands.cache.get('mod')?.hasPermission(user) ? '开' : '关'}`, ephemeral: true})
+                }
+                // Block who are not guild owner to use change permission function
+                if (interaction.user.id !== _guild.get.ownerId) return interaction.reply({content: `此功能仅限伺服器所有者使用`, ephemeral: true})
+                // Check if permission not change
+                if (enable && await _guild?.commands.cache.get('mod')?.permissionEnable(user, 'USER') === 105) {
+                    return interaction.reply({content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                } else if (enable === false && await _guild?.commands.cache.get('mod')?.permissionDisable(user, 'USER') === 105)
+                    return interaction.reply({content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                // Reply permission change message
+                return interaction.reply({content: `${player.mention()} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true})
+            }
+            if (role) {
+                let target = await _guild?.role(role)
+                if (enable === undefined) {
+                    return interaction.reply({content: `${target} mod 权限更改为：${_guild.commands.cache.get('mod')?.hasPermission(role) ? '开' : '关'}`, ephemeral: true})
+                }
+                if (interaction.user.id !== _guild.get.ownerId) return interaction.reply({content: `此功能仅限伺服器所有者使用`, ephemeral: true})
+                if (enable && await _guild?.commands.cache.get('mod')?.permissionEnable(role, 'ROLE') === 105) 
+                    return interaction.reply({content: `${target} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                else if (enable === false && await _guild?.commands.cache.get('mod')?.permissionDisable(role, 'ROLE') === 105)
+                    return interaction.reply({content: `${target} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                return interaction.reply({content: `${target} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true})
+            }
+            // User and Role part is not filled
+            return interaction.reply({content: '请选择目标', ephemeral: true})
+        break;
+
     }
+    
 }

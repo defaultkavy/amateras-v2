@@ -42,7 +42,7 @@ export class _Guild {
         if (this.#lobby) {
             this.lobby = new LobbyManager(this.#lobby, this, this.#amateras)
             console.time('| Lobby loaded')
-            await this.lobby.init()
+            //await this.lobby.init()
             console.timeEnd('| Lobby loaded')
         }
         this.forums = new ForumManager(this.#forums, this, this.#amateras)
@@ -98,5 +98,25 @@ export class _Guild {
         await this.save()
         console.log(`Guild ${this.id} Lobby Function is off.`)
         return 100
+    }
+
+    async member(id: string) {
+        try {
+            return await this.get.members.fetch(id)
+        } catch(err) {
+            console.debug(`Member ${id} not exist`)
+            console.debug(err)
+            return 404
+        }
+    }
+
+    async role(id: string) {
+        try {
+            return await this.get.roles.fetch(id)
+        } catch(err) {
+            console.debug(`Role ${id} not exist`)
+            console.debug(err)
+            return 404
+        }
     }
 }

@@ -501,6 +501,31 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "name": "permission",
+                    "description": "设定使用 mod 请求的权限",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "user",
+                            "description": "玩家选择",
+                            "type": 6,
+                            "required": false
+                        },
+                        {
+                            "name": "role",
+                            "description": "身份组选择",
+                            "type": 8,
+                            "required": false
+                        },
+                        {
+                            "name": "enable",
+                            "description": "开关",
+                            "type": 5,
+                            "required": false
+                        }
+                    ]
                 }
             ]
         },
