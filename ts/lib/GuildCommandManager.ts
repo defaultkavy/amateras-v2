@@ -26,7 +26,7 @@ export class GuildCommandManager {
     async init() {
         if (!this.#commandsList) return console.log('| Guild Command Disabled')
 
-        await this.deploy() // Deploy command setup to Discord Guild
+        await this.deploy() // Deploy command setup to Guild
 
         const appCommands = await this.#_guild.get.commands.fetch()
         if (this.#commands) {

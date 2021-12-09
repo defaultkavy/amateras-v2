@@ -14,6 +14,8 @@ exports.default = execute;
 function execute(interaction, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interaction.user.id);
+        if (player === 404)
+            return;
         for (const subcmd0 of interaction.options.data) {
             switch (subcmd0.name) {
                 case 'list':

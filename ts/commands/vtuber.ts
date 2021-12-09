@@ -4,6 +4,7 @@ import { checkImage } from "../lib/terminal"
 
 export default async function item(interact: CommandInteraction, amateras: Amateras) {
     const player = await amateras.players.fetch(interact.user.id)
+    if (player === 404) return
     if (!player.v) {
         interact.reply({content: 'VTuber 限定功能。', ephemeral: true})
         return

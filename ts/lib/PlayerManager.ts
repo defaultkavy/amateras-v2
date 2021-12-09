@@ -14,7 +14,7 @@ export class PlayerManager {
      * Get player data from Database
      * @param id Player id.
      */
-    async fetch(id: string, callback?: (player: Player) => void): Promise<Player> {
+    async fetch(id: string, callback?: (player: Player) => void) {
         const collection = this.#amateras.db!.collection('player')
         let playerData = await collection.findOne({ id: id })
         if (!playerData) {
@@ -27,7 +27,7 @@ export class PlayerManager {
         } else {
             const player = new Player(<PlayerData>playerData, this.#amateras)
             this.cache.set(id, player)
-            await player.init()
+            if (await player.init() === 404) return 404
             if (callback) callback(player)
             return player
         }

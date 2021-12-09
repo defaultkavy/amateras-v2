@@ -13,6 +13,8 @@ exports.default = execute;
 function execute(interaction, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interaction.targetId);
+        if (player === 404)
+            return;
         if (!player)
             return console.error('Player not exist');
         if (!player.v) {

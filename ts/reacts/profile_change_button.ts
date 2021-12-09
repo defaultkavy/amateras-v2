@@ -4,6 +4,7 @@ import Amateras from "../lib/Amateras"
 export default async function profile_change_button(interact: ButtonInteraction, amateras: Amateras) {
     const id = interact.message.embeds[0].footer!.text!
     const player = await amateras.players.fetch(id)
+    if (player === 404) return
     const message = await interact.channel!.messages.fetch(interact.message.id)
     
     let embed

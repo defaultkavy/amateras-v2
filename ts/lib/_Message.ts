@@ -60,6 +60,7 @@ export class _Message {
 
     async updateVInfo() {
         const player = await this.#amateras.players.fetch(this.get.embeds[0].footer!.text!)
+        if (player === 404) return
         const defaultFolder = player.v!.imageFolders.default
         if (defaultFolder) this.get.edit({embeds: [await player.v!.infoEmbed(defaultFolder, Array.from(defaultFolder.images.values())[0])]})
     }

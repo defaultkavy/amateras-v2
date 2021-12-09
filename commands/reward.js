@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function item(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
+        if (player === 404)
+            return;
         let list = '```';
         for (const reward of player.rewards.values()) {
             list += `${reward.title} - ${reward.count} / ${reward.reach}\n${reward.description}\n奖励：${reward.pay}G - 已完成${reward.times}次\n\n`;

@@ -18,6 +18,8 @@ function execute(interaction, amateras) {
             return;
         }
         const player = yield amateras.players.fetch(interaction.user.id);
+        if (player === 404)
+            return;
         for (const subcmd0 of interaction.options.data) {
             switch (subcmd0.name) {
                 case 'give':
@@ -30,7 +32,10 @@ function execute(interaction, amateras) {
                         switch (subcmd1.name) {
                             case 'user':
                                 if (subcmd1.value && typeof subcmd1.value === 'string') {
-                                    receiverWallets = (yield amateras.players.fetch(subcmd1.value)).wallets;
+                                    const receiver = yield amateras.players.fetch(subcmd1.value);
+                                    if (receiver === 404)
+                                        return;
+                                    receiverWallets = receiver.wallets;
                                 }
                                 break;
                             case 'amount':

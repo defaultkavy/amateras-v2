@@ -5,6 +5,7 @@ import { Mission } from "../lib/Mission";
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {
     const player = await amateras.players!.fetch(interaction.user.id)
+    if (player === 404) return
     for (const subcmd0 of interaction.options.data) {
         switch (subcmd0.name) {
             case 'list':

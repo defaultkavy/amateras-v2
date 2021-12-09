@@ -94,10 +94,7 @@ export default class MissionManager {
 
     async sendMissionChoices(interaction: CommandInteraction, type: 'MISSION_CLOSE' | 'MISSION_CANCEL' | 'MISSION_QUIT') {
         const player = await this.#amateras.players?.fetch(interaction.user.id)
-        if (!player) {
-            console.error(`Player "${interaction.user.id}(${interaction.user.username}) fetch failed. (MsgManager.js)`)
-            return
-        }
+        if (player === 404) return
         //#region Message components create
         const selectmenu = new MessageSelectMenu()
         let fields: EmbedFieldData[] = []
@@ -216,6 +213,7 @@ export default class MissionManager {
 
     async sendMissionList(interact: CommandInteraction) {
         const player = await this.#amateras.players?.fetch(interact.user.id)
+        if (player === 404) return
         if (!player) {
             console.error(`Player "${interact.user.id}(${interact.user.username}) fetch failed. (MsgManager.js)`)
             return

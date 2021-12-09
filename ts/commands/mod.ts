@@ -89,49 +89,6 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                 }
             }
         break;
-
-        case 'vtuber':
-            if (!subcmd0.options) return
-            for (const subcmd1 of subcmd0.options) {
-                switch (subcmd1.name) {
-                    case 'set':
-                        if (!subcmd1.options) return;
-                        let userId: string = ''
-                        for (const subcmd2 of subcmd1.options) {
-                            switch (subcmd2.name) {
-                                case 'user':
-                                    if (typeof subcmd2.value === 'string') {
-                                        userId = subcmd2.value
-                                    }
-                                break;
-                            }
-                        }
-                        const player = await amateras.players.fetch(userId)
-                        await player.setVTuber()
-                        interaction.reply({ content: '设定完成', ephemeral: true })
-                        
-                    break;
-                    case 'unset':
-                        if (!subcmd1.options) return;
-                        let userId_v: string = ''
-                        for (const subcmd2 of subcmd1.options) {
-                            switch (subcmd2.name) {
-                                case 'user':
-                                    if (typeof subcmd2.value === 'string') {
-                                        userId_v = subcmd2.value
-                                    }
-                                break;
-                            }
-                        }
-                        const player_v = await amateras.players.fetch(userId_v)
-                        await player_v.unsetVTuber()
-                        interaction.reply({ content: '设定完成', ephemeral: true })
-                        
-                    break;
-                }
-            }
-        break;
-
         case 'message':
             if (!subcmd0.options) return
             for (const subcmd1 of subcmd0.options) {
@@ -176,7 +133,8 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
             }
             if (user) {
                 // For user permission
-                let player = await amateras.players.fetch(user)
+                const player = await amateras.players.fetch(user)
+                if (player === 404) return 
                 // Check parameter Enable filled / No -> Reply permission status
                 if (enable === undefined) {
                     return interaction.reply({content: `${player.mention()} mod 权限：${_guild.commands.cache.get('mod')?.hasPermission(user) ? '开' : '关'}`, ephemeral: true})

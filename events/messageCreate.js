@@ -15,9 +15,11 @@ module.exports = {
     once: false,
     execute(message, amateras) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!message.guild || message.system || message.author.bot)
+            if (message.system || message.author.bot || !message.guild)
                 return;
             const player = yield amateras.players.fetch(message.author.id);
+            if (player === 404)
+                return;
             const _guild = amateras.guilds.cache.get(message.guild.id);
             //Reward
             const reward = player.rewards.get('message');
@@ -28,6 +30,8 @@ module.exports = {
                 if (message.author.id === repliedMessage.author.id)
                     return;
                 const repliedPlayer = yield amateras.players.fetch(repliedMessage.author.id);
+                if (repliedPlayer === 404)
+                    return;
                 const repliedReward = repliedPlayer.rewards.get('replied');
                 if (repliedReward)
                     repliedReward.add();

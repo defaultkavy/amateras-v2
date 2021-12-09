@@ -20,7 +20,9 @@ export default class Wallet {
     }
 
     async init() {
-        this.owner = await this.#amateras.players.fetch(this.#owner)
+        const player = await this.#amateras.players.fetch(this.#owner)
+        if (player === 404) return
+        this.owner = player
     }
 
     /**

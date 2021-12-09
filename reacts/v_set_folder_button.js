@@ -18,6 +18,8 @@ function v_set_folder_button(interact, amateras, options) {
             return;
         }
         const player = yield amateras.players.fetch(interact.user.id);
+        if (player === 404)
+            return;
         let message = undefined;
         if (!options)
             message = yield interact.channel.messages.fetch(interact.message.id);

@@ -17,7 +17,9 @@ function execute(interaction, amateras) {
             return;
         }
         if (interaction.guild) {
-            let player = yield amateras.players.fetch(interaction.targetId);
+            const player = yield amateras.players.fetch(interaction.targetId);
+            if (player === 404)
+                return;
             player.sendInfo(interaction, true);
         }
         else {

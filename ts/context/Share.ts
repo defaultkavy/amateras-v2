@@ -8,7 +8,8 @@ async function execute(interaction: ContextMenuInteraction, amateras: Amateras) 
         return
     }
     if (interaction.guild) {
-        let player = await amateras.players.fetch(interaction.targetId);
+        const player = await amateras.players.fetch(interaction.targetId);
+        if (player === 404) return
         player.sendInfo(interaction, true)
     } else {
         console.error('interaction.guild is not defined.')

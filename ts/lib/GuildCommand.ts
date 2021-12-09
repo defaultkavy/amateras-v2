@@ -42,15 +42,10 @@ export class GuildCommand {
         let deployedPermissions = await this.permissionFetch()
         // If permissions is different in Database and Discord server
         if (!arrayEqual(deployedPermissions, this.permissions)) {
-            console.debug(this.name)
-            console.debug(deployedPermissions, this.permissions)
-            console.time('permission')
             await this.permissionSet(this.permissions)
-            console.timeEnd('permission')
             await this.save()
         } else {
             if (!this.#data) {
-                console.debug('save command')
                 await this.save()
             }
         }

@@ -14,6 +14,8 @@ function profile_change_button(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const id = interact.message.embeds[0].footer.text;
         const player = yield amateras.players.fetch(id);
+        if (player === 404)
+            return;
         const message = yield interact.channel.messages.fetch(interact.message.id);
         let embed;
         const action = new discord_js_1.MessageActionRow;

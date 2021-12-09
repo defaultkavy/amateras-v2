@@ -52,15 +52,13 @@ export class Mission {
 
     async init() {
         const owner = await this.#amateras.players?.fetch(this.#owner)
-        if (!owner) {
-            console.error(`Mission Owner "${this.#owner}" fetch failed.`)
-            return
-        }
+        if (owner === 404) return
         this.owner = owner
         let agents = []
         for (const agent of this.#agents) {
             if (agent) {
                 const player = await this.#amateras.players!.fetch(agent)
+                if (player === 404) continue
                 if (!player) {
                     console.error(`Player "${agent}" fetch failed.`)
                     return

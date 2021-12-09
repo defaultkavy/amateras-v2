@@ -42,7 +42,7 @@ export class _Guild {
         if (this.#lobby) {
             this.lobby = new LobbyManager(this.#lobby, this, this.#amateras)
             console.time('| Lobby loaded')
-            //await this.lobby.init()
+            await this.lobby.init()
             console.timeEnd('| Lobby loaded')
         }
         this.forums = new ForumManager(this.#forums, this, this.#amateras)

@@ -3,15 +3,12 @@ import Amateras from '../lib/Amateras';
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {
-    if (!amateras.players) {
-        interaction.reply({ content: '命令无法使用：资料库不存在。', ephemeral: true })
-        return
-    }
     const options = interaction.options.data
     switch (options[0].name) {
         case 'edit':
             if (options[0].options) {
                 const player = await amateras.players.fetch(interaction.user.id)
+                if (player === 404) return
                 for (const subcmd of options[0].options) {
                     switch (subcmd.name) {
                         case 'intro':
@@ -44,14 +41,14 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
 
         case 'info':
             if (interaction.guild) {
-                let player, share = false
+                let user, share = false
 
                 if (options[0].options) {
                     for (const subcmd of options[0].options) {
                         switch (subcmd.name) {
                             case 'user':
                                 if (typeof subcmd.value !== 'string') return;
-                                player = await amateras.players.fetch(subcmd.value)
+                                user = subcmd.value
                             break;
                             case 'share':
                                 if (typeof subcmd.value !== 'boolean') return;
@@ -59,11 +56,18 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                             break;
                         }
                     }
-                    if (!player) player = await amateras.players.fetch(interaction.user.id)
+                    if (!user) {
+                        const player = await amateras.players.fetch(interaction.user.id)
+                        if (player === 404) return
+                        player.sendInfo(interaction, share)
+                    } else {
+                        const player = await amateras.players.fetch(user)
+                        if (player === 404) return
+                        player.sendInfo(interaction, share)
+                    }
                 } else {
-                    if (!player) player = await amateras.players.fetch(interaction.user.id)
-                }
-                if (player) {
+                    const player = await amateras.players.fetch(interaction.user.id)
+                    if (player === 404) return
                     player.sendInfo(interaction, share)
                 }
             } else {

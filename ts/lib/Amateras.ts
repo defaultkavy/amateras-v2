@@ -13,6 +13,8 @@ import { TransactionManager } from "./TransactionManager";
 import { _CharacterManager } from "./_CharacterManager";
 import cmd from "./cmd";
 import { Log } from "./Log";
+import { System } from './System';
+import { CommandManager } from './CommandManager';
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {
@@ -31,12 +33,14 @@ export default class Amateras {
     rewards: RewardManager;
     transactions: TransactionManager;
     characters: _CharacterManager;
-    log: Log
-    constructor(client: Client, options: { db: Db }) {
+    log: Log;
+    system: System;
+    commands: CommandManager;
+    constructor(client: Client, db: Db, admin: string) {
         this.client = client;
         this.id = client.user!.id;
-        this.db = options.db;
-        //this.commands = new CommandManager(this);
+        this.db = db;
+        this.commands = new CommandManager(this);
         this.players = new PlayerManager(this)
         this.wallets = new WalletManager(this)
         this.missions = new MissionManager(this)
@@ -48,6 +52,8 @@ export default class Amateras {
         this.transactions = new TransactionManager(this)
         this.characters = new _CharacterManager(this)
         this.log = new Log(this)
+        this.system = new System(admin, this)
+        
     }
 
     async init() {
@@ -56,13 +62,16 @@ export default class Amateras {
         console.time('| Guilds Initialized')
         await this.guilds.init()
         console.timeEnd('| Guilds Initialized')
+        const player = await this.players.fetch(this.id)
+        if (player === 404) throw new Error('Amateras Fatal Error: Amateras User fetch failed')
+        this.me = player
+        await this.system.init()
         console.time('| Global Command Deployed')
-        //await this.commands.init()
+        await this.commands.init()
         console.timeEnd('| Global Command Deployed')
         console.timeEnd('| System Initialized')
         this.eventHandler()
         this.setTimer()
-        this.me = await this.players.fetch(this.id)
         console.log(cmd.Yellow, 'Amateras Ready.')
     }
 

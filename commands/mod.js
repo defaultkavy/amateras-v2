@@ -112,48 +112,6 @@ function execute(interaction, amateras) {
                     }
                 }
                 break;
-            case 'vtuber':
-                if (!subcmd0.options)
-                    return;
-                for (const subcmd1 of subcmd0.options) {
-                    switch (subcmd1.name) {
-                        case 'set':
-                            if (!subcmd1.options)
-                                return;
-                            let userId = '';
-                            for (const subcmd2 of subcmd1.options) {
-                                switch (subcmd2.name) {
-                                    case 'user':
-                                        if (typeof subcmd2.value === 'string') {
-                                            userId = subcmd2.value;
-                                        }
-                                        break;
-                                }
-                            }
-                            const player = yield amateras.players.fetch(userId);
-                            yield player.setVTuber();
-                            interaction.reply({ content: '设定完成', ephemeral: true });
-                            break;
-                        case 'unset':
-                            if (!subcmd1.options)
-                                return;
-                            let userId_v = '';
-                            for (const subcmd2 of subcmd1.options) {
-                                switch (subcmd2.name) {
-                                    case 'user':
-                                        if (typeof subcmd2.value === 'string') {
-                                            userId_v = subcmd2.value;
-                                        }
-                                        break;
-                                }
-                            }
-                            const player_v = yield amateras.players.fetch(userId_v);
-                            yield player_v.unsetVTuber();
-                            interaction.reply({ content: '设定完成', ephemeral: true });
-                            break;
-                    }
-                }
-                break;
             case 'message':
                 if (!subcmd0.options)
                     return;
@@ -200,7 +158,9 @@ function execute(interaction, amateras) {
                 }
                 if (user) {
                     // For user permission
-                    let player = yield amateras.players.fetch(user);
+                    const player = yield amateras.players.fetch(user);
+                    if (player === 404)
+                        return;
                     // Check parameter Enable filled / No -> Reply permission status
                     if (enable === undefined) {
                         return interaction.reply({ content: `${player.mention()} mod 权限：${((_c = _guild.commands.cache.get('mod')) === null || _c === void 0 ? void 0 : _c.hasPermission(user)) ? '开' : '关'}`, ephemeral: true });

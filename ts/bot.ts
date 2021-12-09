@@ -6,7 +6,6 @@ import { Db, MongoClient } from 'mongodb';
 // AMATERAS Library
 import Amateras from './lib/Amateras';
 import cmd from './lib/cmd';
-import { removeArrayItem } from './lib/terminal';
 // Client config
 let config = require('./bot_config.json')
 // Create Bot Client
@@ -16,7 +15,7 @@ const client = new Client({
     partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
 // Database Client
-const mongo = new MongoClient('mongodb://isekai.live:27017/', {auth: {username: config.db.user, password: config.db.pwd}})
+const mongo = new MongoClient(config.db.host, {auth: {username: config.db.user, password: config.db.pwd}})
 let db: Db
 // Connect to DB
 databaseInit(init)
@@ -38,7 +37,7 @@ async function init() {
     // Client Ready
     client.once('ready', async () => {
         console.timeEnd('| Connected');
-        const amateras = new Amateras(client, {db: db})
+        const amateras = new Amateras(client, db, config.system.admin)
         await amateras.init()
     })
 }
