@@ -1,13 +1,16 @@
 import Amateras from "./Amateras";
 import { Player } from "./Player";
+import { VManager } from "./VManager";
 
 export class PlayerManager {
     #amateras: Amateras
     cache: Map<string, Player>;
+    v: VManager
     
     constructor(amateras: Amateras) {
         this.#amateras = amateras
         this.cache = new Map()
+        this.v = new VManager(amateras)
     }
 
     /**
@@ -15,22 +18,23 @@ export class PlayerManager {
      * @param id Player id.
      */
     async fetch(id: string, callback?: (player: Player) => void) {
+        const cache = this.cache.get(id)
+        if (cache) {
+            return cache
+        }
         const collection = this.#amateras.db!.collection('player')
         let playerData = await collection.findOne({ id: id })
         if (!playerData) {
             playerData = { id: id }
         }
-        if (this.cache.get(id)) {
-            const player = this.cache.get(id)!
-            if (callback) callback(player)
-            return player
-        } else {
-            const player = new Player(<PlayerData>playerData, this.#amateras)
-            this.cache.set(id, player)
-            if (await player.init() === 404) return 404
-            if (callback) callback(player)
-            return player
+        const player = new Player(<PlayerData>playerData, this.#amateras)
+        this.cache.set(id, player)
+        if (await player.init() === 404) {
+            this.cache.delete(id)
+            return 404
         }
+        if (callback) callback(player)
+        return player
     }
 
     /**

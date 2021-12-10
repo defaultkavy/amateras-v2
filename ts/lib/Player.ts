@@ -1,5 +1,6 @@
 import { ColorResolvable, CommandInteraction, GuildMember, Interaction, Message, MessageActionRow, MessageButton, MessageEmbedOptions, User } from "discord.js";
 import Amateras from "./Amateras";
+import { Err } from "./Err";
 import { Gender } from "./layout";
 import { Lobby } from "./Lobby";
 import { PlayerMissionManager } from "./PlayerMissionManager";
@@ -60,9 +61,10 @@ export class Player {
         try {
             this.get = await this.#amateras.client.users.fetch(this.id)
         } catch(err) {
-            console.error(err)
+            new Err(`Player fetch failed: (User)${ this.id }`)
             return 404
         }
+        // Init wallet
         this.wallets = await this.walletInit()
         this.missions = {
             accepted: {
@@ -77,9 +79,17 @@ export class Player {
         if (!this.class) this.class = ['PLAYER']
         if (this.class.includes('VTUBER')) {
             const vData = <VData>await this.#amateras.db.collection('v').findOne({id: this.id})
-            if (!vData) return console.error('vData is ' + vData)
-            this.v = new V(vData, this, this.#amateras)
-            await this.v.init()
+            if (vData) {
+                const v = await this.#amateras.players.v.create(this.id)
+                if (v instanceof V) {
+                    this.v = v
+                    await this.v.init()
+                } else {
+                    new Err(`V Object create failed. (User)${this.id}`)
+                }
+            } else {
+                new Err(`V Data is not found. (User)${ this.id }`)
+            }
         }
         for (const type in this.#missions) {
             for (const status in this.#missions[type]) {
@@ -103,7 +113,6 @@ export class Player {
                 if (reward) this.rewards.set(reward.name, reward)
             }
         }
-
         return 100
     }
 
@@ -291,25 +300,53 @@ export class Player {
         return embed
     }
 
+    /**
+     * Add V class to this player
+     * @returns 101 - Already set
+     * @returns 102 - Player fetch failed
+     */
     async setVTuber() {
-        const vData: VData = {
-            id: this.id,
-            name: undefined,
-            avatar: undefined,
-            description: undefined,
-            imageFolders: undefined
+        // Check class
+        if (this.class?.includes('VTUBER')) {
+            return 101 // Already set
         }
-        this.v = new V(vData, this, this.#amateras)
-        if (this.class) this.class.push('VTUBER')
-        await this.v.init()
-        await this.v.save()
-        await this.save()
+        const v = await this.#amateras.players.v.fetch(this.id)
+        if (v instanceof V) {
+            if (this.class) this.class.push('VTUBER')
+            this.v = v
+            await this.save()
+            return this.v // Fetch old data from database and set this player to V
+        } else if (v === 404) {
+            const newV = await this.#amateras.players.v.create(this.id)
+            if (newV instanceof V) {
+                this.v = newV
+                if (this.class) this.class.push('VTUBER')
+                await this.v.init()
+                await this.v.save()
+                await this.save()
+                return this.v
+            } else {
+                return 102 // Player fetch failed
+            }
+        } else {
+            return 102 // Player fetch failed
+        }
     }
 
+    /**
+     * Remove V class from this player
+     * @returns 100 - Success
+     * @returns 101 - Already removed
+     */
     async unsetVTuber() {
+        if (!this.class?.includes('VTUBER')) {
+            this.v = undefined
+            return 101 // Already removed
+        }
         this.v = undefined
         if (this.class) this.class = removeArrayItem(this.class, 'VTUBER')
         await this.save()
+        return 100
     }
 
     joinLobby(lobby: Lobby) {

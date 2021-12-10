@@ -67,7 +67,7 @@ export default class Amateras {
         this.me = player
         await this.system.init()
         console.time('| Global Command Deployed')
-        await this.commands.init()
+        //await this.commands.init()
         console.timeEnd('| Global Command Deployed')
         console.timeEnd('| System Initialized')
         this.eventHandler()

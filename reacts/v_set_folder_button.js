@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 function v_set_folder_button(interact, amateras, options) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.debug(1);
         const footer = interact.message.embeds[0].footer;
         if (!footer || footer.text !== interact.user.id) {
             interact.reply({ content: '你无法更改别人的形象。', ephemeral: true });
@@ -28,6 +29,8 @@ function v_set_folder_button(interact, amateras, options) {
         const select = new discord_js_1.MessageSelectMenu;
         select.placeholder = '选择你的文件夹';
         select.customId = interact.id + '_v_set_default_folder_select';
+        if (player.v.imageFolders.folders.size === 0)
+            return interact.reply({ content: `Error: Folder not exist`, ephemeral: true });
         for (const folder of player.v.imageFolders.folders.values()) {
             select.addOptions({
                 label: folder.name ? folder.name : '未命名',
@@ -36,6 +39,7 @@ function v_set_folder_button(interact, amateras, options) {
             });
         }
         action.addComponents(select);
+        console.debug(action);
         if (message)
             message.edit({ components: [action] });
         else if (options)
