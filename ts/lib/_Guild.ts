@@ -7,6 +7,8 @@ import { GuildLog } from "./GuildLog";
 import { cloneObj } from "./terminal";
 import { _ChannelManager } from "./_ChannelManager";
 import { GuildCommandManager } from "./GuildCommandManager";
+import { _RoleManager } from "./_RoleManager";
+import { Err } from "./Err";
 
 export class _Guild {
     #amateras: Amateras;
@@ -19,6 +21,7 @@ export class _Guild {
     #forums?: ForumManagerData;
     forums: ForumManager;
     commands: GuildCommandManager;
+    roles: _RoleManager;
 
     constructor(data: _GuildData, guild: Guild, amateras: Amateras) {
         this.#amateras = amateras
@@ -30,6 +33,7 @@ export class _Guild {
         this.#lobby = data.lobby
         this.#forums = data.forums
         this.forums = <ForumManager>{}
+        this.roles = new _RoleManager(this, this.#amateras)
     }
 
     async init() {
@@ -49,11 +53,14 @@ export class _Guild {
         console.time('| Forum loaded')
         await this.forums.init()
         console.timeEnd('| Forum loaded')
+        console.time('| Role loaded')
+        await this.roles.init()
+        console.timeEnd('| Role loaded')
         await this.save()
     }
 
     async save() {
-        const data = cloneObj(this, ['get'])
+        const data = cloneObj(this, ['get', 'roles'])
         data.commands = this.commands.toData()
         data.log = this.log ? this.log.toData() : undefined
         data.lobby = this.lobby ? this.lobby.toData() : undefined
@@ -104,19 +111,12 @@ export class _Guild {
         try {
             return await this.get.members.fetch(id)
         } catch(err) {
-            console.debug(`Member ${id} not exist`)
-            console.debug(err)
+            new Err(`Member fetch failed. (User)${id}`)
             return 404
         }
     }
 
-    async role(id: string) {
-        try {
-            return await this.get.roles.fetch(id)
-        } catch(err) {
-            console.debug(`Role ${id} not exist`)
-            console.debug(err)
-            return 404
-        }
+    async setRoleVTuber() {
+        
     }
 }

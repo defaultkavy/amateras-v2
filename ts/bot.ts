@@ -2,16 +2,16 @@ process.env.TZ = 'Asia/Kuala_Lumpur'
 // NodeJS module
 import { Client, Intents } from 'discord.js';
 import { Db, MongoClient } from 'mongodb';
-
 // AMATERAS Library
 import Amateras from './lib/Amateras';
 import cmd from './lib/cmd';
+import { Err } from './lib/Err';
 // Client config
 let config = require('./bot_config.json')
 // Create Bot Client
 // Client Options - Partials: Cache message and reaction.
 const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
     partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
 // Database Client

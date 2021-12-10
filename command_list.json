@@ -576,10 +576,7 @@
             "name": "VTuber",
             "type": 2,
             "default_permission": false
-        }
-    ],
-
-    "global_commands": [
+        },
         {
             "name": "sys",
             "description": "系统管理",
@@ -645,7 +642,7 @@
                     ]
                 },
                 {
-                    "name": "vtuber",
+                    "name": "v",
                     "description": "VTuber 设定",
                     "type": 2,
                     "options": [
@@ -657,21 +654,17 @@
                                 {
                                     "name": "user",
                                     "description": "玩家",
-                                    "type": 6,
-                                    "required": true
-                                }
-                            ]
-                        },
-                        {
-                            "name": "unset",
-                            "description": "取消玩家的 VTuber 设定",
-                            "type": 1,
-                            "options": [
+                                    "type": 6
+                                },
                                 {
-                                    "name": "user",
-                                    "description": "玩家",
-                                    "type": 6,
-                                    "required": true
+                                    "name": "role",
+                                    "description": "身份组",
+                                    "type": 8
+                                },
+                                {
+                                    "name": "enable",
+                                    "description": "开关",
+                                    "type": 5
                                 }
                             ]
                         }
@@ -679,5 +672,8 @@
                 }
             ]
         }
+    ],
+
+    "global_commands": [
     ]
 }

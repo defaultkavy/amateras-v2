@@ -178,17 +178,19 @@ function execute(interaction, amateras) {
                     return interaction.reply({ content: `${player.mention()} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true });
                 }
                 if (role) {
-                    let target = yield (_guild === null || _guild === void 0 ? void 0 : _guild.role(role));
+                    const _role = yield (_guild === null || _guild === void 0 ? void 0 : _guild.roles.fetch(role));
+                    if (_role === 404)
+                        return interaction.reply({ content: `Error: Role fetch failed` });
                     if (enable === undefined) {
-                        return interaction.reply({ content: `${target} mod 权限更改为：${((_f = _guild.commands.cache.get('mod')) === null || _f === void 0 ? void 0 : _f.hasPermission(role)) ? '开' : '关'}`, ephemeral: true });
+                        return interaction.reply({ content: `${_role.mention} mod 权限更改为：${((_f = _guild.commands.cache.get('mod')) === null || _f === void 0 ? void 0 : _f.hasPermission(role)) ? '开' : '关'}`, ephemeral: true });
                     }
                     if (interaction.user.id !== _guild.get.ownerId)
                         return interaction.reply({ content: `此功能仅限伺服器所有者使用`, ephemeral: true });
                     if (enable && (yield ((_g = _guild === null || _guild === void 0 ? void 0 : _guild.commands.cache.get('mod')) === null || _g === void 0 ? void 0 : _g.permissionEnable(role, 'ROLE'))) === 105)
-                        return interaction.reply({ content: `${target} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                        return interaction.reply({ content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
                     else if (enable === false && (yield ((_h = _guild === null || _guild === void 0 ? void 0 : _guild.commands.cache.get('mod')) === null || _h === void 0 ? void 0 : _h.permissionDisable(role, 'ROLE'))) === 105)
-                        return interaction.reply({ content: `${target} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
-                    return interaction.reply({ content: `${target} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true });
+                        return interaction.reply({ content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                    return interaction.reply({ content: `${_role.mention} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true });
                 }
                 // User and Role part is not filled
                 return interaction.reply({ content: '请选择目标', ephemeral: true });

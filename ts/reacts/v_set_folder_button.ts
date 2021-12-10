@@ -3,6 +3,7 @@ import Amateras from "../lib/Amateras"
 import { VImageFolder } from "../lib/VImageFolder"
 
 export default async function v_set_folder_button(interact: ButtonInteraction, amateras: Amateras, options?: { interactOld: CommandInteraction, messageEle: MessageElement }) {
+    console.debug(1)
     const footer = interact.message.embeds[0].footer
     if (!footer || footer.text !== interact.user.id) {
         interact.reply({content: '你无法更改别人的形象。', ephemeral: true})
@@ -18,6 +19,7 @@ export default async function v_set_folder_button(interact: ButtonInteraction, a
     const select = new MessageSelectMenu
     select.placeholder = '选择你的文件夹'
     select.customId = interact.id + '_v_set_default_folder_select'
+    if (player.v!.imageFolders.folders.size === 0) return interact.reply({content:`Error: Folder not exist`, ephemeral: true})
     for (const folder of player.v!.imageFolders.folders.values()) {
         select.addOptions({
             label: folder.name ? folder.name : '未命名',
@@ -26,6 +28,7 @@ export default async function v_set_folder_button(interact: ButtonInteraction, a
         })
     }
     action.addComponents(select)
+    console.debug(action)
     if (message) message.edit({components: [action]})
     else if (options) options.interactOld.editReply({components: [action]})
     interact.deferUpdate()
@@ -70,7 +73,6 @@ export default async function v_set_folder_button(interact: ButtonInteraction, a
         }
         comp![1].components[1].customId = `${set!.id}$${ set!.toArray().indexOf(image) + 1 }` + '#v_info_next_button'
         comp![1].components[0].customId = `${set!.id}$${ set!.toArray().indexOf(image) + 1 }` + '#v_info_prev_button'
-        
         if (message) await message.edit({embeds: [await player.v!.infoEmbed(set, image)], components: comp})
         else if (options) options.interactOld.editReply({embeds: [await player.v!.infoEmbed(set, image)], components: comp})
         interact2.deferUpdate()
