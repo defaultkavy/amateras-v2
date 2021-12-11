@@ -87,7 +87,6 @@ export default async function execute(interact: CommandInteraction, amateras: Am
                     }
                 }
             break;
-
             case 'v':
                 if (!subcmd0.options) return
                 for (const subcmd1 of subcmd0.options) {

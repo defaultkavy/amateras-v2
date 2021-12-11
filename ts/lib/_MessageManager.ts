@@ -46,6 +46,7 @@ export default class _MessageManager {
         }
         // Create Mission object
         const msg = new _Message(msgData, this.#amateras)
+        this.cache.set(msg.id, msg)
         await msg.init()
         await msg.save()
         return msg

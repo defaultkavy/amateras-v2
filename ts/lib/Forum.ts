@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Message, MessageEmbed, MessageEmbedOptions, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { ForumManager } from "./ForumManager";
@@ -9,7 +9,7 @@ export class Forum {
     #amateras: Amateras;
     #collection: Collection;
     id: string;
-    channel: TextChannel;
+    get: TextChannel;
     #_guild: _Guild;
     #manager: ForumManager;
     state: "OPEN" | "CLOSED"
@@ -20,16 +20,16 @@ export class Forum {
         this.#_guild = _guild
         this.#manager = manager
         this.id = data.id
-        this.channel = <TextChannel>{}
+        this.get = <TextChannel>{}
         this.state = data.state
     }
 
     async init() {
-        this.channel = <TextChannel>await this.#_guild.get.channels.fetch(this.id)
+        this.get = <TextChannel>await this.#_guild.get.channels.fetch(this.id)
     }
 
     async save() {
-        let data = cloneObj(this, ['channel'])
+        let data = cloneObj(this, ['get'])
         // Check collection exist
         if (!this.#collection) {
             console.error(`Collection is ${this.#collection}`)
@@ -48,8 +48,12 @@ export class Forum {
 
     async close() {
         this.state = "CLOSED"
-        this.channel.setRateLimitPerUser(0)
+        this.get.setRateLimitPerUser(0)
         await this.save()
         this.#manager.cache.delete(this.id)
+    }
+
+    share(message: Message) {
+        return `Author: ${message.author} From: ${this.get} ${message.thread}\n\n${message.content}`
     }
 }

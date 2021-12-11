@@ -22,6 +22,7 @@ export class _Guild {
     forums: ForumManager;
     commands: GuildCommandManager;
     roles: _RoleManager;
+    channels: _ChannelManager;
 
     constructor(data: _GuildData, guild: Guild, amateras: Amateras) {
         this.#amateras = amateras
@@ -34,6 +35,7 @@ export class _Guild {
         this.#forums = data.forums
         this.forums = <ForumManager>{}
         this.roles = new _RoleManager(this, this.#amateras)
+        this.channels = new _ChannelManager(this, this.#amateras)
     }
 
     async init() {
