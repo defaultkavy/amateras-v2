@@ -1,6 +1,7 @@
 import { TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
+import { Err } from "./Err";
 import { Forum } from "./Forum";
 import { cloneObj } from "./terminal";
 import { _Guild } from "./_Guild";
@@ -35,19 +36,13 @@ export class ForumManager {
     async fetch(id: string) {
         const data = <ForumData>await this.#collection?.findOne({ id: id })
         if (!data) {
-            console.error(`Forum "${id}" fetch failed.`)
-            return
+            new Err(`Forum fetch failed. (Channel)${id}`)
+            return 404
         } else {
-            if (this.cache.has(id)) {
-                const forum = this.cache.get(id)!
-                await forum.init()
-                return forum
-            } else {
-                const forum = new Forum(data, this.#_guild, this, this.#amateras)
-                this.cache.set(id, forum)
-                await forum.init()
-                return forum 
-            }
+            const forum = new Forum(data, this.#_guild, this, this.#amateras)
+            this.cache.set(id, forum)
+            await forum.init()
+            return forum 
         }
     }
 
@@ -70,7 +65,7 @@ export class ForumManager {
 
     async closeForum(channel: TextChannel) {
         const forum = await this.fetch(channel.id)
-        if (forum && forum.state === "OPEN") {
+        if (forum instanceof Forum && forum.state === "OPEN") {
             await forum.close()
             await this.#_guild.save()
             return 100

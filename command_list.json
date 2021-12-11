@@ -543,6 +543,18 @@
             ]
         },
         {
+            "name": "share",
+            "description": "分享",
+            "options": [
+                {
+                    "name": "url",
+                    "description": "贴文讯息链接",
+                    "type": 3,
+                    "required": true
+                }
+            ]
+        },
+        {
             "name": "Angry",
             "type": 3,
             "default_permission": false
@@ -569,11 +581,6 @@
         },
         {
             "name": "Toggle",
-            "type": 2,
-            "default_permission": false
-        },
-        {
-            "name": "VTuber",
             "type": 2,
             "default_permission": false
         },
