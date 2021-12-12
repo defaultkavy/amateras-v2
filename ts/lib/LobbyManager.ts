@@ -1,6 +1,7 @@
 import { Message, MessageActionRow, MessageButton, MessageEmbedOptions, OverwriteResolvable, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
+import { Err } from "./Err";
 import { Lobby } from "./Lobby";
 import { cloneObj, removeArrayItem } from "./terminal";
 import { _Channel } from "./_Channel";
@@ -10,68 +11,91 @@ export class LobbyManager {
     #amateras: Amateras;
     #collection: Collection;
     #_guild: _Guild;
-    #lobbies: string[];
-    #channel: string;
-    channel: TextChannel;
+    #data?: LobbyManagerData;
+    channel?: TextChannel;
     cache: Map<string, Lobby>
-    #message?: string;
     message?: Message;
     #resolve: Map<string, Lobby>
     permissions: string[]
-    constructor(data: LobbyManagerData, _guild: _Guild, amateras: Amateras) {
+    enabled: boolean
+    constructor(data: LobbyManagerData | undefined, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('lobbies')
         this.#_guild = _guild
-        this.#channel = data.channel
+        this.#data = data
         this.channel = <TextChannel>{}
-        this.#lobbies = data.lobbies
         this.cache = new Map
-        this.#message = data.message
         this.message
         this.#resolve = new Map
-        this.permissions = data.permissions ? data.permissions : []
+        this.permissions = this.#data ? this.#data.permissions : []
+        this.enabled = false
     }
 
     async init() {
-        let channel
-        try {
-            channel = await this.#_guild.get.channels.fetch(this.#channel)
-            if (!channel) {
-                console.error('channel is ' + channel)
-                return
-            }
-        } catch {
-            console.error('Lobby Channel is deleted. Lobby function close.')
-            this.#_guild.closeLobbyManager()
+        if (!this.#data) {
+            this.enabled = false
             return
         }
-        this.channel = <TextChannel>channel
-        if (this.#lobbies && this.#lobbies.length !== 0) {
-            for (const lobbyId of this.#lobbies) {
-                const lobbyData = <LobbyData>await this.#collection.findOne({owner: lobbyId, state: "OPEN"})
-                if (lobbyData) {
-                    const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
-                    this.cache.set(lobbyId, lobby)
-                    if (await lobby.init()) this.#resolve.set(lobby.categoryChannel.id, lobby)
-                    else this.cache.delete(lobbyId)
+        try {
+            const channel = await this.#_guild.channels.fetch(this.#data?.channel)
+                if (channel === 404) { 
+                    new Err(`Lobby channel fetch failed`)
+                    return 404
+                }
+                    this.channel = <TextChannel>channel.get
+            if (this.#data.lobbies && this.#data.lobbies.length !== 0) {
+                for (const lobbyId of this.#data.lobbies) {
+                    const lobbyData = <LobbyData>await this.#collection.findOne({owner: lobbyId, state: "OPEN"})
+                    if (lobbyData) {
+                        const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
+                        this.cache.set(lobbyId, lobby)
+                        if (await lobby.init()) this.#resolve.set(lobby.categoryChannel.id, lobby)
+                        else this.cache.delete(lobbyId)
+                    }
                 }
             }
-        }
-        if (this.#message) try {
-            this.message = await this.channel.messages.fetch(this.#message)
+            if (this.#data.message) {
+                try {
+                    this.message = await this.channel.messages.fetch(this.#data.message)
+                } catch {
+                    new Err(`Lobby message fetch failed`)
+                }
+            }
+            if (!this.message) await this.sendInitMessage()
+            else await this.updateInitMessage()
         } catch {
-            console.error('Lobby Message is deleted.')
+            return 404
         }
-        if (!this.message) await this.sendInitMessage()
-        else await this.updateInitMessage()
     }
 
+    /**
+     * Setup lobby channel
+     * @returns 101 - Already set
+     */
     async setup(channel: TextChannel) {
+        if (this.channel && this.channel.id === channel.id) return 101
+        this.enabled = true
         this.channel = channel
-        this.#channel = channel.id
         if (this.message && !this.message.deleted) this.message.delete()
         await this.sendInitMessage()
         await this.#_guild.save()
+        return this.channel
+    }
+
+    /**
+     * Unset lobby channel
+     * @returns 100 - Success
+     * @returns 101 - Lobby channel never set
+     * @returns 102 - Not a lobby channel
+     */
+    async unset(channel: TextChannel) {
+        if (!this.channel) return 101
+        if (this.channel.id !== channel.id) return 102
+        this.enabled = false
+        this.channel = undefined
+        if (this.message && !this.message.deleted) this.message.delete()
+        await this.#_guild.save()
+        return 100
     }
 
     async fetch(id: string) {
@@ -128,8 +152,7 @@ export class LobbyManager {
         }
         const category = await this.#_guild.get.channels.create(member.displayName + '的房间', {
             type: 'GUILD_CATEGORY',
-            permissionOverwrites: [ownerPermission, otherPermission],
-            position: this.channel.parent ? this.channel.parent.position + 1 : this.channel.position + 1
+            permissionOverwrites: [ownerPermission, otherPermission]
         })
         const infoChannel = await category.createChannel('素材频道', {
             type: 'GUILD_TEXT'
@@ -169,13 +192,14 @@ export class LobbyManager {
 
     toData() {
         const data = cloneObj(this, ['cache'])
-        data.channel = this.#channel
+        data.channel = this.channel ? this.channel.id : undefined
         data.lobbies = Array.from(this.cache.keys())
-        data.message = this.#message
+        data.message = this.message ? this.message.id : undefined
         return data
     }
 
     private async sendInitMessage() {
+        if (!this.channel) return 101
         const embed = this.initEmbed()
         const create_button = new MessageButton
         create_button.label = '创建房间'
@@ -190,7 +214,6 @@ export class LobbyManager {
         action.addComponents(close_button)
         const message = await this.channel.send({embeds: [embed], components: [action]})
         this.message = message
-        this.#message = message.id
         this.#amateras.messages.create(message, {
             lobby_create: 'lobby_create',
             lobby_close: 'lobby_close'
@@ -217,14 +240,27 @@ export class LobbyManager {
         return embed
     }
 
+    /**
+     * Remove user from permission list
+     * @returns 100 - Success
+     * @returns 101 - Already added
+     */
     async permissionAdd(id: string) {
-        if (this.permissions.includes(id)) return
+        if (this.permissions.includes(id)) return 101
         this.permissions.push(id)
         await this.#_guild.save()
+        return 100
     }
 
+    /**
+     * Remove user from permission list
+     * @returns 100 - Success
+     * @returns 101 - Already removed
+     */
     async permissionRemove(id: string) {
+        if (!this.permissions.includes(id)) return 101
         this.permissions = removeArrayItem(this.permissions, id)
         await this.#_guild.save()
+        return 100
     }
 }

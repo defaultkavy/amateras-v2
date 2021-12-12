@@ -51,6 +51,7 @@ export class Forum {
         this.get.setRateLimitPerUser(0)
         await this.save()
         this.#manager.cache.delete(this.id)
+        await this.#_guild.save()
     }
 
     share(message: Message) {

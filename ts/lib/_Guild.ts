@@ -16,8 +16,7 @@ export class _Guild {
     id: string;
     get: Guild;
     log: GuildLog;
-    #lobby?: LobbyManagerData;
-    lobby?: LobbyManager;
+    lobby: LobbyManager;
     #forums?: ForumManagerData;
     forums: ForumManager;
     commands: GuildCommandManager;
@@ -31,7 +30,7 @@ export class _Guild {
         this.id = data.id
         this.commands = new GuildCommandManager(data.commands, this, this.#amateras)
         this.log = new GuildLog(data.log, this, this.#amateras)
-        this.#lobby = data.lobby
+        this.lobby = new LobbyManager(data.lobby, this, this.#amateras)
         this.#forums = data.forums
         this.forums = <ForumManager>{}
         this.roles = new _RoleManager(this, this.#amateras)
@@ -45,12 +44,8 @@ export class _Guild {
         console.time('| Guild Log Channel loaded')
         await this.log.init()
         console.timeEnd('| Guild Log Channel loaded')
-        if (this.#lobby) {
-            this.lobby = new LobbyManager(this.#lobby, this, this.#amateras)
-            console.time('| Lobby loaded')
-            await this.lobby.init()
-            console.timeEnd('| Lobby loaded')
-        }
+        await this.lobby.init()
+        console.timeEnd('| Lobby loaded')
         this.forums = new ForumManager(this.#forums, this, this.#amateras)
         console.time('| Forum loaded')
         await this.forums.init()
@@ -62,7 +57,7 @@ export class _Guild {
     }
 
     async save() {
-        const data = cloneObj(this, ['get', 'roles'])
+        const data = cloneObj(this, ['get', 'roles', 'channels'])
         data.commands = this.commands.toData()
         data.log = this.log ? this.log.toData() : undefined
         data.lobby = this.lobby ? this.lobby.toData() : undefined
@@ -75,40 +70,6 @@ export class _Guild {
         }
     }
 
-    async setupLobbyManager(channel: TextChannel) {
-        if (this.lobby) {
-            await this.lobby.setup(channel)
-        } else {
-            const data: LobbyManagerData = {
-                channel: channel.id,
-                lobbies: [],
-                message: undefined,
-                permissions: []
-            }
-            this.lobby = new LobbyManager(data, this, this.#amateras)
-            await this.lobby.init()
-        }
-        console.log(`Guild ${this.id} Lobby Function is on.`)
-    }
-
-    async closeLobbyManager() {
-        if (this.lobby) {
-            if (this.lobby.cache.size !== 0) {
-                for (const lobby of this.lobby.cache.values()) {
-                    await lobby.close()
-                }
-            }
-            if (this.lobby.message) {
-                try { this.lobby.message.delete() } catch { }
-            }
-        } else return 101
-        this.lobby = undefined
-        this.#lobby = undefined
-        await this.save()
-        console.log(`Guild ${this.id} Lobby Function is off.`)
-        return 100
-    }
-
     async member(id: string) {
         try {
             return await this.get.members.fetch(id)
@@ -116,9 +77,5 @@ export class _Guild {
             new Err(`Member fetch failed. (User)${id}`)
             return 404
         }
-    }
-
-    async setRoleVTuber() {
-        
     }
 }
