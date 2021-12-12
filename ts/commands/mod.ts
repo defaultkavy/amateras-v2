@@ -11,47 +11,100 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
         case 'lobby':
             if (!subcmd0.options) return
             const lobbyChannel = interaction.channel
+            if (!lobbyChannel || lobbyChannel.type !== 'GUILD_TEXT') return interaction.reply({ content: 'Error: Channel is not GUILD_TEXT'})
             if (!_guild) return
             for (const subcmd1 of subcmd0.options) {
                 switch (subcmd1.name) {
-                    case 'setup':
-                        if (lobbyChannel && lobbyChannel.type === 'GUILD_TEXT') {
-                            _guild.setupLobbyManager(lobbyChannel)
-                            interaction.reply({ content: '房间频道设定完成', ephemeral: true })
+                    case 'set':
+                        // Check sub-command is filled
+                        if (subcmd1.options) {
+                            const value = {enable: false}
+                            for (const subcmd2 of subcmd1.options) {
+                                switch (subcmd2.name) {
+                                    case 'enable':
+                                        value.enable = <boolean>subcmd2.value
+                                    break;
+                                }
+                            }
+                            if (value.enable === true) {
+                                if (await _guild.lobby.setup(lobbyChannel) === 101) {
+                                    interaction.reply({ content: `此频道房间模式保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                } else {
+                                    interaction.reply({ content: `此频道房间模式更改为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                }
+                            } else if (value.enable === false) {
+                                const unset = await _guild.lobby.unset(lobbyChannel)
+                                if (unset === 101) {
+                                    interaction.reply({ content: `当前没有设立的房间频道`, ephemeral: true })
+                                } else if (unset === 102) {
+                                    interaction.reply({ content: `此频道不是房间频道`, ephemeral: true })
+                                }else {
+                                    interaction.reply({ content: `此频道房间模式更改为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                }
+                            }
                         } else {
-                            interaction.reply({ content: '错误：必须是文字频道', ephemeral: true })
+                            if (!_guild.lobby.channel) {
+                                interaction.reply({ content: `房间模式：关`, ephemeral: true })
+                            } else {
+                                if (_guild.lobby.channel) return interaction.reply({ content: `房间模式：开，${_guild.lobby.channel}`, ephemeral: true })
+                                interaction.reply({ content: `房间模式：开`, ephemeral: true })
+                            }
+                            
                         }
-                    break;
-                    case 'unset':
-                        if (await _guild.closeLobbyManager() === 100) {
-                            interaction.reply({ content: '房间系统已关闭', ephemeral: true })
-                        } else {
-                            interaction.reply({ content: '错误：房间系统未开启', ephemeral: true })
-                        }
+                        
                     break;
                     case 'permission':
                         if (!subcmd1.options) return
                         if (!_guild?.lobby) return
-                        let role = ''
-                        let boolean = null
+                        const value: {user?: string, role?: string, enable?: boolean} = {
+                            user: undefined,
+                            role: undefined,
+                            enable: undefined
+                        }
                         for (const subcmd2 of subcmd1.options) {
                             switch (subcmd2.name) {
-                                case 'role':
-                                    role = <string>subcmd2.value
+                                case 'user':
+                                    value.user = <string>subcmd2.value
                                 break;
-                                case 'switch':
-                                    boolean = <boolean>subcmd2.value
+                                case 'role':
+                                    value.role = <string>subcmd2.value
+                                break;
+                                case 'enable':
+                                    value.enable = <boolean>subcmd2.value
                                 break;
                             }
                         }
-                        if (boolean === null) {
-                            interaction.reply({ content: `${_guild.get.roles.cache.get(role)}创建房间权限：${_guild?.lobby.permissions.includes(role) ? '开' : '关'}`, ephemeral: true })
-                        } else if (boolean === true) {
-                            await _guild?.lobby.permissionAdd(role)
-                            interaction.reply({ content: `${_guild.get.roles.cache.get(role)}开启创建房间权限`, ephemeral: true })
-                        } else if (boolean === false) {
-                            await _guild?.lobby.permissionRemove(role)
-                            interaction.reply({ content: `${_guild.get.roles.cache.get(role)}关闭创建房间权限`, ephemeral: true })
+                        if (value.user) {
+                            const player = await amateras.players.fetch(value.user)
+                            if (player === 404) return interaction.reply({content: 'Error: Player fetch failed'})
+                            if (value.enable === undefined) {
+                                interaction.reply({ content: `${player.mention()}创建房间权限：${_guild.lobby.permissions.includes(value.user) ? '开' : '关'}`, ephemeral: true })
+                            } else {
+                                if (value.enable === true) {
+                                    if (await _guild.lobby.permissionAdd(value.user) === 101)
+                                        return interaction.reply({ content: `${player.mention()}创建房间权限保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                } else {
+                                    if (await _guild.lobby.permissionRemove(value.user) === 101)
+                                        return interaction.reply({ content: `${player.mention()}创建房间权限保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                }
+                                interaction.reply({ content: `${player.mention()}创建房间权限更改为：${_guild.lobby.permissions.includes(value.user) ? '开' : '关'}`, ephemeral: true })
+                            }
+                        }
+                        if (value.role) {
+                            const _role = await _guild.roles.fetch(value.role)
+                            if (_role === 404) return interaction.reply({content: 'Error: Role fetch failed'})
+                            if (value.enable === undefined) {
+                                interaction.reply({ content: `${_role.mention()}创建房间权限：${_guild.lobby.permissions.includes(value.role) ? '开' : '关'}`, ephemeral: true })
+                            } else {
+                                if (value.enable === true) {
+                                    if (await _guild.lobby.permissionAdd(value.role) === 101)
+                                        return interaction.reply({ content: `${_role.mention()}创建房间权限保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                } else {
+                                    if (await _guild.lobby.permissionRemove(value.role) === 101)
+                                        return interaction.reply({ content: `${_role.mention()}创建房间权限保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                }
+                                interaction.reply({ content: `${_role.mention()}创建房间权限更改为：${_guild.lobby.permissions.includes(value.role) ? '开' : '关'}`, ephemeral: true })
+                            }
                         }
                     break;
                 }
@@ -60,31 +113,48 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
 
         case 'forum':
             if (!subcmd0.options) return
+            // Check channel is text channel
             const forumChannel = interaction.channel
+            if (!forumChannel || forumChannel.type !== 'GUILD_TEXT') return interaction.reply({ content: 'Error: Channel is not GUILD_TEXT'})
             if (!_guild) return
             for (const subcmd1 of subcmd0.options) {
                 switch (subcmd1.name) {
-                    case 'setup':
-                        if (forumChannel && forumChannel.type === 'GUILD_TEXT') {
-                            if (await _guild.forums?.create(forumChannel) === 101) {
-                                interaction.reply({ content: '错误：此频道论坛模式未关闭', ephemeral: true })
-                            } else {
-                                interaction.reply({ content: '论坛模式已开启', ephemeral: true })
+                    case 'set':
+                        // Check sub-command is filled
+                        if (subcmd1.options) {
+                            const value = {enable: false}
+                            for (const subcmd2 of subcmd1.options) {
+                                switch (subcmd2.name) {
+                                    case 'enable':
+                                        value.enable = <boolean>subcmd2.value
+                                    break;
+                                }
+                            }
+                            if (value.enable === true) {
+                                if (await _guild.forums.create(forumChannel) === 101) {
+                                    interaction.reply({ content: `此频道论坛模式保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                } else {
+                                    interaction.reply({ content: `此频道论坛模式更改为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                }
+                            } else if (value.enable === false) {
+                                const forum = await _guild.forums.fetch(forumChannel.id)
+                                if (forum === 404 || forum.state === 'CLOSED') {
+                                    interaction.reply({ content: `此频道论坛模式保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                } else {
+                                    await forum.close()
+                                    interaction.reply({ content: `此频道论坛模式更改为：${value.enable ? '开' : '关'}`, ephemeral: true })
+                                }
                             }
                         } else {
-                            interaction.reply({ content: '错误：必须是文字频道', ephemeral: true })
-                        }
-                    break;
-                    case 'unset':
-                        if (forumChannel && forumChannel.type === 'GUILD_TEXT') {
-                            if (await _guild.forums?.closeForum(forumChannel) === 101) {
-                                interaction.reply({ content: '错误：此频道论坛模式未开启', ephemeral: true })
+                            const forum = await _guild.forums.fetch(forumChannel.id)
+                            if (forum === 404 || forum.state === 'CLOSED') {
+                                interaction.reply({ content: `此频道论坛模式：关`, ephemeral: true })
                             } else {
-                                interaction.reply({ content: '论坛模式已关闭', ephemeral: true })
+                                interaction.reply({ content: `此频道论坛模式：开`, ephemeral: true })
                             }
-                        } else {
-                            interaction.reply({ content: '错误：必须是文字频道', ephemeral: true })
+                            
                         }
+                        
                     break;
                 }
             }

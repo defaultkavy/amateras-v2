@@ -36,8 +36,7 @@ export class ForumManager {
     async fetch(id: string) {
         const data = <ForumData>await this.#collection?.findOne({ id: id })
         if (!data) {
-            new Err(`Forum fetch failed. (Channel)${id}`)
-            return 404
+            return 404 // Forum not found
         } else {
             const forum = new Forum(data, this.#_guild, this, this.#amateras)
             this.cache.set(id, forum)
@@ -61,16 +60,5 @@ export class ForumManager {
         const data = cloneObj(this, ['cache'])
         data.list = Array.from(this.cache.keys())
         return data
-    }
-
-    async closeForum(channel: TextChannel) {
-        const forum = await this.fetch(channel.id)
-        if (forum instanceof Forum && forum.state === "OPEN") {
-            await forum.close()
-            await this.#_guild.save()
-            return 100
-        } else {
-            return 101 // Forum not found.
-        }
     }
 }

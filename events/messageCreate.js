@@ -38,8 +38,8 @@ module.exports = {
             }
             //Forum
             if (_guild && _guild.forums) {
-                const forum = _guild.forums.cache.get(message.channel.id);
-                if (forum && message.channel.type === "GUILD_TEXT") {
+                const forum = yield _guild.forums.fetch(message.channel.id);
+                if (forum !== 404 && forum.state === "OPEN" && message.channel.type === "GUILD_TEXT") {
                     let content = '';
                     if (message.cleanContent) {
                         content = message.cleanContent;

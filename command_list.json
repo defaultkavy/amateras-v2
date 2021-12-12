@@ -403,14 +403,17 @@
                     "type": 2,
                     "options": [
                         {
-                            "name": "setup",
+                            "name": "set",
                             "description": "设定频道为论坛频道",
-                            "type": 1
-                        },
-                        {
-                            "name": "unset",
-                            "description": "将此频道关闭论坛模式",
-                            "type": 1
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "enable",
+                                    "description": "开关",
+                                    "type": 5,
+                                    "required": false
+                                }
+                            ]
                         }
                     ]
                 },
@@ -420,14 +423,17 @@
                     "type": 2,
                     "options": [
                         {
-                            "name": "setup",
-                            "description": "设定频道为房间大厅频道",
-                            "type": 1
-                        },
-                        {
-                            "name": "unset",
-                            "description": "关闭房间系统",
-                            "type": 1
+                            "name": "set",
+                            "description": "设定频道为论坛频道",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "enable",
+                                    "description": "开关",
+                                    "type": 5,
+                                    "required": false
+                                }
+                            ]
                         },
                         {
                             "name": "permission",
@@ -435,15 +441,22 @@
                             "type": 1,
                             "options": [
                                 {
+                                    "name": "user",
+                                    "description": "玩家选择",
+                                    "type": 6,
+                                    "required": false
+                                },
+                                {
                                     "name": "role",
                                     "description": "身份组选择",
                                     "type": 8,
-                                    "required": true
+                                    "required": false
                                 },
                                 {
-                                    "name": "switch",
+                                    "name": "enable",
                                     "description": "权限开关",
-                                    "type": 5
+                                    "type": 5,
+                                    "required": false
                                 }
                             ]
                         }
