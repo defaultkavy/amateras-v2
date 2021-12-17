@@ -99,57 +99,19 @@
             ]
         },
         {
-            "name": "vtuber",
+            "name": "v",
             "description": "VTuber 管理",
             "options": [
                 {
                     "name": "image",
                     "description": "图片管理",
-                    "type": "2",
+                    "type": "1",
                     "options": [
                         {
-                            "name": "add",
-                            "description": "添加图片",
-                            "type": "1",
-                            "options": [
-                                {
-                                    "name": "url",
-                                    "description": "输入图片网址",
-                                    "type": 3,
-                                    "required": true
-                                },
-                                {
-                                    "name": "folder",
-                                    "description": "选择文件夹（预设值为'default'，输入不存在的文件夹编号将会自动创建新文件夹）",
-                                    "type": 3,
-                                    "required": false
-                                }
-                            ]
-                        },
-                        {
-                            "name": "set",
-                            "description": "更改图片文件夹属性",
-                            "type": 1,
-                            "options": [
-                                {
-                                    "name": "id",
-                                    "description": "目标文件夹的ID",
-                                    "type": 3,
-                                    "required": true
-                                },
-                                {
-                                    "name": "name",
-                                    "description": "更改文件夹名称",
-                                    "type": 3,
-                                    "required": false
-                                },
-                                {
-                                    "name": "newid",
-                                    "description": "更改文件夹ID",
-                                    "type": 3,
-                                    "required": false
-                                }
-                            ]
+                            "name": "url",
+                            "description": "图片链接",
+                            "type": 3,
+                            "required": true
                         }
                     ]
                 },
@@ -159,34 +121,15 @@
                     "type": 1,
                     "options": [
                         {
+                            "name": "user",
+                            "description": "展示某个用户的名片",
+                            "type": 6,
+                            "required": false
+                        },
+                        {
                             "name": "share",
                             "description": "是否要分享？",
                             "type": 5,
-                            "required": false
-                        }
-                    ]
-                },
-                {
-                    "name": "edit",
-                    "description": "编辑你的 VTuber 名片",
-                    "type": 1,
-                    "options": [
-                        {
-                            "name": "name",
-                            "description": "编辑你的名字",
-                            "type": 3,
-                            "required": false
-                        },
-                        {
-                            "name": "intro",
-                            "description": "编辑你的简介",
-                            "type": 3,
-                            "required": false
-                        },
-                        {
-                            "name": "avatar",
-                            "description": "输入你的头像图片链接",
-                            "type": 3,
                             "required": false
                         }
                     ]
@@ -689,6 +632,11 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "name": "data",
+                    "description": "...",
+                    "type": 1
                 }
             ]
         }

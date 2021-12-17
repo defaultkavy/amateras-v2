@@ -91,9 +91,9 @@ function v_set_folder_button(interact, amateras, options) {
             comp[1].components[1].customId = `${set.id}$${set.toArray().indexOf(image) + 1}` + '#v_info_next_button';
             comp[1].components[0].customId = `${set.id}$${set.toArray().indexOf(image) + 1}` + '#v_info_prev_button';
             if (message)
-                yield message.edit({ embeds: [yield player.v.infoEmbed(set, image)], components: comp });
+                yield message.edit({ embeds: [], components: comp });
             else if (options)
-                options.interactOld.editReply({ embeds: [yield player.v.infoEmbed(set, image)], components: comp });
+                options.interactOld.editReply({ embeds: [], components: comp });
             interact2.deferUpdate();
             status = 1;
         }));

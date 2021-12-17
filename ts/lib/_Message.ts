@@ -1,6 +1,7 @@
 import { BaseGuildTextChannel, Channel, DMChannel, Guild, Message, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
+import { Err } from "./Err";
 import { cloneObj } from "./terminal";
 
 export class _Message {
@@ -62,6 +63,23 @@ export class _Message {
         const player = await this.#amateras.players.fetch(this.get.embeds[0].footer!.text!)
         if (player === 404) return
         const defaultFolder = player.v!.imageFolders.default
-        if (defaultFolder) this.get.edit({embeds: [await player.v!.infoEmbed(defaultFolder, Array.from(defaultFolder.images.values())[0])]})
+        if (defaultFolder) this.get.edit({embeds: []})
+    }
+
+    /**
+     * 
+     * @returns 100 - Success
+     * @returns 101 - Message delete failed
+     */
+    async delete() {
+        try {
+            const message = this.get.fetch()
+            if (!message) return 102
+            await this.get.delete()
+            return 100
+        } catch {
+            new Err(`Message delete failed. (Message)${this.id}`)
+            return 101
+        }
     }
 }

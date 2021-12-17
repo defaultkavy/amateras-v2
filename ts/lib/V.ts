@@ -1,6 +1,5 @@
 import { BaseGuildTextChannel, CommandInteraction, Interaction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageEmbedOptions, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
-import profile_change_button from "../reacts/profile_change_button";
 import v_info_page_button from "../reacts/v_info_page_button";
 import v_set_folder_button from "../reacts/v_set_folder_button";
 import Amateras from "./Amateras";
@@ -21,6 +20,7 @@ export class V {
     name?: string;
     description?: string;
     avatar?: string;
+    image?: string;
     constructor(data: VData, player: Player, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('v')
@@ -29,6 +29,7 @@ export class V {
         this.description = data.description
         this.avatar = data.avatar
         this.me = player
+        this.image = data.image
         this.#imageFolders = data.imageFolders
         this.imageFolders = <VImageFolderManager>{}
     }
@@ -62,128 +63,29 @@ export class V {
         this.name = vObj.name ? vObj.name : this.name
         this.description = vObj.description ? vObj.description : this.description
         this.avatar = vObj.avatar ? vObj.avatar : this.avatar
+        this.image = vObj.image ? vObj.image : this.image
         await this.save()
-    }
-
-    async sendInfo(interact: CommandInteraction, share: boolean) {
-        const channel = <TextChannel> interact.channel
-        const messageEle = await this.infoMessage(interact.user.id, channel.parentId!, share)
-
-        interact.reply({embeds: [messageEle.embed], components: messageEle.comp, ephemeral: !share})
-
-        if (share && messageEle.inLobby) {
-            this.#amateras.messages.create(<Message>await interact.fetchReply(), {
-                v_set_default_folder: 'v_set_folder_button',
-                v_info_prev_button: 'v_info_page_button',
-                v_info_next_button: 'v_info_page_button',
-                v_set_once_folder: 'v_set_folder_button'
-            })
-        }
-
-        if (!share) {
-            const collector = interact.channel!.createMessageComponentCollector({
-                filter: (interact2) => {
-                    if (!interact2.message.interaction) return false
-                    if (interact.user.id === interact2.user.id && interact2.message.interaction!.id === interact.id) return true
-                    return false
-                },
-                time: 1000 * 60
-            })
-
-            collector.on('collect', (interact2) => {
-                if (interact2.customId === messageEle.next_button.customId || interact2.customId === messageEle.prev_button.customId) {
-                    if (interact2.isButton()) v_info_page_button(interact2, this.#amateras, { interactOld: interact, messageEle: <MessageElement>messageEle})
-                } else {
-                    if (interact2.isButton()) v_set_folder_button(interact2, this.#amateras, { interactOld: interact, messageEle: <MessageElement>messageEle})
-                }
-            })
-
-            collector.on('end', () => {
-                interact.editReply({components: []})
-            })
-        }
+        await this.refreshInfoInLobby()
     }
 
     async sendInfoLobby (lobby: Lobby) {
-        const messageEle = await this.infoMessage(this.id, lobby.infoChannel.parentId!)
+        // Check if message already exist
+        const _messageFind = lobby.messages.get(this.id)
+        if (_messageFind) {
+            await _messageFind.delete()
+        }
+        const embed = this.infoEmbed()
+        if (embed === 101) return 101
+        const message = <Message>await lobby.infoChannel.send({embeds: [embed]})
 
-        const message = <Message>await lobby.infoChannel.send({embeds: [messageEle.embed], components: messageEle.comp})
-
-        const _message = await this.#amateras.messages.create(message, {
-            v_set_default_folder: 'v_set_folder_button',
-            v_info_prev_button: 'v_info_page_button',
-            v_info_next_button: 'v_info_page_button',
-            v_set_once_folder: 'v_set_folder_button'
-        })
+        const _message = await this.#amateras.messages.create(message)
 
         await lobby.setMessage(this.id, _message)
     }
 
-    private async infoMessage(userId: string, channelId?: string, share?: boolean) {
-        let inLobby
-        if (!channelId) {
-            inLobby = false
-        } else {
-            inLobby = this.me.joinedLobbies.has(channelId)
-        }
-        let image: VImage | undefined = undefined
-        let folder: VImageFolder | undefined = undefined
-        if (!share || inLobby) {
-            const lobbyDefaultFolder = this.me.joinedLobbies.get(channelId!)?.vFolder.get(userId)
-            folder = inLobby ? lobbyDefaultFolder ? lobbyDefaultFolder : this.imageFolders.default : this.imageFolders.default
-            if (folder) {
-                image = folder.images.entries().next().value[1]
-            }
-        }
-        const embed = await this.infoEmbed(folder, image)
-        const action = new MessageActionRow()
-        const action2 = new MessageActionRow()
-        let comp: MessageActionRow[] = []
-        if (folder && image) {
-            if (!share || inLobby) {
-                const set_default_button = new MessageButton()
-                set_default_button.label = '设定预设直播形象'
-                set_default_button.style = 'PRIMARY'
-                set_default_button.customId =  '#v_set_default_folder'
-                action.addComponents(set_default_button)
-                const prev_button = new MessageButton()
-                prev_button.label = '上一页'
-                prev_button.style = 'SECONDARY'
-                prev_button.customId = `${folder.id}$${ folder.toArray().indexOf(image) + 1 }` + '#v_info_prev_button'
-                const next_button = new MessageButton()
-                next_button.label = '下一页'
-                next_button.style = 'SECONDARY'
-                next_button.customId = `${folder.id}$${ folder.toArray().indexOf(image) + 1 }` + '#v_info_next_button'
-                action2.addComponents(prev_button)
-                action2.addComponents(next_button)
-    
-                if (inLobby) {
-                    const set_once_button = new MessageButton
-                    set_once_button.label = '设定本次直播形象'
-                    set_once_button.style = 'PRIMARY'
-                    set_once_button.customId = '#v_set_once_folder'
-                    action.addComponents(set_once_button)
-                }
-                comp.push(action)
-                comp.push(action2)
-            }
-        }
-        
-
-        return {
-            inLobby: inLobby,
-            embed: embed,
-            comp: comp,
-            set_default_button: action.components[0],
-            set_once_button: action.components[1],
-            prev_button: action2.components[0],
-            next_button: action2.components[1],
-        }
-    }
-
-    async infoEmbed(folder?: VImageFolder, image?: VImage) {
-        
-        const user = await this.#amateras.client.users.fetch(this.id)
+    infoEmbed() {
+        const user = this.me.get
+        if (!user) return 101
         const embed = new MessageEmbed({
             author: {
                 name: 'VTuber'
@@ -194,19 +96,37 @@ export class V {
                 url: this.avatar ? this.avatar : user.displayAvatarURL({ size:512 })
             },
             image: {
+                url: this.image
             },
+            fields: [
+                {
+                    name: 'Links',
+                    value: `[YouTube](https://www.youtube.com/channel/${this.me.youtube}) [Twitter](https://twitter.com/${this.me.twitter})\n[跳图链接](https://discord-reactive-images.fugi.tech/individual/${this.id})` 
+                }
+            ],
             footer: {
                 text: this.id
             },
             color: <number>this.me.color
         })
-        if (image) {
-            embed.setImage(image.url)
-            if (folder) {
-                embed.addField(`${folder.name ? folder.name : '未命名'}`, `${ folder.toArray().indexOf(image) + 1 } / ${ folder.toArray().length }`, true)
-            }
-        }
         
         return embed
+    }
+
+    async initInfoInLobby() {
+        for (const lobby of this.me.joinedLobbies) {
+            this.sendInfoLobby(lobby[1])
+        }
+    }
+
+    async refreshInfoInLobby() {
+        const embed = this.infoEmbed()
+        if (embed === 101) return 101
+        for (const lobby of this.me.joinedLobbies) {
+            const _message = lobby[1].messages.get(this.id)
+            if (_message) {
+                _message.get.edit({embeds: [embed]})
+            }
+        }
     }
 }

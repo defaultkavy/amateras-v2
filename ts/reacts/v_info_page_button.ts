@@ -35,7 +35,7 @@ export default async function v_info_page_button(interact: ButtonInteraction, am
     const image = folder.images.get(imageId[i - 1])
     comp[1].components[1].customId = `${folderId}$${ i }` + '#v_info_next_button'
     comp[1].components[0].customId = `${folderId}$${ i }` + '#v_info_prev_button'
-    if (message) await message.edit({embeds: [await player.v!.infoEmbed(folder, image)], components: comp})
-    else await options!.interactOld.editReply({embeds: [await player.v!.infoEmbed(folder, image)], components: comp})
+    if (message) await message.edit({embeds: [], components: comp})
+    else await options!.interactOld.editReply({embeds: [], components: comp})
     interact.deferUpdate()
 }
