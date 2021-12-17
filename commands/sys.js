@@ -9,6 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const google_spreadsheet_1 = require("google-spreadsheet");
+const config = require('../bot_config.json');
 function execute(interact, amateras) {
     var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
@@ -189,6 +191,45 @@ function execute(interact, amateras) {
                                 break;
                         }
                     }
+                    break;
+                case 'data':
+                    const doc = new google_spreadsheet_1.GoogleSpreadsheet('1vf1AzwVggPXZB9bCy9l8i1-jhUZYp87vV3WFACyhoS8');
+                    yield doc.useServiceAccountAuth({
+                        client_email: config.google.client_email,
+                        private_key: config.google.private_key
+                    });
+                    yield doc.loadInfo();
+                    const sheets = doc.sheetsByIndex;
+                    const data = [];
+                    const rows = yield sheets[0].getRows();
+                    const header = sheets[0].headerValues;
+                    // create JSON from sheet
+                    for (let r = 0; r < rows.length; r++) {
+                        const obj = {};
+                        header.forEach(varname => {
+                            obj[varname] = rows[r][varname];
+                        });
+                        data.push(obj);
+                    }
+                    console.log('Starting load V Data...');
+                    console.time('V Data loaded');
+                    for (const vData of data) {
+                        if (vData.discordId === '')
+                            continue;
+                        const v = yield amateras.players.v.fetch(vData.discordId);
+                        if (v === 404 || v === 101)
+                            continue;
+                        v.description = vData.description;
+                        v.me.youtube = vData.youtube_id;
+                        v.me.twitter = vData.id;
+                        yield v.setInfo({
+                            description: vData.description,
+                            name: vData.nameCh_front + vData.nameCh_back,
+                            image: vData.character_Img
+                        });
+                    }
+                    console.timeEnd('V Data loaded');
+                    interact.followUp({ content: 'Command: Data', ephemeral: true });
                     break;
             }
         }

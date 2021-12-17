@@ -73,8 +73,8 @@ export default async function v_set_folder_button(interact: ButtonInteraction, a
         }
         comp![1].components[1].customId = `${set!.id}$${ set!.toArray().indexOf(image) + 1 }` + '#v_info_next_button'
         comp![1].components[0].customId = `${set!.id}$${ set!.toArray().indexOf(image) + 1 }` + '#v_info_prev_button'
-        if (message) await message.edit({embeds: [await player.v!.infoEmbed(set, image)], components: comp})
-        else if (options) options.interactOld.editReply({embeds: [await player.v!.infoEmbed(set, image)], components: comp})
+        if (message) await message.edit({embeds: [], components: comp})
+        else if (options) options.interactOld.editReply({embeds: [], components: comp})
         interact2.deferUpdate()
         status = 1
     })

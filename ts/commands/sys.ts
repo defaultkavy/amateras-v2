@@ -1,6 +1,8 @@
 import { CommandInteraction } from "discord.js";
 import Amateras from "../lib/Amateras";
 import Wallet from "../lib/Wallet";
+import { GoogleSpreadsheet } from 'google-spreadsheet'
+const config = require('../bot_config.json')
 
 export default async function execute(interact: CommandInteraction, amateras: Amateras) {
     interact.deferReply({ephemeral: true})
@@ -162,7 +164,44 @@ export default async function execute(interact: CommandInteraction, amateras: Am
                     }
                 }
             break;
-    
+            case 'data':
+                const doc = new GoogleSpreadsheet('1vf1AzwVggPXZB9bCy9l8i1-jhUZYp87vV3WFACyhoS8')
+                await doc.useServiceAccountAuth({
+                    client_email: config.google.client_email,
+                    private_key: config.google.private_key
+                })
+                await doc.loadInfo()
+                const sheets = doc.sheetsByIndex
+                const data = []
+                const rows = await sheets[0].getRows()
+                const header = sheets[0].headerValues
+                // create JSON from sheet
+                for(let r = 0; r < rows.length; r++) {
+                    const obj: any = {}
+                    header.forEach(varname => {
+                        obj[varname] = rows[r][varname]
+                    })
+                    data.push(obj)
+                }
+
+                console.log('Starting load V Data...')
+                console.time('V Data loaded')
+                for (const vData of data) {
+                    if (vData.discordId === '') continue;
+                    const v = await amateras.players.v.fetch(vData.discordId)
+                    if (v === 404 || v === 101) continue;
+                    v.description = vData.description
+                    v.me.youtube = vData.youtube_id
+                    v.me.twitter = vData.id
+                    await v.setInfo({
+                        description: vData.description,
+                        name: vData.nameCh_front + vData.nameCh_back,
+                        image: vData.character_Img
+                    })
+                }
+                console.timeEnd('V Data loaded')
+                interact.followUp({ content: 'Command: Data', ephemeral: true })
+            break;
             }
         }
 }

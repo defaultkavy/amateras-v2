@@ -24,6 +24,7 @@ interface VObj {
     name?: string;
     description?: string;
     avatar?: string;
+    image?: string;
 }
 
 interface VData extends VObj {

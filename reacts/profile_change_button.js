@@ -21,7 +21,9 @@ function profile_change_button(interact, amateras) {
         const action = new discord_js_1.MessageActionRow;
         const button = new discord_js_1.MessageButton;
         if (message.embeds[0].author && message.embeds[0].author.name === 'Player') {
-            embed = yield player.v.infoEmbed();
+            if (!player.v)
+                return interact.deferUpdate();
+            embed = player.v.infoEmbed();
             button.label = '切换到 Player';
             button.style = 'PRIMARY';
             button.customId = '#profile_change_button';
@@ -35,6 +37,8 @@ function profile_change_button(interact, amateras) {
         else
             return;
         action.addComponents(button);
+        if (typeof embed === 'number')
+            return interact.deferUpdate();
         message.edit({ embeds: [embed], components: [action] });
         interact.deferUpdate();
     });

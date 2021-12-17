@@ -77,7 +77,7 @@ export class VImageFolderManager {
             const _message = lobby.messages.get(this.owner.id)
             if (_message) {
                 if (lobby.vFolder.has(this.owner.id)) continue
-                _message.updateVInfo()
+                // _message.updateVInfo()
             }
         }
         return folder

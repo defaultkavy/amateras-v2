@@ -52,9 +52,9 @@ function v_info_page_button(interact, amateras, options) {
         comp[1].components[1].customId = `${folderId}$${i}` + '#v_info_next_button';
         comp[1].components[0].customId = `${folderId}$${i}` + '#v_info_prev_button';
         if (message)
-            yield message.edit({ embeds: [yield player.v.infoEmbed(folder, image)], components: comp });
+            yield message.edit({ embeds: [], components: comp });
         else
-            yield options.interactOld.editReply({ embeds: [yield player.v.infoEmbed(folder, image)], components: comp });
+            yield options.interactOld.editReply({ embeds: [], components: comp });
         interact.deferUpdate();
     });
 }

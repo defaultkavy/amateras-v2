@@ -11,7 +11,8 @@ export default async function profile_change_button(interact: ButtonInteraction,
     const action = new MessageActionRow
     const button = new MessageButton
     if (message.embeds[0].author && message.embeds[0].author.name === 'Player') {
-        embed = await player.v!.infoEmbed()
+        if (!player.v) return interact.deferUpdate()
+        embed = player.v.infoEmbed()
         button.label = '切换到 Player'
         button.style = 'PRIMARY'
         button.customId = '#profile_change_button'
@@ -23,6 +24,7 @@ export default async function profile_change_button(interact: ButtonInteraction,
     } else return
 
     action.addComponents(button)
+    if (typeof embed === 'number') return interact.deferUpdate()
     message.edit({embeds: [embed], components: [action]})
     interact.deferUpdate()
 }

@@ -42,6 +42,7 @@ export class VManager {
             const v = new V(vData, player, this.#amateras)
             this.cache.set(id, v)
             await v.init()
+            await v.initInfoInLobby()
             await v.save()
             return v
         } else return 101 // Player fetch failed.

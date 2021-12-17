@@ -44,6 +44,7 @@ export class _Guild {
         console.time('| Guild Log Channel loaded')
         await this.log.init()
         console.timeEnd('| Guild Log Channel loaded')
+        console.time('| Lobby loaded')
         await this.lobby.init()
         console.timeEnd('| Lobby loaded')
         this.forums = new ForumManager(this.#forums, this, this.#amateras)

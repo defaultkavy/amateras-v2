@@ -1,1 +1,0 @@
-{"version":3,"file":"NotifyChannel.js","sourceRoot":"","sources":["../ts/lib/NotifyChannel.ts"],"names":[],"mappings":";;;AAEA,yCAAsC;AAGtC,MAAa,aAAc,SAAQ,mBAAQ;IAEvC,YAAY,IAAkB,EAAE,MAAc,EAAE,KAAY,EAAE,QAAkB;QAC5E,KAAK,CAAC,IAAI,EAAE,QAAQ,EAAE,MAAM,EAAE,KAAK,EAAE,QAAQ,CAAC,CAAA;IAClD,CAAC;CACJ;AALD,sCAKC"}
