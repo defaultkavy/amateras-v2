@@ -52,7 +52,7 @@ function execute(interact, amateras) {
                     if (!message)
                         return interact.reply('讯息不存在');
                     // Everything pass
-                    return interact.reply({ content: forum.share(message), allowedMentions: { parse: [] } });
+                    return interact.reply({ content: forum.share(message), files: message.attachments.toJSON(), allowedMentions: { parse: [] } });
                 }
                 catch (_a) {
                     return interact.reply({ content: '讯息不存在', ephemeral: true });

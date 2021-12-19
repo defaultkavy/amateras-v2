@@ -36,7 +36,7 @@ export default async function execute(interact: CommandInteraction, amateras: Am
                 const message = await (<TextChannel>_channel.get).messages.fetch(messageId)
                 if (!message) return interact.reply('讯息不存在')
                 // Everything pass
-                return interact.reply({content: forum.share(message), allowedMentions: {parse: []}})
+                return interact.reply({content: forum.share(message), files:message.attachments.toJSON(), allowedMentions: {parse: []}})
             } catch {
                 return interact.reply({content: '讯息不存在', ephemeral: true})
             }
