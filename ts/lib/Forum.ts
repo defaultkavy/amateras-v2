@@ -1,6 +1,7 @@
 import { Message, MessageEmbed, MessageEmbedOptions, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
+import { Err } from "./Err";
 import { ForumManager } from "./ForumManager";
 import { cloneObj } from "./terminal";
 import { _Guild } from "./_Guild";
@@ -25,7 +26,13 @@ export class Forum {
     }
 
     async init() {
-        this.get = <TextChannel>await this.#_guild.get.channels.fetch(this.id)
+        try {
+            this.get = <TextChannel>await this.#_guild.get.channels.fetch(this.id)
+            return 100
+        } catch {
+            new Err(`Channel fetch failed. (Channel)${this.id}`)
+            return 101
+        }
     }
 
     async save() {

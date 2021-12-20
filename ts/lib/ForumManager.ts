@@ -24,10 +24,15 @@ export class ForumManager {
         if (this.#forums && this.#forums.length > 0) {
             for (const forumId of this.#forums) {
                 const forumData = <ForumData>await this.#collection.findOne({id: forumId})
-                if (forumData) {
+                if (forumData && forumData.state === 'OPEN') {
                     const forum = new Forum(forumData, this.#_guild, this, this.#amateras)
                     this.cache.set(forumId, forum)
-                    await forum.init()
+                    if (await forum.init() === 101) {
+                        this.cache.delete(forumId)
+                        forum.state = 'CLOSED'
+                        console.log(`Forum state set to 'CLOSED'. (Channel)${forum.id}`)
+                        await forum.save()
+                    }
                 }
             }
         }
