@@ -13,14 +13,14 @@ function invite(interact, amateras) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         let lobby;
-        if (interact.guild) {
-            const guild = amateras.guilds.cache.get(interact.guild.id);
-            if (guild) {
-                lobby = yield ((_a = guild.lobby) === null || _a === void 0 ? void 0 : _a.fetch(interact.user.id));
-            }
-            else
-                return;
-        }
+        if (!interact.guild)
+            return;
+        const guild = amateras.guilds.cache.get(interact.guild.id);
+        if (!guild)
+            return;
+        lobby = yield ((_a = guild.lobby) === null || _a === void 0 ? void 0 : _a.fetch(interact.user.id));
+        if (lobby === 101 || lobby === 404)
+            return interact.reply({ content: '你没有创建房间', ephemeral: true });
         if (!interact.options.data) {
             interact.reply({ content: '请输入必要参数。', ephemeral: true });
             return;
@@ -35,8 +35,6 @@ function invite(interact, amateras) {
                     break;
             }
         }
-        if (!lobby)
-            return interact.reply({ content: '你没有创建房间', ephemeral: true });
         yield lobby.addMember(userId);
         interact.reply({ content: '已邀请', ephemeral: true });
     });

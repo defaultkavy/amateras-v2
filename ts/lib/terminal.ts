@@ -184,7 +184,16 @@ export function objectEqual(obj: any, object2: any) {
 export function arrayHasObj(arr: any[], obj: {}) {
     for (const child of arr) {
         if (child instanceof Object) {
-            return objectEqual(child, obj)
+            if (objectEqual(child, obj)) return true
+        }
+    }
+    return false
+}
+
+export function equalOneOf<T>(target: T, array: T[]) {
+    for (const element of array) {
+        if (target === element) {
+            return true
         }
     }
     return false

@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const terminal_1 = require("../lib/terminal");
 module.exports = {
     name: 'messageCreate',
     once: false,
@@ -38,22 +37,10 @@ module.exports = {
             }
             //Forum
             if (_guild && _guild.forums) {
-                const forum = yield _guild.forums.fetch(message.channel.id);
-                if (forum !== 404 && forum.state === "OPEN" && message.channel.type === "GUILD_TEXT") {
-                    let content = '';
-                    if (message.cleanContent) {
-                        content = message.cleanContent;
-                    }
-                    else if (message.attachments.first()) {
-                        content = Array.from(message.attachments)[0][1].name;
-                    }
-                    const name = (0, terminal_1.wordCounter)(content, 20);
-                    yield message.channel.threads.create({
-                        name: name,
-                        autoArchiveDuration: 1440,
-                        startMessage: message
-                    });
-                }
+                const forum = _guild.forums.cache.get(message.channel.id);
+                if (!forum)
+                    return;
+                forum.post(message);
             }
         });
     }

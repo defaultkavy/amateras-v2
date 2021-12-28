@@ -15,15 +15,15 @@ function lobby(interact, amateras) {
         let lobby;
         let currentLobby;
         let _guild;
-        if (interact.guild) {
-            _guild = amateras.guilds.cache.get(interact.guild.id);
-            if (_guild) {
-                lobby = yield ((_a = _guild.lobby) === null || _a === void 0 ? void 0 : _a.fetch(interact.user.id));
-                currentLobby = yield ((_b = _guild.lobby) === null || _b === void 0 ? void 0 : _b.fetchByCategory((_c = interact.channel.parent) === null || _c === void 0 ? void 0 : _c.id));
-            }
-            else
-                return;
-        }
+        if (!interact.guild)
+            return;
+        _guild = amateras.guilds.cache.get(interact.guild.id);
+        if (!_guild)
+            return;
+        lobby = yield ((_a = _guild.lobby) === null || _a === void 0 ? void 0 : _a.fetch(interact.user.id));
+        if (lobby === 101 || lobby === 404)
+            return interact.reply({ content: '你没有创建房间', ephemeral: true });
+        currentLobby = yield ((_b = _guild.lobby) === null || _b === void 0 ? void 0 : _b.fetchByCategory((_c = interact.channel.parent) === null || _c === void 0 ? void 0 : _c.id));
         for (const subcmd0 of interact.options.data) {
             switch (subcmd0.name) {
                 case 'create':
@@ -39,10 +39,8 @@ function lobby(interact, amateras) {
                     }
                     break;
                 case 'close':
-                    if (!lobby)
-                        return interact.reply({ content: '你没有创建房间', ephemeral: true });
-                    interact.reply({ content: '房间已关闭', ephemeral: true });
                     yield (lobby === null || lobby === void 0 ? void 0 : lobby.close());
+                    interact.reply({ content: '房间已关闭', ephemeral: true });
                     break;
                 case 'invite':
                     if (!subcmd0.options) {
@@ -59,8 +57,6 @@ function lobby(interact, amateras) {
                                 break;
                         }
                     }
-                    if (!lobby)
-                        return interact.reply({ content: '你没有创建房间', ephemeral: true });
                     yield lobby.addMember(userId);
                     interact.reply({ content: '已邀请', ephemeral: true });
                     break;

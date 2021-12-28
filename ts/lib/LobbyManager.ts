@@ -15,6 +15,7 @@ export class LobbyManager {
     channel?: TextChannel;
     cache: Map<string, Lobby>
     message?: Message;
+    threadMessage?: Message;
     #resolve: Map<string, Lobby>
     permissions: string[]
     enabled: boolean
@@ -26,6 +27,7 @@ export class LobbyManager {
         this.channel = <TextChannel>{}
         this.cache = new Map
         this.message
+        this.threadMessage
         this.#resolve = new Map
         this.permissions = this.#data ? this.#data.permissions : []
         this.enabled = false
@@ -61,8 +63,17 @@ export class LobbyManager {
                     new Err(`Lobby message fetch failed`)
                 }
             }
-            if (!this.message) await this.sendInitMessage()
-            else await this.updateInitMessage()
+
+            if (this.#data.threadMessage) {
+                try {
+                    if (this.message && this.message.thread) {
+                        this.threadMessage = await this.message.thread.messages.fetch(this.#data.threadMessage)
+                    }
+                } catch {
+                    new Err(`Lobby thread message fetch failed`)
+                }
+            }
+            await this.updateInitMessage()
         } catch {
             return 404
         }
@@ -98,12 +109,16 @@ export class LobbyManager {
         return 100
     }
 
+    /**
+     * @returns 101 - Lobby closed
+     * @returns 404 - Lobby fetch failed
+     */
     async fetch(id: string) {
         const lobby = this.cache.get(id)
         if (lobby && lobby.state === 'OPEN') {
             return lobby
         } else if (lobby && lobby.state === 'CLOSED') {
-            return
+            return 101
         }
         const lobbyData = <LobbyData>await this.#collection.findOne({owner: id, state: "OPEN"})
         if (lobbyData) {
@@ -112,7 +127,7 @@ export class LobbyManager {
             await lobby.init()
             this.#resolve.set(lobby.categoryChannel.id, lobby)
             return lobby
-        } else return
+        } else return 404
     }
 
     async fetchByCategory(id: string) {
@@ -195,6 +210,7 @@ export class LobbyManager {
         data.channel = this.channel ? this.channel.id : undefined
         data.lobbies = Array.from(this.cache.keys())
         data.message = this.message ? this.message.id : undefined
+        data.threadMessage = this.threadMessage ? this.threadMessage.id : undefined
         return data
     }
 
@@ -223,7 +239,27 @@ export class LobbyManager {
 
     async updateInitMessage() {
         const embed = this.initEmbed()
-        if (this.message) await this.message.edit({embeds: [embed]})
+        if (this.message) {
+            await this.message.edit({embeds: [embed]})
+            if (!this.message.thread) {
+                if (this.message.channel.type !== 'GUILD_TEXT') return
+                await this.message.channel.threads.create({startMessage: this.message, name: '房间列表', autoArchiveDuration: 60})
+            }
+            let list = ``
+            for (const lobby of this.cache) {
+                if (lobby[1].state === 'OPEN') list += `\n${lobby[1].owner.mention()} - ${new Date(lobby[1].categoryChannel.createdTimestamp).toLocaleString('en-ZA')}`
+            }
+            const listEmbed: MessageEmbedOptions = {
+                description: list
+            }
+            if (this.message.thread) {
+                if (this.threadMessage) {
+                    this.threadMessage.edit({embeds: [listEmbed], allowedMentions: {parse: []}})
+                } else {
+                    this.threadMessage = await this.message.thread.send({embeds: [listEmbed], allowedMentions: {parse: []}})
+                }
+            }
+        } else await this.sendInitMessage()
     }
 
     private initEmbed() {

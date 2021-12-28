@@ -10,7 +10,8 @@ export default async function Invite(interact: ContextMenuInteraction, amateras:
     }
 
     const lobby = await _guild.lobby.fetch(interact.user.id)
-    if (lobby && lobby.state === 'OPEN') {
+    if (lobby === 101 || lobby === 404) return interact.reply({ content: '你还没创建房间！', ephemeral: true})
+    if (lobby.state === 'OPEN') {
         if (lobby.member.has(interact.targetId)) {
             lobby.removeMember(interact.targetId)
             interact.reply({ content: (await _guild.get.members.fetch(interact.targetId)).displayName + '从你的房间成员名单移除了。', ephemeral: true})
@@ -21,5 +22,4 @@ export default async function Invite(interact: ContextMenuInteraction, amateras:
             return
         }
     }
-    interact.reply({ content: '你还没创建房间！', ephemeral: true})
 }

@@ -36,7 +36,7 @@ export class GuildLog {
         })
     }
 
-    async send(content: string) {
+    async send(content: string, mod?: boolean) {
         await this.fetchChannel()
         const fetch = await this.fetchMessage()
         if (fetch === 101 || fetch === 404) {
@@ -45,12 +45,12 @@ export class GuildLog {
         const date = new Date
         const time = `# ${date.toLocaleString('en-ZA')}\n`
         const prevContent = this.message!.content.slice(3, this.message!.content.length - 3)
-        let resultContent = '```' + prevContent + `\n` + time + content + `\`\`\``
+        let resultContent = '```' + prevContent + `\n` + (mod ? '@ MOD ' : '') + time + content + `\`\`\``
         //Check message word count
         if (resultContent.length > 2000) {
             this.messageCount += 1
             await this.newMessage()
-            resultContent = '```' + this.message!.content.slice(3, this.message!.content.length - 3) + `\n` + time + content + `\`\`\``
+            resultContent = '```' + this.message!.content.slice(3, this.message!.content.length - 3) + `\n` + (mod ? '@ MOD ' : '') + time + content + `\`\`\``
         }
         this.message!.edit({
             content: resultContent

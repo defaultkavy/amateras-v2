@@ -75,8 +75,12 @@ export class GuildCommand {
         return permission
     }
 
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Failed
+     * @returns 105 - Already exist
+     */
     async permissionEnable(id: string, type: 'USER' | 'ROLE') {
-        console.debug(true)
         if (arrayHasObj(this.permissions, {id: id, type: type, permission: true})) {
             return 105 // Already exist
         } 
@@ -87,8 +91,6 @@ export class GuildCommand {
             type: type,
             permission: true
         })
-
-        console.debug(this.permissions)
         
         try {
             await this.get.permissions.set({
@@ -97,11 +99,15 @@ export class GuildCommand {
             await this.save()
             return 100 // Success
         } catch(err) {
-            console.debug(err)
-            throw 101 // Failed
+            return 101 // Failed
         }
     }
     
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Failed
+     * @returns 105 - Already exist
+     */
     async permissionDisable(id: string, type: 'USER' | 'ROLE') {
         if (arrayHasObj(this.permissions, {id: id, type: type, permission: false})) {
             return 105 // Already exist
@@ -121,8 +127,7 @@ export class GuildCommand {
             await this.save()
             return 100 // Success
         } catch(err) {
-            console.debug(err)
-            throw 101 // Failed
+            return 101 // Failed
         }
     }
 

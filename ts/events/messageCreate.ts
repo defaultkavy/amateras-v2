@@ -1,6 +1,5 @@
 import { Message } from "discord.js";
 import Amateras from "../lib/Amateras";
-import { wordCounter } from "../lib/terminal";
 
 module.exports = {
     name: 'messageCreate',
@@ -25,22 +24,9 @@ module.exports = {
 
         //Forum
         if (_guild && _guild.forums) {
-            const forum =  await _guild.forums.fetch(message.channel.id)
-            if (forum !== 404 && forum.state === "OPEN" && message.channel.type === "GUILD_TEXT") {
-                let content = ''
-                if (message.cleanContent) {
-                    content = message.cleanContent
-                } else if (message.attachments.first()) {
-                    content = Array.from(message.attachments)[0][1].name!
-                }
-                
-                const name = wordCounter(content, 20)
-                await message.channel.threads.create({
-                    name: name,
-                    autoArchiveDuration: 1440,
-                    startMessage: message
-                })
-            }
+            const forum = _guild.forums.cache.get(message.channel.id)
+            if (!forum) return
+            forum.post(message)
         }
     }
 }
