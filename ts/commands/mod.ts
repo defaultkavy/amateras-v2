@@ -1,12 +1,17 @@
 import { CommandInteraction, TextChannel } from 'discord.js';
 import Amateras from '../lib/Amateras';
+import { equalOneOf } from '../lib/terminal';
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {
     const subcmd0 = interaction.options.data[0]
     const _guild = amateras.guilds.cache.get(interaction.guild!.id)
     if (!_guild) return interaction.reply({ content: 'Unknown _Guild', ephemeral: true })
-
+    // Get moderator player profile
+    const moderator = await amateras.players.fetch(interaction.user.id)
+    if (moderator === 404) return interaction.reply({content: `管理员不存在`, ephemeral: true})
+    // Check is moderator
+    if (!_guild.moderators.includes(moderator.id)) return interaction.reply({content: `你不是管理员`, ephemeral: true})
     switch (subcmd0.name) {
         case 'lobby':
             if (!subcmd0.options) return
@@ -104,6 +109,30 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                                         return interaction.reply({ content: `${_role.mention()}创建房间权限保持为：${value.enable ? '开' : '关'}`, ephemeral: true })
                                 }
                                 interaction.reply({ content: `${_role.mention()}创建房间权限更改为：${_guild.lobby.permissions.includes(value.role) ? '开' : '关'}`, ephemeral: true })
+                            }
+                        }
+                    break;
+
+                    case "close":
+                        if (!subcmd1.options) return interaction.reply({content: `请输入必要参数`, ephemeral: true})
+                        const value3 = { user: '' }
+                        for (const subcmd2 of subcmd1.options) {
+                            switch (subcmd2.name) {
+                                case "user":
+                                    value3.user = <string>subcmd2.value
+                                break;
+                            }
+                        }
+                        if (!value3.user) return interaction.reply({content: `对象不存在`, ephemeral: true})
+                        else {
+                            const player = await amateras.players.fetch(value3.user)
+                            if (player === 404) return interaction.reply({content: `Error: Player fetch failed`})
+                            else {
+                                const lobby = await _guild.lobby.fetch(value3.user)
+                                if (lobby === 404 || lobby === 101) return interaction.reply({content: `房间不存在`, ephemeral: true})
+                                else await lobby.close()
+                                interaction.reply({content: `${player.mention()} 房间已关闭`, ephemeral: true})
+                                _guild.log.send(`${await _guild.log.name(moderator.id)} 关闭了 ${await _guild.log.name(player.id)} 的房间`, true)
                             }
                         }
                     break;
@@ -212,24 +241,37 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                 // Block who are not guild owner to use change permission function
                 if (interaction.user.id !== _guild.get.ownerId) return interaction.reply({content: `此功能仅限伺服器所有者使用`, ephemeral: true})
                 // Check if permission not change
-                if (enable && await _guild?.commands.cache.get('mod')?.permissionEnable(user, 'USER') === 105) {
-                    return interaction.reply({content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
-                } else if (enable === false && await _guild?.commands.cache.get('mod')?.permissionDisable(user, 'USER') === 105)
-                    return interaction.reply({content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                if (enable) {
+                    const set = await _guild.setModerator(user, 'USER')
+                    if (equalOneOf(set, [101, 102, 405, 404])) return interaction.reply({content: `Error: Setting failed`})
+                    // Check if nothing change
+                    if (set === 105) return interaction.reply({content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                } else if (enable === false) {
+                    const set = await _guild.removeModerator(user, 'USER')
+                    if (equalOneOf(set, [101, 102, 405, 404])) return interaction.reply({content: `Error: Setting failed`})
+                    if (set === 105) return interaction.reply({content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                }
                 // Reply permission change message
                 return interaction.reply({content: `${player.mention()} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true})
             }
             if (role) {
-                const _role = await _guild?.roles.fetch(role)
+                const _role = await _guild.roles.fetch(role)
                 if (_role === 404) return interaction.reply({content: `Error: Role fetch failed`})
                 if (enable === undefined) {
                     return interaction.reply({content: `${_role.mention} mod 权限更改为：${_guild.commands.cache.get('mod')?.hasPermission(role) ? '开' : '关'}`, ephemeral: true})
                 }
                 if (interaction.user.id !== _guild.get.ownerId) return interaction.reply({content: `此功能仅限伺服器所有者使用`, ephemeral: true})
-                if (enable && await _guild?.commands.cache.get('mod')?.permissionEnable(role, 'ROLE') === 105) 
-                    return interaction.reply({content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
-                else if (enable === false && await _guild?.commands.cache.get('mod')?.permissionDisable(role, 'ROLE') === 105)
-                    return interaction.reply({content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                
+                if (enable) {
+                    const set = await _guild.setModerator(role, 'ROLE')
+                    if (equalOneOf(set, [101, 102, 405, 404])) return interaction.reply({content: `Error: Setting failed`})
+                    if (set === 105) return interaction.reply({content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                }
+                else if (enable === false) {
+                    const set = await _guild.removeModerator(role, 'ROLE')
+                    if (equalOneOf(set, [101, 102, 405, 404])) return interaction.reply({content: `Error: Setting failed`})
+                    if (set === 105) return interaction.reply({content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                }
                 return interaction.reply({content: `${_role.mention} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true})
             }
             // User and Role part is not filled

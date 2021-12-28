@@ -3,13 +3,12 @@ import Amateras from "../lib/Amateras";
 import { Lobby } from "../lib/Lobby";
 
 export default async function invite(interact: CommandInteraction, amateras: Amateras) {
-    let lobby: Lobby | undefined
-    if (interact.guild) {
-        const guild = amateras.guilds.cache.get(interact.guild.id)
-        if (guild) {
-            lobby = await guild.lobby?.fetch(interact.user.id)
-        } else return
-    }
+    let lobby: Lobby | 101 | 404
+    if (!interact.guild) return
+    const guild = amateras.guilds.cache.get(interact.guild.id)
+    if (!guild) return
+    lobby = await guild.lobby?.fetch(interact.user.id)
+    if (lobby === 101 || lobby === 404) return interact.reply({ content: '你没有创建房间', ephemeral: true })
     if (!interact.options.data) {
         interact.reply({ content: '请输入必要参数。', ephemeral: true })
         return
@@ -23,7 +22,6 @@ export default async function invite(interact: CommandInteraction, amateras: Ama
                 break;
         }
     }
-    if (!lobby) return interact.reply({ content: '你没有创建房间', ephemeral: true })
     await lobby.addMember(userId)
     interact.reply({ content: '已邀请', ephemeral: true })
 }

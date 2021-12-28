@@ -25,6 +25,7 @@ export class _GuildManager {
                 // Guild data not exist, create one to database
                 const _newGuildData: _GuildData = {
                     id: guild.id,
+                    moderators: [guild.ownerId]
                 }
                 const _guild = new _Guild(_newGuildData, guild, this.#amateras)
                 await _guild.init()

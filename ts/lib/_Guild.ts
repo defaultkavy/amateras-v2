@@ -4,7 +4,7 @@ import Amateras from "./Amateras";
 import { ForumManager } from "./ForumManager";
 import { LobbyManager } from "./LobbyManager";
 import { GuildLog } from "./GuildLog";
-import { cloneObj } from "./terminal";
+import { cloneObj, removeArrayItem } from "./terminal";
 import { _ChannelManager } from "./_ChannelManager";
 import { GuildCommandManager } from "./GuildCommandManager";
 import { _RoleManager } from "./_RoleManager";
@@ -22,6 +22,7 @@ export class _Guild {
     commands: GuildCommandManager;
     roles: _RoleManager;
     channels: _ChannelManager;
+    moderators: string[]
 
     constructor(data: _GuildData, guild: Guild, amateras: Amateras) {
         this.#amateras = amateras
@@ -35,6 +36,7 @@ export class _Guild {
         this.forums = <ForumManager>{}
         this.roles = new _RoleManager(this, this.#amateras)
         this.channels = new _ChannelManager(this, this.#amateras)
+        this.moderators = data.moderators ? data.moderators : [guild.ownerId]
     }
 
     async init() {
@@ -77,6 +79,72 @@ export class _Guild {
         } catch(err) {
             new Err(`Member fetch failed. (User)${id}`)
             return 404
+        }
+    }
+
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Mod command get failed
+     * @returns 102 - Command permission change failed
+     * @returns 105 - Already set
+     * @returns 404 - Player fetch failed
+     * @returns 405 - Role fetch failed
+     */
+    async setModerator(id: string, type: 'USER' | 'ROLE') {
+        const command = this.commands.cache.get('mod')
+        if (!command) return 101
+        if (type === 'USER') {
+            const player = await this.#amateras.players.fetch(id)
+            if (player === 404) return 404
+            const enable = await command.permissionEnable(id, 'USER')
+            if (enable === 105) return 105
+            if (enable === 101) return 102
+            this.moderators.push(id)
+            await this.save()
+            return 100
+        } else {
+            const role = await this.roles.fetch(id)
+            if (role === 404) return 405
+            const enable = await command.permissionEnable(id, 'ROLE')
+            if (enable === 105) return 105
+            if (enable === 101) return 102
+            for (const member of role.get.members) {
+                this.moderators.push(member[1].id)
+            }
+            await this.save()
+            return 100
+        }
+    }
+    
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Mod command get failed
+     * @returns 102 - Command permission change failed
+     * @returns 105 - Already set
+     * @returns 405 - Role fetch failed
+     */
+     async removeModerator(id: string, type: 'USER' | 'ROLE') {
+        const command = this.commands.cache.get('mod')
+        if (!command) return 101
+        if (!this.moderators.includes(id)) return 102
+        if (type === 'USER') {
+            const disable = await command.permissionDisable(id, 'USER')
+            if (disable === 105) return 105
+            if (disable === 101) return 102
+            this.moderators = removeArrayItem(this.moderators, id)
+            await this.save()
+            return 100
+        } else {
+            const role = await this.roles.fetch(id)
+            if (role === 404) return 405
+            const disable = await command.permissionDisable(id, 'ROLE')
+            if (disable === 105) return 105
+            if (disable === 101) return 102
+            for (const member of role.get.members) {
+                this.moderators.push(member[1].id)
+            }
+            await this.save()
+            return 100
         }
     }
 }

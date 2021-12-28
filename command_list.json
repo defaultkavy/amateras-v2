@@ -402,6 +402,19 @@
                                     "required": false
                                 }
                             ]
+                        },
+                        {
+                            "name": "close",
+                            "description": "关闭指定对象所创建的房间",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "user",
+                                    "description": "选择对象",
+                                    "type": 6,
+                                    "required": true
+                                }
+                            ]
                         }
                     ]
                 },

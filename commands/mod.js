@@ -9,14 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const terminal_1 = require("../lib/terminal");
 exports.default = execute;
 function execute(interaction, amateras) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const subcmd0 = interaction.options.data[0];
         const _guild = amateras.guilds.cache.get(interaction.guild.id);
         if (!_guild)
             return interaction.reply({ content: 'Unknown _Guild', ephemeral: true });
+        // Get moderator player profile
+        const moderator = yield amateras.players.fetch(interaction.user.id);
+        if (moderator === 404)
+            return interaction.reply({ content: `管理员不存在`, ephemeral: true });
+        // Check is moderator
+        if (!_guild.moderators.includes(moderator.id))
+            return interaction.reply({ content: `你不是管理员`, ephemeral: true });
         switch (subcmd0.name) {
             case 'lobby':
                 if (!subcmd0.options)
@@ -130,6 +138,34 @@ function execute(interaction, amateras) {
                                             return interaction.reply({ content: `${_role.mention()}创建房间权限保持为：${value.enable ? '开' : '关'}`, ephemeral: true });
                                     }
                                     interaction.reply({ content: `${_role.mention()}创建房间权限更改为：${_guild.lobby.permissions.includes(value.role) ? '开' : '关'}`, ephemeral: true });
+                                }
+                            }
+                            break;
+                        case "close":
+                            if (!subcmd1.options)
+                                return interaction.reply({ content: `请输入必要参数`, ephemeral: true });
+                            const value3 = { user: '' };
+                            for (const subcmd2 of subcmd1.options) {
+                                switch (subcmd2.name) {
+                                    case "user":
+                                        value3.user = subcmd2.value;
+                                        break;
+                                }
+                            }
+                            if (!value3.user)
+                                return interaction.reply({ content: `对象不存在`, ephemeral: true });
+                            else {
+                                const player = yield amateras.players.fetch(value3.user);
+                                if (player === 404)
+                                    return interaction.reply({ content: `Error: Player fetch failed` });
+                                else {
+                                    const lobby = yield _guild.lobby.fetch(value3.user);
+                                    if (lobby === 404 || lobby === 101)
+                                        return interaction.reply({ content: `房间不存在`, ephemeral: true });
+                                    else
+                                        yield lobby.close();
+                                    interaction.reply({ content: `${player.mention()} 房间已关闭`, ephemeral: true });
+                                    _guild.log.send(`${yield _guild.log.name(moderator.id)} 关闭了 ${yield _guild.log.name(player.id)} 的房间`, true);
                                 }
                             }
                             break;
@@ -247,27 +283,47 @@ function execute(interaction, amateras) {
                     if (interaction.user.id !== _guild.get.ownerId)
                         return interaction.reply({ content: `此功能仅限伺服器所有者使用`, ephemeral: true });
                     // Check if permission not change
-                    if (enable && (yield ((_b = _guild === null || _guild === void 0 ? void 0 : _guild.commands.cache.get('mod')) === null || _b === void 0 ? void 0 : _b.permissionEnable(user, 'USER'))) === 105) {
-                        return interaction.reply({ content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                    if (enable) {
+                        const set = yield _guild.setModerator(user, 'USER');
+                        if ((0, terminal_1.equalOneOf)(set, [101, 102, 405, 404]))
+                            return interaction.reply({ content: `Error: Setting failed` });
+                        // Check if nothing change
+                        if (set === 105)
+                            return interaction.reply({ content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
                     }
-                    else if (enable === false && (yield ((_c = _guild === null || _guild === void 0 ? void 0 : _guild.commands.cache.get('mod')) === null || _c === void 0 ? void 0 : _c.permissionDisable(user, 'USER'))) === 105)
-                        return interaction.reply({ content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                    else if (enable === false) {
+                        const set = yield _guild.removeModerator(user, 'USER');
+                        if ((0, terminal_1.equalOneOf)(set, [101, 102, 405, 404]))
+                            return interaction.reply({ content: `Error: Setting failed` });
+                        if (set === 105)
+                            return interaction.reply({ content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                    }
                     // Reply permission change message
                     return interaction.reply({ content: `${player.mention()} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true });
                 }
                 if (role) {
-                    const _role = yield (_guild === null || _guild === void 0 ? void 0 : _guild.roles.fetch(role));
+                    const _role = yield _guild.roles.fetch(role);
                     if (_role === 404)
                         return interaction.reply({ content: `Error: Role fetch failed` });
                     if (enable === undefined) {
-                        return interaction.reply({ content: `${_role.mention} mod 权限更改为：${((_d = _guild.commands.cache.get('mod')) === null || _d === void 0 ? void 0 : _d.hasPermission(role)) ? '开' : '关'}`, ephemeral: true });
+                        return interaction.reply({ content: `${_role.mention} mod 权限更改为：${((_b = _guild.commands.cache.get('mod')) === null || _b === void 0 ? void 0 : _b.hasPermission(role)) ? '开' : '关'}`, ephemeral: true });
                     }
                     if (interaction.user.id !== _guild.get.ownerId)
                         return interaction.reply({ content: `此功能仅限伺服器所有者使用`, ephemeral: true });
-                    if (enable && (yield ((_e = _guild === null || _guild === void 0 ? void 0 : _guild.commands.cache.get('mod')) === null || _e === void 0 ? void 0 : _e.permissionEnable(role, 'ROLE'))) === 105)
-                        return interaction.reply({ content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
-                    else if (enable === false && (yield ((_f = _guild === null || _guild === void 0 ? void 0 : _guild.commands.cache.get('mod')) === null || _f === void 0 ? void 0 : _f.permissionDisable(role, 'ROLE'))) === 105)
-                        return interaction.reply({ content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                    if (enable) {
+                        const set = yield _guild.setModerator(role, 'ROLE');
+                        if ((0, terminal_1.equalOneOf)(set, [101, 102, 405, 404]))
+                            return interaction.reply({ content: `Error: Setting failed` });
+                        if (set === 105)
+                            return interaction.reply({ content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                    }
+                    else if (enable === false) {
+                        const set = yield _guild.removeModerator(role, 'ROLE');
+                        if ((0, terminal_1.equalOneOf)(set, [101, 102, 405, 404]))
+                            return interaction.reply({ content: `Error: Setting failed` });
+                        if (set === 105)
+                            return interaction.reply({ content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                    }
                     return interaction.reply({ content: `${_role.mention} mod 权限更改为：${enable ? '开' : '关'}`, ephemeral: true });
                 }
                 // User and Role part is not filled

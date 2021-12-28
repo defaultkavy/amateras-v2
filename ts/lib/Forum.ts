@@ -3,7 +3,7 @@ import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Err } from "./Err";
 import { ForumManager } from "./ForumManager";
-import { cloneObj } from "./terminal";
+import { cloneObj, wordCounter } from "./terminal";
 import { _Guild } from "./_Guild";
 
 export class Forum {
@@ -59,6 +59,24 @@ export class Forum {
         await this.save()
         this.#manager.cache.delete(this.id)
         await this.#_guild.save()
+    }
+
+    async post(message: Message) {
+        if (this.state === "OPEN" && message.channel.type === "GUILD_TEXT") {
+            let content = ''
+            if (message.cleanContent) {
+                content = message.cleanContent
+            } else if (message.attachments.first()) {
+                content = Array.from(message.attachments)[0][1].name!
+            }
+            
+            const name = wordCounter(content, 20)
+            await message.channel.threads.create({
+                name: name,
+                autoArchiveDuration: 1440,
+                startMessage: message
+            })
+        } else return
     }
 
     share(message: Message) {

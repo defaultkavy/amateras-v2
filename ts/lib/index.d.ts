@@ -168,6 +168,7 @@ interface _GuildData {
     lobby?: LobbyManagerData;
     forums?: ForumManagerData;
     commands?: GuildCommandManagerData;
+    moderators: string[];
 }
 
 interface GuildCommandManagerData {
@@ -201,6 +202,7 @@ interface LobbyManagerData {
     channel: string;
     lobbies: string[];
     message?: string;
+    threadMessage?: string;
     permissions: string[]
 }
 
