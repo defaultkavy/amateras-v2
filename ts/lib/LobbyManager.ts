@@ -253,11 +253,14 @@ export class LobbyManager {
                 description: list
             }
             if (this.message.thread) {
-                if (this.threadMessage) {
-                    this.threadMessage.edit({embeds: [listEmbed], allowedMentions: {parse: []}})
-                } else {
-                    this.threadMessage = await this.message.thread.send({embeds: [listEmbed], allowedMentions: {parse: []}})
-                }
+                try {
+                    await this.message.thread.setArchived(false)
+                    if (this.threadMessage) {
+                        this.threadMessage.edit({embeds: [listEmbed], allowedMentions: {parse: []}})
+                    } else {
+                        this.threadMessage = await this.message.thread.send({embeds: [listEmbed], allowedMentions: {parse: []}})
+                    }
+                } catch { new Err(`Lobby thread message init error`) }
             }
         } else await this.sendInitMessage()
     }

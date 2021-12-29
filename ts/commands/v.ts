@@ -17,11 +17,11 @@ export default async function item(interact: CommandInteraction, amateras: Amate
             }
             for (const subcmd1 of subcmd0.options) {
                 if (subcmd1.name === 'url') {
-                    imageObj.url === <string>imageObj.url
+                    imageObj.url = <string>subcmd1.value
                 }
             }
             if (imageObj.url && checkImage(imageObj.url)) {
-                v.image = imageObj.url
+                v.setInfo({image: imageObj.url})
                 interact.reply({content: '图片设定完成', ephemeral: true})
             } else {
                 interact.reply({content: '图片链接无效', ephemeral: true})
