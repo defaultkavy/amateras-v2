@@ -65,6 +65,8 @@ function lobby(interact, amateras) {
                     }
                     else {
                         _guild.log.send(`${yield _guild.log.name(interact.user.id)} 邀请 ${yield _guild.log.name(userId)} 加入房间`);
+                        if (interact.channelId === lobby.textChannel.id)
+                            return interact.deferReply();
                         interact.reply({ content: '已邀请', ephemeral: true });
                     }
                     break;
@@ -89,6 +91,8 @@ function lobby(interact, amateras) {
                     }
                     else {
                         _guild.log.send(`${yield _guild.log.name(interact.user.id)} 将 ${yield _guild.log.name(userId)} 移出房间`);
+                        if (interact.channelId === lobby.textChannel.id)
+                            return interact.deferReply();
                         interact.reply({ content: '已移除', ephemeral: true });
                     }
                     break;

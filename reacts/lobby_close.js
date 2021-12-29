@@ -21,6 +21,7 @@ function lobby_close(interact, amateras) {
             return interact.reply({ content: '房间不存在。', ephemeral: true });
         yield lobby.close();
         interact.reply({ content: '房间已关闭~', ephemeral: true });
+        _guild.log.send(`${yield _guild.log.name(interact.user.id)} 关闭了房间`);
     });
 }
 exports.default = lobby_close;

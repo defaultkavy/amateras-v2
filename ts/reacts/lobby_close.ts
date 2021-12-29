@@ -10,4 +10,5 @@ export default async function lobby_close(interact: ButtonInteraction, amateras:
     if (lobby === 101 || lobby === 404) return interact.reply({content: '房间不存在。', ephemeral: true})
     await lobby.close()
     interact.reply({content: '房间已关闭~', ephemeral: true})
+    _guild.log.send(`${await _guild.log.name(interact.user.id)} 关闭了房间`)
 }

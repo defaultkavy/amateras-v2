@@ -25,6 +25,11 @@ export default async function kick(interact: CommandInteraction, amateras: Amate
         interact.reply({ content: '对象不在你的房间中', ephemeral: true })
     } else {
         guild.log.send(`${await guild.log.name(interact.user.id)} 将 ${await guild.log.name(userId)} 移出房间`)
+        if (interact.channelId === lobby.textChannel.id) {
+            await interact.deferReply()
+            interact.deleteReply()
+            return
+        }
         interact.reply({ content: '已移除', ephemeral: true })
     }
 }

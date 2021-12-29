@@ -40,6 +40,11 @@ function invite(interact, amateras) {
         }
         else {
             guild.log.send(`${yield guild.log.name(interact.user.id)} 邀请 ${yield guild.log.name(userId)} 加入房间`);
+            if (interact.channelId === lobby.textChannel.id) {
+                yield interact.deferReply();
+                interact.deleteReply();
+                return;
+            }
             interact.reply({ content: '已邀请', ephemeral: true });
         }
     });

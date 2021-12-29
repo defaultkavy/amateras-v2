@@ -1,4 +1,4 @@
-import { Message, MessageActionRow, MessageButton, MessageEmbedOptions, OverwriteResolvable, TextChannel } from "discord.js";
+import { Message, MessageActionRow, MessageButton, MessageEmbedOptions, OverwriteResolvable, TextChannel, ThreadChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Err } from "./Err";
@@ -15,7 +15,7 @@ export class LobbyManager {
     channel?: TextChannel;
     cache: Map<string, Lobby>
     message?: Message;
-    threadMessage?: Message;
+    thread?: ThreadChannel | null;
     #resolve: Map<string, Lobby>
     permissions: string[]
     enabled: boolean
@@ -27,7 +27,7 @@ export class LobbyManager {
         this.channel = <TextChannel>{}
         this.cache = new Map
         this.message
-        this.threadMessage
+        this.thread
         this.#resolve = new Map
         this.permissions = this.#data ? this.#data.permissions : []
         this.enabled = false
@@ -40,11 +40,28 @@ export class LobbyManager {
         }
         try {
             const channel = await this.#_guild.channels.fetch(this.#data?.channel)
-                if (channel === 404) { 
-                    new Err(`Lobby channel fetch failed`)
-                    return 404
+            if (channel === 404) { 
+                new Err(`Lobby channel fetch failed`)
+                return 404
+            }
+            this.channel = <TextChannel>channel.get
+            if (this.#data.message) {
+                try {
+                    this.message = await this.channel.messages.fetch(this.#data.message)
+                } catch {
+                    new Err(`Lobby message fetch failed`)
                 }
-                    this.channel = <TextChannel>channel.get
+            }
+            try {
+                if (this.message) {
+                    this.thread = this.message.thread
+                    if (!this.thread) {
+                        this.thread = await this.message.startThread({name: `房间列表`, autoArchiveDuration: 60})
+                    }
+                }
+            } catch {
+                new Err(`Lobby thread message fetch failed`)
+            }
             if (this.#data.lobbies && this.#data.lobbies.length !== 0) {
                 for (const lobbyId of this.#data.lobbies) {
                     const lobbyData = <LobbyData>await this.#collection.findOne({owner: lobbyId, state: "OPEN"})
@@ -54,23 +71,6 @@ export class LobbyManager {
                         if (await lobby.init()) this.#resolve.set(lobby.categoryChannel.id, lobby)
                         else this.cache.delete(lobbyId)
                     }
-                }
-            }
-            if (this.#data.message) {
-                try {
-                    this.message = await this.channel.messages.fetch(this.#data.message)
-                } catch {
-                    new Err(`Lobby message fetch failed`)
-                }
-            }
-
-            if (this.#data.threadMessage) {
-                try {
-                    if (this.message && this.message.thread) {
-                        this.threadMessage = await this.message.thread.messages.fetch(this.#data.threadMessage)
-                    }
-                } catch {
-                    new Err(`Lobby thread message fetch failed`)
                 }
             }
             await this.updateInitMessage()
@@ -196,6 +196,24 @@ export class LobbyManager {
         await lobby.save()
         await this.#_guild.save()
         await this.updateInitMessage()
+        // Lobby hint
+        const embed: MessageEmbedOptions = {
+            title: `欢迎`,
+            description: `这里是 ${lobby.owner.mention()} 的房间。\n这里只有房主和被房主邀请的对象以及伺服器管理员可见。房主能够自行创建更多的文字和语音频道，但是无法删除初始设定的三个频道。\n\n每当新的V成员加入房间时，${infoChannel} 将会更新成员的V身份资料，包含了简介、人物立绘、跳图链接等。`,
+            fields: [
+                {
+                    name: `房主可使用的请求`,
+                    value: `\`\`\`/invite\n- 邀请指定对象（右键对方头像，选择菜单中的 Apps（应用程式）> Invite 也能够实现邀请）\n/kick\n- 移除指定对象\n/lobby close\n- 关闭房间\`\`\``,
+                    inline: false
+                },
+                {
+                    name: `成员可使用的请求`,
+                    value: `\`\`\`/lobby exit\n- 退出房间\`\`\``,
+                    inline: false
+                }
+            ]
+        }
+        lobby.textChannel.send({embeds: [embed]})
         lobby.textChannel.send({content: `${member}创建了房间`})
         this.#_guild.log.send(`${await this.#_guild.log.name(id)} 创建了房间`)
         if (lobby.owner.v) lobby.owner.v.sendInfoLobby(lobby)
@@ -204,11 +222,10 @@ export class LobbyManager {
     }
 
     toData() {
-        const data = cloneObj(this, ['cache'])
+        const data = cloneObj(this, ['cache', 'thread'])
         data.channel = this.channel ? this.channel.id : undefined
         data.lobbies = Array.from(this.cache.keys())
         data.message = this.message ? this.message.id : undefined
-        data.threadMessage = this.threadMessage ? this.threadMessage.id : undefined
         return data
     }
 
@@ -239,27 +256,6 @@ export class LobbyManager {
         const embed = this.initEmbed()
         if (this.message) {
             await this.message.edit({embeds: [embed]})
-            if (!this.message.thread) {
-                if (this.message.channel.type !== 'GUILD_TEXT') return
-                await this.message.channel.threads.create({startMessage: this.message, name: '房间列表', autoArchiveDuration: 60})
-            }
-            let list = ``
-            for (const lobby of this.cache) {
-                if (lobby[1].state === 'OPEN') list += `\n${lobby[1].owner.mention()} - ${new Date(lobby[1].categoryChannel.createdTimestamp).toLocaleString('en-ZA')}`
-            }
-            const listEmbed: MessageEmbedOptions = {
-                description: list
-            }
-            if (this.message.thread) {
-                try {
-                    await this.message.thread.setArchived(false)
-                    if (this.threadMessage) {
-                        this.threadMessage.edit({embeds: [listEmbed], allowedMentions: {parse: []}})
-                    } else {
-                        this.threadMessage = await this.message.thread.send({embeds: [listEmbed], allowedMentions: {parse: []}})
-                    }
-                } catch { new Err(`Lobby thread message init error`) }
-            }
         } else await this.sendInitMessage()
     }
 
