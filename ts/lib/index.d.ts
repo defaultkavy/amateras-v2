@@ -202,7 +202,6 @@ interface LobbyManagerData {
     channel: string;
     lobbies: string[];
     message?: string;
-    threadMessage?: string;
     permissions: string[]
 }
 
@@ -217,6 +216,7 @@ interface LobbyData {
     state: 'OPEN' | 'CLOSED';
     guild: string;
     messages: {[keys: string]: string};
+    lobbyMessage?: string;
 }
 
 interface LogData {

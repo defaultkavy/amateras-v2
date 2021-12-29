@@ -54,6 +54,7 @@ export default async function lobby(interact: CommandInteraction, amateras: Amat
                     interact.reply({ content: '对象已在你的房间中', ephemeral: true })
                 } else {
                     _guild.log.send(`${await _guild.log.name(interact.user.id)} 邀请 ${await _guild.log.name(userId)} 加入房间`)
+                    if (interact.channelId === lobby.textChannel.id) return interact.deferReply()
                     interact.reply({content: '已邀请', ephemeral: true})
                 }
             break;
@@ -76,6 +77,7 @@ export default async function lobby(interact: CommandInteraction, amateras: Amat
                     interact.reply({ content: '对象不在你的房间中', ephemeral: true })
                 } else {
                     _guild.log.send(`${await _guild.log.name(interact.user.id)} 将 ${await _guild.log.name(userId)} 移出房间`)
+                    if (interact.channelId === lobby.textChannel.id) return interact.deferReply()
                     interact.reply({ content: '已移除', ephemeral: true })
                 }
             break;

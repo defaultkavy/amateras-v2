@@ -1,4 +1,4 @@
-import { CategoryChannel, TextChannel, VoiceChannel } from "discord.js";
+import { CategoryChannel, Message, MessageEmbedOptions, TextChannel, VoiceChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { LobbyManager } from "./LobbyManager";
@@ -11,6 +11,7 @@ import { _Message } from "./_Message";
 export class Lobby {
     #amateras: Amateras;
     #collection: Collection;
+    #data: LobbyData
     #_guild: _Guild;
     #categoryChannel: string;
     categoryChannel: CategoryChannel;
@@ -30,9 +31,11 @@ export class Lobby {
     #manager: LobbyManager;
     #messages: {[keys: string]: string};
     messages: Map<string, _Message>
+    lobbyMessage?: Message
     constructor(data: LobbyData, _guild: _Guild, manager: LobbyManager, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('lobbies')
+        this.#data = data
         this.#_guild = _guild
         this.#owner = data.owner
         this.owner = <Player>{}
@@ -121,6 +124,7 @@ export class Lobby {
                 this.messages.set(v, _message)
             }
         }
+        await this.initLobbyMessage()
         return true
     }
 
@@ -131,10 +135,11 @@ export class Lobby {
         data.voiceChannel = this.#voiceChannel
         data.infoChannel = this.#infoChannel
         data.owner = this.#owner
-        data.member = this.#member
+        data.member = [...this.member.keys()]
         data.vFolder = this.#vFolder
         data.guild = this.#_guild.id
         data.messages = {}
+        data.lobbyMessage = this.lobbyMessage ? this.lobbyMessage.id : undefined
         if (this.state !== 'CLOSED') for (const id of this.messages.keys()) {
             data.messages[id] = this.messages.get(id)!.id
         }
@@ -159,6 +164,7 @@ export class Lobby {
             if (!this.categoryChannel.deleted) await this.categoryChannel.delete()
         } catch { }
         this.state = 'CLOSED'
+        if (this.lobbyMessage && !this.lobbyMessage.deleted) this.lobbyMessage.delete()
         await this.save()
         this.#manager.cache.delete(this.owner.id)
         await this.#manager.updateInitMessage()
@@ -174,7 +180,6 @@ export class Lobby {
         const player = await this.#amateras.players.fetch(id)
         if (player === 404) return 404
         this.member.set(player.id, player)
-        this.#member.push(id)
         player.joinLobby(this)
         const member = await this.textChannel.guild.members.fetch(id)
         this.textChannel.send({content: `${member}加入了房间`})
@@ -183,6 +188,7 @@ export class Lobby {
         this.textChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
         this.voiceChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
         this.infoChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
+        await this.initLobbyMessage()
         await this.save()
         return 100
     }
@@ -200,13 +206,13 @@ export class Lobby {
         }
         this.member.delete(id)
         if (player) player.leaveLobby(this)
-        this.#member = removeArrayItem(this.#member, id)
         this.categoryChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
         this.textChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
         this.voiceChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
         this.infoChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: false })
         this.deleteMessage(id)
         this.textChannel.send({content: `${member}退出了房间`})
+        await this.initLobbyMessage()
         await this.save()
         return 100
     }
@@ -239,5 +245,44 @@ export class Lobby {
         const _message = this.messages.get(id)
         if (_message && !_message.get.deleted) await _message.get.delete()
         this.messages.delete(id)
+    }
+
+    async initLobbyMessage() {
+        if (this.#manager.thread) {
+            if (this.lobbyMessage) {
+                if (this.lobbyMessage.deleted) {
+                    this.lobbyMessage = await this.#manager.thread.send({embeds: [this.lobbyMessageEmbed()]})
+                    await this.save()
+                } else {
+                    await this.lobbyMessage.edit({embeds: [this.lobbyMessageEmbed()]})
+                }
+            } else {
+                if (this.#data.lobbyMessage) {
+                    this.lobbyMessage = await this.#manager.thread.messages.fetch(this.#data.lobbyMessage)
+                } else {
+                    this.lobbyMessage = await this.#manager.thread.send({embeds: [this.lobbyMessageEmbed()]})
+                    await this.save()
+                }
+            }
+        }
+
+    }
+
+    lobbyMessageEmbed() {
+        const embed: MessageEmbedOptions = {
+            description: `${this.owner.mention()} 的房间`,
+            thumbnail: {
+                url: this.owner.get ? this.owner.get.displayAvatarURL({format: "jpg", size: 512}) : undefined
+            },
+            fields: [
+                {
+                    name: `人数`,
+                    value: `${this.member.size + 1}人`
+                }
+            ],
+            timestamp: new Date(this.infoChannel.createdTimestamp)
+        }
+
+        return embed
     }
 }
