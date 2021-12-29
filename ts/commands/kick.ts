@@ -1,7 +1,7 @@
 import { CommandInteraction, TextChannel } from "discord.js";
 import Amateras from "../lib/Amateras";
 
-export default async function invite(interact: CommandInteraction, amateras: Amateras) {
+export default async function kick(interact: CommandInteraction, amateras: Amateras) {
     if (!interact.guild) return
     const guild = amateras.guilds.cache.get(interact.guild.id)
     if (!guild) return
@@ -20,11 +20,11 @@ export default async function invite(interact: CommandInteraction, amateras: Ama
                 break;
         }
     }
-    const result = await lobby.addMember(userId) 
+    const result = await lobby.removeMember(userId)
     if (result === 101) {
-        interact.reply({ content: '对象已在你的房间中', ephemeral: true })
+        interact.reply({ content: '对象不在你的房间中', ephemeral: true })
     } else {
-        guild.log.send(`${await guild.log.name(interact.user.id)} 邀请 ${await guild.log.name(userId)} 加入房间`)
-        interact.reply({content: '已邀请', ephemeral: true})
+        guild.log.send(`${await guild.log.name(interact.user.id)} 将 ${await guild.log.name(userId)} 移出房间`)
+        interact.reply({ content: '已移除', ephemeral: true })
     }
 }

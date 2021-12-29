@@ -12,18 +12,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function lobby(interact, amateras) {
     var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
-        let lobby;
-        let currentLobby;
         let _guild;
         if (!interact.guild)
             return;
         _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
-        lobby = yield ((_a = _guild.lobby) === null || _a === void 0 ? void 0 : _a.fetch(interact.user.id));
+        const lobby = yield ((_a = _guild.lobby) === null || _a === void 0 ? void 0 : _a.fetch(interact.user.id));
         if (lobby === 101 || lobby === 404)
             return interact.reply({ content: '你没有创建房间', ephemeral: true });
-        currentLobby = yield ((_b = _guild.lobby) === null || _b === void 0 ? void 0 : _b.fetchByCategory((_c = interact.channel.parent) === null || _c === void 0 ? void 0 : _c.id));
+        const currentLobby = yield ((_b = _guild.lobby) === null || _b === void 0 ? void 0 : _b.fetchByCategory((_c = interact.channel.parent) === null || _c === void 0 ? void 0 : _c.id));
+        const player = yield amateras.players.fetch(interact.user.id);
+        if (player === 404)
+            return interact.reply({ content: `Error: Player fetch failed` });
         for (const subcmd0 of interact.options.data) {
             switch (subcmd0.name) {
                 case 'create':
@@ -41,13 +42,14 @@ function lobby(interact, amateras) {
                 case 'close':
                     yield (lobby === null || lobby === void 0 ? void 0 : lobby.close());
                     interact.reply({ content: '房间已关闭', ephemeral: true });
+                    _guild.log.send(`${yield _guild.log.name(interact.user.id)} 关闭了房间`);
                     break;
                 case 'invite':
                     if (!subcmd0.options) {
                         interact.reply({ content: '请输入必要参数。', ephemeral: true });
                         return;
                     }
-                    let userId = '';
+                    var userId = '';
                     for (const subcmd1 of subcmd0.options) {
                         if (!subcmd1.value)
                             return;
@@ -57,14 +59,47 @@ function lobby(interact, amateras) {
                                 break;
                         }
                     }
-                    yield lobby.addMember(userId);
-                    interact.reply({ content: '已邀请', ephemeral: true });
+                    var result = yield lobby.addMember(userId);
+                    if (result === 101) {
+                        interact.reply({ content: '对象已在你的房间中', ephemeral: true });
+                    }
+                    else {
+                        _guild.log.send(`${yield _guild.log.name(interact.user.id)} 邀请 ${yield _guild.log.name(userId)} 加入房间`);
+                        interact.reply({ content: '已邀请', ephemeral: true });
+                    }
+                    break;
+                case 'kick':
+                    if (!subcmd0.options) {
+                        interact.reply({ content: '请输入必要参数。', ephemeral: true });
+                        return;
+                    }
+                    var userId = '';
+                    for (const subcmd1 of subcmd0.options) {
+                        if (!subcmd1.value)
+                            return;
+                        switch (subcmd1.name) {
+                            case 'user':
+                                userId = subcmd1.value;
+                                break;
+                        }
+                    }
+                    var result = yield lobby.removeMember(userId);
+                    if (result === 101) {
+                        interact.reply({ content: '对象不在你的房间中', ephemeral: true });
+                    }
+                    else {
+                        _guild.log.send(`${yield _guild.log.name(interact.user.id)} 将 ${yield _guild.log.name(userId)} 移出房间`);
+                        interact.reply({ content: '已移除', ephemeral: true });
+                    }
                     break;
                 case 'exit':
                     if (!currentLobby)
                         return interact.reply({ content: '你不在房间频道内', ephemeral: true });
+                    if (currentLobby.owner.id === interact.user.id)
+                        return interact.reply({ content: '你无法退出自己创建的房间，请使用关闭房间请求', ephemeral: true });
                     interact.reply({ content: '正在退出', ephemeral: true });
                     yield currentLobby.removeMember(interact.user.id);
+                    _guild.log.send(`${yield _guild.log.name(interact.user.id)} 退出了 ${yield _guild.log.name(currentLobby.owner.id)} 房间`);
             }
         }
     });

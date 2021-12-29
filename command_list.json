@@ -493,6 +493,19 @@
                     ]
                 },
                 {
+                    "name": "kick",
+                    "description": "将玩家从你的房间移除（快捷输入/kick）",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "user",
+                            "description": "移除对象",
+                            "type": 6,
+                            "required": true
+                        }
+                    ]
+                },
+                {
                     "name": "exit",
                     "description": "退出当前房间（退出后需要房主重新邀请才能进入）",
                     "type": 1
@@ -506,6 +519,19 @@
                 {
                     "name": "user",
                     "description": "邀请对象",
+                    "type": 6,
+                    "required": true
+                }
+            ]
+        },
+        {
+            "name": "kick",
+            "description": "将玩家从你的房间移除",
+            "type": 1,
+            "options": [
+                {
+                    "name": "user",
+                    "description": "移除对象",
                     "type": 6,
                     "required": true
                 }
