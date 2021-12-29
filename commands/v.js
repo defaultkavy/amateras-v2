@@ -26,11 +26,11 @@ function item(interact, amateras) {
                 };
                 for (const subcmd1 of subcmd0.options) {
                     if (subcmd1.name === 'url') {
-                        imageObj.url === imageObj.url;
+                        imageObj.url = subcmd1.value;
                     }
                 }
                 if (imageObj.url && (0, terminal_1.checkImage)(imageObj.url)) {
-                    v.image = imageObj.url;
+                    v.setInfo({ image: imageObj.url });
                     interact.reply({ content: '图片设定完成', ephemeral: true });
                 }
                 else {

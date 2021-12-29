@@ -1,13 +1,9 @@
-import { BaseGuildTextChannel, CommandInteraction, Interaction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageEmbedOptions, TextChannel } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 import { Collection } from "mongodb";
-import v_info_page_button from "../reacts/v_info_page_button";
-import v_set_folder_button from "../reacts/v_set_folder_button";
 import Amateras from "./Amateras";
 import { Lobby } from "./Lobby";
 import { Player } from "./Player";
 import { cloneObj } from "./terminal";
-import { VImage } from "./VImage";
-import { VImageFolder } from "./VImageFolder";
 import { VImageFolderManager } from "./VImageFolderManager";
 
 export class V {

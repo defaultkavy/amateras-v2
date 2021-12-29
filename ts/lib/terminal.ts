@@ -77,11 +77,11 @@ export function validURL(str: string) {
 }
 
 export function checkImage(image_url: string) {
+    if (!image_url || typeof image_url !== 'string') return false
     var http = new XMLHttpRequest;
 
     http.open('HEAD', image_url, false);
     http.send();
-    console.log(http.status)
     if (http.status !== 200) return false;
     return true
 }
