@@ -162,12 +162,17 @@ export class Lobby {
         await this.save()
         this.#manager.cache.delete(this.owner.id)
         await this.#manager.updateInitMessage()
-        this.#_guild.log.send(`${await this.#_guild.log.name(this.owner.id)} 关闭了房间`)
     }
 
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Member already in lobby
+     * @returns 404 - Player fetch failed
+     */
     async addMember(id: string) {
+        if (this.member.get(id)) return 101
         const player = await this.#amateras.players.fetch(id)
-        if (player === 404) return
+        if (player === 404) return 404
         this.member.set(player.id, player)
         this.#member.push(id)
         player.joinLobby(this)
@@ -179,9 +184,15 @@ export class Lobby {
         this.voiceChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
         this.infoChannel.permissionOverwrites.create(await this.#amateras.client.users.fetch(id), { VIEW_CHANNEL: true })
         await this.save()
+        return 100
     }
 
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Member not in lobby
+     */
     async removeMember(id: string) {
+        if (!this.member.get(id)) return 101
         const member = await this.textChannel.guild.members.fetch(id)
         const player = this.member.get(id)
         if (member.voice.channel === this.voiceChannel) {
@@ -197,6 +208,7 @@ export class Lobby {
         this.deleteMessage(id)
         this.textChannel.send({content: `${member}退出了房间`})
         await this.save()
+        return 100
     }
 
     async setFolder(id: string, folderId: string) {

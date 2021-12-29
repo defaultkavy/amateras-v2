@@ -351,10 +351,12 @@ export class Player {
 
     joinLobby(lobby: Lobby) {
         this.joinedLobbies.set(lobby.categoryChannel.id, lobby)
+        this.save()
     }
 
     leaveLobby(lobby: Lobby) {
         this.joinedLobbies.delete(lobby.categoryChannel.id)
+        this.save()
     }
 
     mention() {

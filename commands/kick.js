@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-function invite(interact, amateras) {
+function kick(interact, amateras) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         if (!interact.guild)
@@ -34,15 +34,15 @@ function invite(interact, amateras) {
                     break;
             }
         }
-        const result = yield lobby.addMember(userId);
+        const result = yield lobby.removeMember(userId);
         if (result === 101) {
-            interact.reply({ content: '对象已在你的房间中', ephemeral: true });
+            interact.reply({ content: '对象不在你的房间中', ephemeral: true });
         }
         else {
-            guild.log.send(`${yield guild.log.name(interact.user.id)} 邀请 ${yield guild.log.name(userId)} 加入房间`);
-            interact.reply({ content: '已邀请', ephemeral: true });
+            guild.log.send(`${yield guild.log.name(interact.user.id)} 将 ${yield guild.log.name(userId)} 移出房间`);
+            interact.reply({ content: '已移除', ephemeral: true });
         }
     });
 }
-exports.default = invite;
-//# sourceMappingURL=invite.js.map
+exports.default = kick;
+//# sourceMappingURL=kick.js.map

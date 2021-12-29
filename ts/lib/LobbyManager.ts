@@ -178,8 +178,6 @@ export class LobbyManager {
         const voiceChannel = await category.createChannel('语音频道', {
             type: 'GUILD_VOICE'
         })
-        textChannel.lockPermissions()
-        voiceChannel.lockPermissions()
         const data: LobbyData = {
             owner: id,
             member: [],
