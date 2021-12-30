@@ -9,6 +9,7 @@ import { _ChannelManager } from "./_ChannelManager";
 import { GuildCommandManager } from "./GuildCommandManager";
 import { _RoleManager } from "./_RoleManager";
 import { Err } from "./Err";
+import { MusicPlayer } from "./MusicPlayer";
 
 export class _Guild {
     #amateras: Amateras;
@@ -23,6 +24,7 @@ export class _Guild {
     roles: _RoleManager;
     channels: _ChannelManager;
     moderators: string[]
+    musicPlayer: MusicPlayer;
 
     constructor(data: _GuildData, guild: Guild, amateras: Amateras) {
         this.#amateras = amateras
@@ -37,6 +39,7 @@ export class _Guild {
         this.roles = new _RoleManager(this, this.#amateras)
         this.channels = new _ChannelManager(this, this.#amateras)
         this.moderators = data.moderators ? data.moderators : [guild.ownerId]
+        this.musicPlayer = new MusicPlayer(this, amateras)
     }
 
     async init() {
@@ -56,11 +59,14 @@ export class _Guild {
         console.time('| Role loaded')
         await this.roles.init()
         console.timeEnd('| Role loaded')
+        console.time('| Music loaded')
+        await this.musicPlayer.init()
+        console.timeEnd('| Music loaded')
         await this.save()
     }
 
     async save() {
-        const data = cloneObj(this, ['get', 'roles', 'channels'])
+        const data = cloneObj(this, ['get', 'roles', 'channels', 'musicPlayer'])
         data.commands = this.commands.toData()
         data.log = this.log ? this.log.toData() : undefined
         data.lobby = this.lobby ? this.lobby.toData() : undefined

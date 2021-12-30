@@ -1,5 +1,5 @@
 import Amateras from "./Amateras";
-import { Player } from "./Player";
+import { Player, PlayerData } from "./Player";
 import { VManager } from "./VManager";
 
 export class PlayerManager {

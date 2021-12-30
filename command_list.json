@@ -419,6 +419,26 @@
                     ]
                 },
                 {
+                    "name": "music",
+                    "description": "音乐系统设定",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "set",
+                            "description": "设定频道为音乐频道",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "enable",
+                                    "description": "开关",
+                                    "type": 5,
+                                    "required": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "name": "message",
                     "description": "讯息管理",
                     "type": 2,
@@ -546,6 +566,55 @@
                     "description": "贴文讯息链接",
                     "type": 3,
                     "required": true
+                }
+            ]
+        },
+        {
+            "name": "music",
+            "description": "音乐",
+            "options": [
+                {
+                    "name": "play",
+                    "description": "播放",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "url",
+                            "description": "YouTube Music 网址",
+                            "type": 3,
+                            "required": true
+                        }
+                    ]
+                },
+                {
+                    "name": "next",
+                    "description": "下一首",
+                    "type": 1
+                },
+                {
+                    "name": "prev",
+                    "description": "上一首",
+                    "type": 1
+                },
+                {
+                    "name": "stop",
+                    "description": "停止播放",
+                    "type": 1
+                },
+                {
+                    "name": "pause",
+                    "description": "暂停播放",
+                    "type": 1
+                },
+                {
+                    "name": "queue",
+                    "description": "下一首",
+                    "type": 1
+                },
+                {
+                    "name": "random",
+                    "description": "随机播放你点过的歌曲",
+                    "type": 1
                 }
             ]
         },

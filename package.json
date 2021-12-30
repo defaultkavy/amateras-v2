@@ -11,13 +11,17 @@
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
     "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/voice": "^0.7.5",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.2.0",
+    "ffmpeg-static": "^4.4.0",
     "google-spreadsheet": "^3.2.0",
+    "libsodium-wrappers": "^0.7.9",
     "mongodb": "^4.1.2",
     "tmi.js": "^1.8.5",
     "ws": "^8.2.3",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "ytdl-core": "^4.9.2"
   },
   "devDependencies": {
     "@types/google-spreadsheet": "^3.1.5",

@@ -4,6 +4,7 @@ import { Err } from "./Err";
 import { Gender } from "./layout";
 import { Lobby } from "./Lobby";
 import { PlayerMissionManager } from "./PlayerMissionManager";
+import { PlayerMusicManager } from "./PlayerMusicManager";
 import { Reward } from "./Reward";
 import { cloneObj, removeArrayItem } from "./terminal";
 import { V } from "./V";
@@ -30,31 +31,33 @@ export class Player {
     #rewards?: string[];
     rewards: Map<string, Reward>;
     get?: User
+    musics: PlayerMusicManager;
     /**
      * @namespace
      * @param player The player data object.
      * @param amateras The amateras object.
      */
-    constructor(player: PlayerData, amateras: Amateras) {
+    constructor(data: PlayerData, amateras: Amateras) {
         this.#amateras = amateras
-        this.id = player.id
-        this.exp = player.exp ? player.exp : 0
-        this.description = player.description
-        this.color = player.color,
-        this.youtube = player.youtube
-        this.twitter = player.twitter
+        this.id = data.id
+        this.exp = data.exp ? data.exp : 0
+        this.description = data.description
+        this.color = data.color,
+        this.youtube = data.youtube
+        this.twitter = data.twitter
         this.level = this.levelCheck()
-        this.aka = player.aka
-        this.gender = player.gender ? player.gender : 1
-        this.#walletsId = player.wallets ? player.wallets : []
+        this.aka = data.aka
+        this.gender = data.gender ? data.gender : 1
+        this.#walletsId = data.wallets ? data.wallets : []
         this.wallets = [];
-        this.#missions = this.init_missions(player)
+        this.#missions = this.init_missions(data)
         this.missions = <PlayerMissionManagerSelector>{};
-        this.class = player.class
+        this.class = data.class
         this.v = undefined
         this.joinedLobbies = new Map
-        this.#rewards = player.rewards
+        this.#rewards = data.rewards
         this.rewards = new Map
+        this.musics = new PlayerMusicManager(this, amateras)
     }
 
     async init() {
@@ -113,6 +116,8 @@ export class Player {
                 if (reward) this.rewards.set(reward.name, reward)
             }
         }
+
+        await this.musics.init()
         return 100
     }
 
@@ -120,10 +125,10 @@ export class Player {
      * Save player cache to Database
      * @param callback Callback when save is done.
      */
-     async save(callback?: () => void): Promise<void> {
+     async save() {
         const collection = this.#amateras.db!.collection('player')
         const player = await collection.findOne({ id: this.id })
-        const data = cloneObj(this, ['wallets', 'v', 'joinedLobbies'])
+        const data = cloneObj(this, ['wallets', 'v', 'joinedLobbies', 'get', 'musics'])
         data.wallets = this.#walletsId
         data.missions = this.#missions
         data.rewards = []
@@ -135,7 +140,6 @@ export class Player {
         } else {
             await collection.replaceOne({ id: this.id }, data)
         }
-        if (callback) callback()
     }
 
     expUp(amount: number): void {
@@ -367,4 +371,20 @@ export class Player {
         }
         return result
     }
+}
+
+export interface PlayerData {
+    id: string;
+    exp?: number;
+    description?: string;
+    color?: import('discord.js').ColorResolvable;
+    youtube?: string;
+    twitter?: string;
+    level?: number;
+    aka?: string;
+    gender?: import('./layout').Gender
+    wallets?: string[];
+    missions?: PlayerMissionData;
+    class?: ('PLAYER' | 'VTUBER')[];
+    rewards?: string[]
 }

@@ -18,10 +18,7 @@ export default class _MessageManager {
     async fetch(msgId: string) {
         if (!msgId) return // Mission create will fetch msg with undefined string
         const msgData = <MsgData>await this.#collection?.findOne({ id: msgId })
-        if (!msgData) {
-            console.error(`Mission "${msgId}" fetch failed.`)
-            return
-        }
+        if (!msgData) return
         if (this.cache.has(msgId)) {
             return this.cache.get(msgId)
         }
