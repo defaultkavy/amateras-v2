@@ -15,6 +15,7 @@ import cmd from "./cmd";
 import { Log } from "./Log";
 import { System } from './System';
 import { CommandManager } from './CommandManager';
+import { MusicManager } from './MusicManager';
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {
@@ -36,6 +37,7 @@ export default class Amateras {
     log: Log;
     system: System;
     commands: CommandManager;
+    musics: MusicManager;
     constructor(client: Client, db: Db, admin: string) {
         this.client = client;
         this.id = client.user!.id;
@@ -53,7 +55,7 @@ export default class Amateras {
         this.characters = new _CharacterManager(this)
         this.log = new Log(this)
         this.system = new System(admin, this)
-        
+        this.musics = new MusicManager(this)
     }
 
     async init() {

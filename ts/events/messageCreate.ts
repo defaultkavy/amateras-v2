@@ -10,7 +10,7 @@ module.exports = {
         const player = await amateras.players.fetch(message.author.id)
         if (player === 404) return
         const _guild = amateras.guilds.cache.get(message.guild.id)
-        //Reward
+        // Reward
         const reward = player.rewards.get('message')
         if (reward) reward.add()
         if (message.type === 'REPLY') {
@@ -22,11 +22,18 @@ module.exports = {
             if (repliedReward) repliedReward.add()
         }
 
-        //Forum
+        // Forum
         if (_guild && _guild.forums) {
             const forum = _guild.forums.cache.get(message.channel.id)
-            if (!forum) return
-            forum.post(message)
+            if (forum) forum.post(message)
+        }
+
+        // Music
+        if (_guild && _guild.musicPlayer.channel) {
+            if (_guild.musicPlayer.channel.id === message.channelId) {
+                await _guild.musicPlayer.link(message, player)
+                if (!message.deleted) message.delete()
+            }
         }
     }
 }

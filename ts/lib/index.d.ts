@@ -4,22 +4,6 @@ interface Command {
     type: number;
     options: Command[];
 }
-
-interface PlayerData {
-    id: string;
-    exp?: number;
-    description?: string;
-    color?: import('discord.js').ColorResolvable;
-    youtube?: string;
-    twitter?: string;
-    level?: number;
-    aka?: string;
-    gender?: import('./layout').Gender
-    wallets?: string[];
-    missions?: PlayerMissionData;
-    class?: ('PLAYER' | 'VTUBER')[];
-    rewards?: string[]
-}
 interface VObj {
     name?: string;
     description?: string;

@@ -1,6 +1,7 @@
 import { CategoryChannel, Message, MessageEmbedOptions, TextChannel, VoiceChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
+import { Err } from "./Err";
 import { LobbyManager } from "./LobbyManager";
 import { Player } from "./Player";
 import { cloneObj, removeArrayItem } from "./terminal";
@@ -83,26 +84,29 @@ export class Lobby {
             this.member.set(memberId, member)
             member.joinLobby(this)
         }
-
-        this.categoryChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
-            VIEW_CHANNEL: true,
-            MANAGE_CHANNELS: true
-        })
-        
-        this.infoChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
-            VIEW_CHANNEL: true,
-            MANAGE_CHANNELS: false
-        })
-
-        this.textChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
-            VIEW_CHANNEL: true,
-            MANAGE_CHANNELS: false
-        })
-        
-        this.voiceChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
-            VIEW_CHANNEL: true,
-            MANAGE_CHANNELS: false
-        })
+        try {
+            this.categoryChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+                VIEW_CHANNEL: true,
+                MANAGE_CHANNELS: true
+            })
+            
+            this.infoChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+                VIEW_CHANNEL: true,
+                MANAGE_CHANNELS: false
+            })
+    
+            this.textChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+                VIEW_CHANNEL: true,
+                MANAGE_CHANNELS: false
+            })
+            
+            this.voiceChannel.permissionOverwrites.edit(await this.categoryChannel.guild.members.fetch(this.owner.id), {
+                VIEW_CHANNEL: true,
+                MANAGE_CHANNELS: false
+            })
+        } catch(err) {
+            new Err(`${err}`)
+        }
 
         //VImage
         if (this.#vFolder && Object.entries(this.#vFolder).length !== 0) {

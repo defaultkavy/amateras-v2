@@ -21,6 +21,20 @@ module.exports = {
         return __awaiter(this, void 0, void 0, function* () {
             let consoleText = `command received: ${interaction.user.username} - `;
             if (interaction.isCommand()) { // If slash command message sent
+                // Return when command run in special channel
+                const guild = interaction.guild;
+                if (guild && interaction.commandName !== 'mod') {
+                    const _guild = amateras.guilds.cache.get(guild.id);
+                    if (_guild) {
+                        if (interaction.channelId) {
+                            if (_guild.lobby.channel && interaction.channelId === _guild.lobby.channel.id ||
+                                _guild.musicPlayer.channel && interaction.channelId === _guild.musicPlayer.channel.id ||
+                                _guild.forums.cache.has(interaction.channelId)) {
+                                return interaction.reply({ content: `你无法在这里发布请求指令`, ephemeral: true });
+                            }
+                        }
+                    }
+                }
                 // Check command file exist
                 if (fs_1.default.existsSync(`./commands/${interaction.commandName}.js`)) {
                     // Import command function
@@ -92,30 +106,23 @@ module.exports = {
                 if (flags.toArray().includes('EPHEMERAL'))
                     return;
                 const msg = (yield ((_b = amateras.messages) === null || _b === void 0 ? void 0 : _b.fetch(interaction.message.id)));
-                if (!msg) {
-                    console.error(`Msg "${interaction.id}" not found. (Amateras.js)`);
-                    return;
-                }
                 let buttonFn = '';
-                if (!msg.actions) {
-                    console.error(`Msg "${interaction.id}" actions is ${msg.actions}. (Amateras.js)`);
-                    return;
-                }
-                const customId = interaction.customId.split('#')[1];
-                for (const action of msg.actions) {
-                    for (const element of action) {
-                        if (element.customId === customId && element.type === 'BUTTON') {
-                            if (!element.fn) {
-                                console.error(`Msg "${msg.id}" button "${element.customId}" function is ${element.fn} (Amateras.js)`);
-                                return;
+                let customId = interaction.customId.split('#')[1];
+                if (msg && msg.actions) {
+                    for (const action of msg.actions) {
+                        for (const element of action) {
+                            if (element.customId === customId && element.type === 'BUTTON') {
+                                if (!element.fn) {
+                                    console.error(`Msg "${msg.id}" button "${element.customId}" function is ${element.fn} (Amateras.js)`);
+                                    return;
+                                }
+                                buttonFn = element.fn;
                             }
-                            buttonFn = element.fn;
                         }
                     }
                 }
                 if (!buttonFn) {
-                    console.error(`Button "${customId}" not found in msg "${msg.id}" or type is uncorrect. (Amateras.js)`);
-                    return;
+                    buttonFn = interaction.customId;
                 }
                 consoleText += `${customId}`;
                 // Check function file exist
@@ -127,7 +134,7 @@ module.exports = {
                 }
                 else {
                     // If Function not exist
-                    console.error(`Button "${interaction.customId}" function file not found. (Amateras.js)`);
+                    console.error(`"${interaction.customId}" function file not found.`);
                     return;
                 }
             }

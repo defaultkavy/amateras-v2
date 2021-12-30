@@ -226,6 +226,62 @@ function execute(interaction, amateras) {
                     }
                 }
                 break;
+            case 'music':
+                if (!subcmd0.options)
+                    return;
+                const channel = interaction.channel;
+                if (!channel || channel.type !== 'GUILD_TEXT')
+                    return interaction.reply({ content: 'Error: Channel is not GUILD_TEXT' });
+                if (!_guild)
+                    return;
+                for (const subcmd1 of subcmd0.options) {
+                    switch (subcmd1.name) {
+                        case 'set':
+                            // Check sub-command is filled
+                            if (subcmd1.options) {
+                                const value = { enable: false };
+                                for (const subcmd2 of subcmd1.options) {
+                                    switch (subcmd2.name) {
+                                        case 'enable':
+                                            value.enable = subcmd2.value;
+                                            break;
+                                    }
+                                }
+                                if (value.enable === true) {
+                                    if ((yield _guild.musicPlayer.setup(channel)) === 101) {
+                                        interaction.reply({ content: `此频道音乐模式保持为：${value.enable ? '开' : '关'}`, ephemeral: true });
+                                    }
+                                    else {
+                                        interaction.reply({ content: `此频道音乐模式更改为：${value.enable ? '开' : '关'}`, ephemeral: true });
+                                    }
+                                }
+                                else if (value.enable === false) {
+                                    const unset = yield _guild.musicPlayer.unset(channel);
+                                    if (unset === 101) {
+                                        interaction.reply({ content: `当前没有设立的音乐频道`, ephemeral: true });
+                                    }
+                                    else if (unset === 102) {
+                                        interaction.reply({ content: `此频道不是音乐频道`, ephemeral: true });
+                                    }
+                                    else {
+                                        interaction.reply({ content: `此频道音乐模式更改为：${value.enable ? '开' : '关'}`, ephemeral: true });
+                                    }
+                                }
+                            }
+                            else {
+                                if (!_guild.musicPlayer.channel) {
+                                    interaction.reply({ content: `音乐模式：关`, ephemeral: true });
+                                }
+                                else {
+                                    if (_guild.musicPlayer.channel)
+                                        return interaction.reply({ content: `音乐模式：开，${_guild.musicPlayer.channel}`, ephemeral: true });
+                                    interaction.reply({ content: `音乐模式：开`, ephemeral: true });
+                                }
+                            }
+                            break;
+                    }
+                }
+                break;
             case 'message':
                 if (!subcmd0.options)
                     return;
