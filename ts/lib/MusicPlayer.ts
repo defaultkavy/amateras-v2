@@ -189,7 +189,7 @@ export class MusicPlayer {
                     return 
                 } 
                 if (oldState.status === AudioPlayerStatus.Playing) {
-                    if (newState.status === AudioPlayerStatus.Idle) {
+                    if (newState.status === AudioPlayerStatus.Idle || newState.status === 'autopaused') {
                         this.next()
                     }
                 }
@@ -258,12 +258,18 @@ export class MusicPlayer {
     }
 
     next() {
-        if (!this.queue[0]) return
+        if (!this.queue[1]) return this.stop()
         const endTrack = this.queue.shift()
         if (!endTrack) return
         this.prevQueue.unshift(endTrack)
         this.state = 'CHANGING'
-        if (this.audioPlayer) this.audioPlayer.stop()
+        if (this.audioPlayer) {
+            if (this.audioPlayer.state.status === 'idle') {
+                this.play()
+            } else {
+                this.audioPlayer.stop()
+            }
+        }
         // Listener
     }
 
@@ -282,6 +288,9 @@ export class MusicPlayer {
     }
 
     async stop() {
+        const endTrack = this.queue.shift()
+        if (!endTrack) return
+        this.prevQueue.unshift(endTrack)
         if (!this.audioPlayer) return
         this.audioPlayer.stop()
         this.audioPlayer = undefined
