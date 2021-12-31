@@ -22,10 +22,11 @@ export class _ChannelManager {
     }
 
     /**
-     * 
+     * @returns 101 - Id is undefined
      * @returns 404 - Channel not found 
      */
     async fetch(id: string) {
+        if (!id) return 101
         try {
             const channel = await this.#_guild.get.channels.fetch(id)
             if (!channel) {

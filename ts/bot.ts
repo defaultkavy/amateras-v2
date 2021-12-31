@@ -7,12 +7,15 @@ import Amateras from './lib/Amateras';
 import cmd from './lib/cmd';
 // Client config
 let config = require('./bot_config.json')
+
+
 // Create Bot Client
 // Client Options - Partials: Cache message and reaction.
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
     partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'GUILD_MEMBER']
 });
+
 // Database Client
 const mongo = new MongoClient(config.db.host, {auth: {username: config.db.user, password: config.db.pwd}})
 let db: Db

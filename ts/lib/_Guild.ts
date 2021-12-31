@@ -2,7 +2,7 @@ import { Guild, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { ForumManager } from "./ForumManager";
-import { LobbyManager } from "./LobbyManager";
+import { LobbyManager, LobbyManagerData } from "./LobbyManager";
 import { GuildLog } from "./GuildLog";
 import { cloneObj, removeArrayItem } from "./terminal";
 import { _ChannelManager } from "./_ChannelManager";
@@ -10,10 +10,13 @@ import { GuildCommandManager } from "./GuildCommandManager";
 import { _RoleManager } from "./_RoleManager";
 import { Err } from "./Err";
 import { MusicPlayer } from "./MusicPlayer";
+import { _GuildManager } from "./_GuildManager";
+import cmd from "./cmd";
 
 export class _Guild {
     #amateras: Amateras;
     #collection: Collection;
+    #manager: _GuildManager;
     id: string;
     get: Guild;
     log: GuildLog;
@@ -25,10 +28,12 @@ export class _Guild {
     channels: _ChannelManager;
     moderators: string[]
     musicPlayer: MusicPlayer;
-
-    constructor(data: _GuildData, guild: Guild, amateras: Amateras) {
+    available: boolean;
+    ready: boolean;
+    constructor(data: _GuildData, guild: Guild, manager: _GuildManager, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = this.#amateras.db.collection('guilds')
+        this.#manager = manager
         this.get = guild
         this.id = data.id
         this.commands = new GuildCommandManager(data.commands, this, this.#amateras)
@@ -40,9 +45,12 @@ export class _Guild {
         this.channels = new _ChannelManager(this, this.#amateras)
         this.moderators = data.moderators ? data.moderators : [guild.ownerId]
         this.musicPlayer = new MusicPlayer(this, amateras)
+        this.available = data.available ? data.available : true
+        this.ready = false
     }
 
     async init() {
+        console.log(cmd.Green, `Guild Initializing: ${this.id}`)
         console.time('| Guild Command deployed')
         await this.commands.init()
         console.timeEnd('| Guild Command deployed')
@@ -63,10 +71,12 @@ export class _Guild {
         await this.musicPlayer.init()
         console.timeEnd('| Music loaded')
         await this.save()
+        console.log(cmd.Green, `Guild Initialized: ${this.id}`)
+        this.ready = true
     }
 
     async save() {
-        const data = cloneObj(this, ['get', 'roles', 'channels', 'musicPlayer'])
+        const data = cloneObj(this, ['get', 'roles', 'channels', 'musicPlayer', 'ready'])
         data.commands = this.commands.toData()
         data.log = this.log ? this.log.toData() : undefined
         data.lobby = this.lobby ? this.lobby.toData() : undefined
@@ -153,4 +163,20 @@ export class _Guild {
             return 100
         }
     }
+
+    async leave() {
+        this.available = false
+        await this.save()
+        this.#manager.cache.delete(this.id)
+    }
+}
+
+export interface _GuildData {
+    id: string;
+    log?: LogData;
+    lobby?: LobbyManagerData;
+    forums?: ForumManagerData;
+    commands?: GuildCommandManagerData;
+    moderators: string[];
+    available?: boolean;
 }

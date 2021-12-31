@@ -26,7 +26,7 @@ function music_next(interact, amateras) {
             return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
         if (!_guild.musicPlayer.queue[1])
             return interact.reply({ content: `没有下一首了`, ephemeral: true });
-        _guild.musicPlayer.next();
+        _guild.musicPlayer.control.next();
         interact.deferUpdate();
     });
 }

@@ -1,4 +1,4 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, Message } from "discord.js";
 import Amateras from "../lib/Amateras";
 
 export default async function music_play(interact: ButtonInteraction, amateras: Amateras) {
@@ -15,12 +15,16 @@ export default async function music_play(interact: ButtonInteraction, amateras: 
     
     if (_guild.musicPlayer.state === 'PLAYING') return interact.reply({content: `正在播放中`, ephemeral: true})
     if (_guild.musicPlayer.state === 'STOPPED') {
+        interact.deferReply()
         await _guild.musicPlayer.random(player, member.voice.channel)
-        _guild.musicPlayer.play()
-        interact.deferUpdate()
+        _guild.musicPlayer.control.play()
+        const reply = <Message>await interact.followUp({content: `随机播放`})
+        setTimeout(() => {
+            if (!reply.deleted) reply.delete()
+        }, 3000);
     }
     if (_guild.musicPlayer.state === 'PAUSE') {
-        await _guild.musicPlayer.resume()
+        await _guild.musicPlayer.control.resume()
         interact.deferUpdate()
     }
 }

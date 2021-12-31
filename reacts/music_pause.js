@@ -27,7 +27,7 @@ function music_pause(interact, amateras) {
         if (_guild.musicPlayer.state === 'STOPPED')
             return interact.reply({ content: `停止状态无法使用暂停`, ephemeral: true });
         if (_guild.musicPlayer.state === 'PLAYING') {
-            yield _guild.musicPlayer.pause();
+            yield _guild.musicPlayer.control.pause();
             interact.deferUpdate();
         }
     });

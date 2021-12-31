@@ -37,7 +37,7 @@ function execute(interact, amateras) {
                 if (!_guild)
                     return interact.reply({ content: '无法找到此讯息的来源伺服器', ephemeral: true });
                 const _channel = yield _guild.channels.fetch(channelId);
-                if (_channel === 404)
+                if (_channel === 404 || _channel === 101)
                     return interact.reply({ content: '无法读取频道', ephemeral: true });
                 if (_channel.get.type !== 'GUILD_TEXT')
                     return interact.reply({ content: '无效的频道类型', ephemeral: true });

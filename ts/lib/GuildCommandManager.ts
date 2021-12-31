@@ -3,7 +3,7 @@ import { Routes } from 'discord-api-types/v9';
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { GuildCommand } from "./GuildCommand";
-import { cloneObj } from "./terminal";
+import { cloneObj, objectEqual, removeArrayItem } from "./terminal";
 import { _Guild } from "./_Guild";
 const { commands } = require('../command_list.json')
 
@@ -25,10 +25,10 @@ export class GuildCommandManager {
 
     async init() {
         if (!this.#commandsList) return console.log('| Guild Command Disabled')
-
-        await this.deploy() // Deploy command setup to Guild
+        if (await this.edited()) await this.deploy() // Deploy command setup to Guild
 
         const appCommands = await this.#_guild.get.commands.fetch()
+        
         if (this.#commands) {
             for (const appCommand of appCommands) {
                 const data = <GuildCommandData | null>await this.#collection.findOne({id: appCommand[0]})
@@ -43,6 +43,53 @@ export class GuildCommandManager {
                 await command.init()
             }
         }
+
+    }
+
+    async edited() {
+        const collection = this.#amateras.db.collection('sys')
+        const data = await collection.findOne({name: 'guild_commands'})
+        // Check if database no record OR record different with commandsList
+        if (!data || (data && !objectEqual(data.commands, this.#commandsList))) {
+            // [] reset guild list
+            await this.record([])
+            return true
+        }
+        if (data.guilds instanceof Array && data.guilds.includes(this.#_guild.id)) {
+            return false
+        } else {
+            // Pass guild[] from record
+            await this.record(data.guilds, data)
+            return true
+        }
+    }
+
+    private async record(guilds: string[], data?: any) {
+        const collection = this.#amateras.db.collection('sys')
+        guilds.push(this.#_guild.id)
+        const newData = {
+            name: 'guild_commands',
+            commands: this.#commandsList,
+            guilds: guilds
+        }
+        if (data) {
+            await collection.replaceOne({name: 'guild_commands'}, newData)
+        } else {
+            await collection.insertOne(newData)
+        }
+    }
+
+    private async removeRecord() {
+        const collection = this.#amateras.db.collection('sys')
+        const data = await collection.findOne({name: 'guild_commands'})
+        if (data) {
+            if (data.guilds instanceof Array && data.guilds.includes(this.#_guild.id)) {
+                data.guilds = removeArrayItem(data.guilds, this.#_guild.id)
+                await collection.replaceOne({name: 'guild_commands'}, data)
+            } else return
+        } else {
+            return
+        }
     }
 
     async deploy() {
@@ -54,6 +101,7 @@ export class GuildCommandManager {
                 { body: this.#commandsList },
             );
         } catch(err) {
+            await this.removeRecord()
             console.error(err);
         }
     }

@@ -20,6 +20,8 @@ module.exports = {
             if (player === 404)
                 return;
             const _guild = amateras.guilds.cache.get(message.guild.id);
+            if (_guild && _guild.ready === false)
+                return;
             // Reward
             const reward = player.rewards.get('message');
             if (reward)
@@ -44,9 +46,10 @@ module.exports = {
             // Music
             if (_guild && _guild.musicPlayer.channel) {
                 if (_guild.musicPlayer.channel.id === message.channelId) {
-                    yield _guild.musicPlayer.link(message, player);
+                    _guild.musicPlayer.link(message, player);
                     if (!message.deleted)
                         message.delete();
+                    _guild.musicPlayer.notify.add(player, `你添加了歌曲`);
                 }
             }
         });

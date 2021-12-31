@@ -6,7 +6,10 @@ module.exports = {
     once: false,
     async execute(reaction: MessageReaction, user: User, amateras: Amateras) {
         await reaction.message.fetch()
-        if (user.bot || !reaction.message.guild || !reaction.message.author) return
+        if (user.bot || 
+            reaction.message.author && reaction.message.author.bot || 
+            !reaction.message.guild || 
+            !reaction.message.author) return
         const reactedPlayer = await amateras.players.fetch(reaction.message.author.id)
         if (reactedPlayer === 404) return
         const reactPlayer = await amateras.players.fetch(user.id)

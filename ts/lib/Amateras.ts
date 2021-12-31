@@ -73,7 +73,7 @@ export default class Amateras {
         console.timeEnd('| Global Command Deployed')
         console.timeEnd('| System Initialized')
         this.eventHandler()
-        this.setTimer()
+        //this.setTimer()
         console.log(cmd.Yellow, 'Amateras Ready.')
     }
 

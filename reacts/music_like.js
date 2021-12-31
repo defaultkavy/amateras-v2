@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-function music_pause(interact, amateras) {
+function music_like(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
         if (player === 404)
@@ -19,16 +19,21 @@ function music_pause(interact, amateras) {
         const _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
-        const member = yield interact.guild.members.fetch(interact.user.id);
-        if (!member)
-            return;
-        if (!member.voice.channel)
-            return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
-        if (!_guild.musicPlayer.queue[1])
-            return interact.reply({ content: `没有下一首了`, ephemeral: true });
-        _guild.musicPlayer.next();
+        const current = _guild.musicPlayer.queue[0];
+        if (!current)
+            return interact.reply({ content: `操作无效`, ephemeral: true });
+        const playerMusic = yield player.musics.add(current.music);
+        const result = yield playerMusic.setLike();
         interact.deferUpdate();
+        if (result === 100) {
+            _guild.musicPlayer.notify.add(player, '加入了收藏');
+            return;
+        }
+        else {
+            playerMusic.unsetLike();
+            _guild.musicPlayer.notify.add(player, '从收藏中移除');
+        }
     });
 }
-exports.default = music_pause;
-//# sourceMappingURL=music_next%20copy.js.map
+exports.default = music_like;
+//# sourceMappingURL=music_like.js.map

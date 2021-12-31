@@ -27,12 +27,17 @@ function music_play(interact, amateras) {
         if (_guild.musicPlayer.state === 'PLAYING')
             return interact.reply({ content: `正在播放中`, ephemeral: true });
         if (_guild.musicPlayer.state === 'STOPPED') {
+            interact.deferReply();
             yield _guild.musicPlayer.random(player, member.voice.channel);
-            _guild.musicPlayer.play();
-            interact.deferUpdate();
+            _guild.musicPlayer.control.play();
+            const reply = yield interact.followUp({ content: `随机播放` });
+            setTimeout(() => {
+                if (!reply.deleted)
+                    reply.delete();
+            }, 3000);
         }
         if (_guild.musicPlayer.state === 'PAUSE') {
-            yield _guild.musicPlayer.resume();
+            yield _guild.musicPlayer.control.resume();
             interact.deferUpdate();
         }
     });

@@ -50,7 +50,8 @@ export class PlayerMusicManager {
         const data: PlayerMusicData = {
             id: music.id,
             counts: 0,
-            player: this.player
+            player: this.player,
+            like: false
         }
         const playerMusic = new PlayerMusic(data, music, this.#amateras)
         this.history.set(music.id, playerMusic)
@@ -65,7 +66,7 @@ export class PlayerMusicManager {
     async add(music: Music) {
         const fetch = await this.fetch(music.id)
         if (fetch instanceof PlayerMusic) return fetch
-        const create = await this.create(music)
+        const create = <PlayerMusic>await this.create(music)
         return create
     }
 

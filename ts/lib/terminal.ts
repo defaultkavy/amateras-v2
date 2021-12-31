@@ -51,12 +51,13 @@ export function idGenerator(length: number) {
 }
 
 export function removeArrayItem<T>(arr: Array<T>, value: T): Array<T> { 
-    if (value instanceof Number || value instanceof String) {
+    if (typeof value === 'number' || typeof value === 'string') {
         const index = arr.indexOf(value);
+        console.debug(value)
         if (index > -1) {
           arr.splice(index, 1);
         }
-    } else if (value instanceof Object) {
+    } else if (typeof value === 'object') {
         for (let i = 0; i < arr.length; i++) {
             if (objectEqual(arr[i], value)) {
                 arr.splice(i, 1)
@@ -197,4 +198,21 @@ export function equalOneOf<T>(target: T, array: T[]) {
         }
     }
     return false
+}
+
+export function msTime(duration: number) {
+    const millisecond = duration % 1000
+    const second = Math.floor(duration / 1000)
+    const minute = Math.floor(second / 60)
+    const hour = Math.floor(minute / 60)
+    const day = Math.floor(hour / 24)
+    const year = Math.floor(day / 365)
+    return {
+        millisecond: millisecond - (second * 1000),
+        second: second - (minute * 60),
+        minute: minute - (hour * 60),
+        hour: hour - (day * 24),
+        day: day - (year * 365),
+        year: year
+    }
 }

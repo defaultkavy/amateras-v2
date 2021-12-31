@@ -6,7 +6,7 @@ import { LobbyManager } from "./LobbyManager";
 import { Player } from "./Player";
 import { cloneObj, removeArrayItem } from "./terminal";
 import { VImageFolder } from "./VImageFolder";
-import { _Guild } from "./_Guild";
+import { _Guild, _GuildData } from "./_Guild";
 import { _Message } from "./_Message";
 
 export class Lobby {
@@ -147,7 +147,7 @@ export class Lobby {
         if (this.state !== 'CLOSED') for (const id of this.messages.keys()) {
             data.messages[id] = this.messages.get(id)!.id
         }
-        const lobby = <_GuildData>await this.#collection.findOne({ owner: this.owner.id } )
+        const lobby = <_GuildData>await this.#collection.findOne({ owner: this.owner.id, guild: this.#_guild.id } )
         if (lobby) {
             await this.#collection.replaceOne({ owner: this.owner.id}, data)
         } else {

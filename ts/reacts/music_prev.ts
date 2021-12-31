@@ -14,6 +14,6 @@ export default async function music_prev(interact: ButtonInteraction, amateras: 
     if (!member.voice.channel) return interact.reply({content: `你必须在一个语音频道内`, ephemeral: true})
     
     if (!_guild.musicPlayer.prevQueue[0]) return interact.reply({content: `这已经是第一首曲目`, ephemeral: true})
-    _guild.musicPlayer.prev()
+    _guild.musicPlayer.control.prev()
     interact.deferUpdate()
 }

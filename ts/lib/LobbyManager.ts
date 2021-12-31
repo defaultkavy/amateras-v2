@@ -24,7 +24,6 @@ export class LobbyManager {
         this.#collection = amateras.db.collection('lobbies')
         this.#_guild = _guild
         this.#data = data
-        this.channel = <TextChannel>{}
         this.cache = new Map
         this.message
         this.thread
@@ -39,8 +38,9 @@ export class LobbyManager {
             return
         }
         try {
-            const channel = await this.#_guild.channels.fetch(this.#data?.channel)
-            if (channel === 404) { 
+            if (!this.#data.channel) return
+            const channel = await this.#_guild.channels.fetch(this.#data.channel)
+            if (channel === 404 || channel == 101) { 
                 new Err(`Lobby channel fetch failed`)
                 return 404
             }
@@ -120,7 +120,7 @@ export class LobbyManager {
         } else if (lobby && lobby.state === 'CLOSED') {
             return 101
         }
-        const lobbyData = <LobbyData>await this.#collection.findOne({owner: id, state: "OPEN"})
+        const lobbyData = <LobbyData>await this.#collection.findOne({owner: id, state: "OPEN", guild: this.#_guild.id})
         if (lobbyData) {
             const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
             this.cache.set(id, lobby)
@@ -137,7 +137,7 @@ export class LobbyManager {
         } else if (lobby && lobby.state === 'CLOSED') {
             return
         }
-        let lobbyData = <LobbyData>await this.#collection.findOne({categoryChannel: id, state: "OPEN"})
+        let lobbyData = <LobbyData>await this.#collection.findOne({categoryChannel: id, state: "OPEN", guild: this.#_guild.id})
         if (lobbyData) {
             const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
             this.cache.set(lobby.owner.id, lobby)
@@ -296,4 +296,11 @@ export class LobbyManager {
         await this.#_guild.save()
         return 100
     }
+}
+
+export interface LobbyManagerData {
+    channel?: string;
+    lobbies: string[];
+    message?: string;
+    permissions: string[]
 }

@@ -146,15 +146,6 @@ interface CommandData {
     permissions: import('discord.js').ApplicationCommandPermissionData[]
 }
 
-interface _GuildData {
-    id: string;
-    log?: LogData;
-    lobby?: LobbyManagerData;
-    forums?: ForumManagerData;
-    commands?: GuildCommandManagerData;
-    moderators: string[];
-}
-
 interface GuildCommandManagerData {
     commands: {[key: string]: string}
 }
@@ -180,13 +171,6 @@ interface _ChannelManagerData {
 
 interface _ChannelData {
     id: string;
-}
-
-interface LobbyManagerData {
-    channel: string;
-    lobbies: string[];
-    message?: string;
-    permissions: string[]
 }
 
 interface LobbyData {

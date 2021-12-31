@@ -20,11 +20,14 @@ module.exports = {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             let consoleText = `command received: ${interaction.user.username} - `;
+            const guild = interaction.guild;
+            const _guild = guild ? amateras.guilds.cache.get(guild.id) : undefined;
             if (interaction.isCommand()) { // If slash command message sent
+                // Check _guild init ready
+                if (_guild && _guild.ready === false)
+                    return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 // Return when command run in special channel
-                const guild = interaction.guild;
                 if (guild && interaction.commandName !== 'mod') {
-                    const _guild = amateras.guilds.cache.get(guild.id);
                     if (_guild) {
                         if (interaction.channelId) {
                             if (_guild.lobby.channel && interaction.channelId === _guild.lobby.channel.id ||
@@ -50,6 +53,8 @@ module.exports = {
                 }
             }
             else if (interaction.isSelectMenu()) { // If menu selected
+                if (_guild && _guild.ready === false)
+                    return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 const flags = interaction.message.flags;
                 if (flags.toArray().includes('EPHEMERAL'))
                     return;
@@ -93,6 +98,8 @@ module.exports = {
                 }
             }
             else if (interaction.isContextMenu()) { // If context menu clicked
+                if (_guild && _guild.ready === false)
+                    return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 if (fs_1.default.existsSync(`./context/${interaction.commandName}.js`)) {
                     // Import command function
                     const contextFn = require(`../context/${interaction.commandName}.js`);
@@ -102,6 +109,8 @@ module.exports = {
                 }
             }
             else if (interaction.isButton()) { // If button clicked
+                if (_guild && _guild.ready === false)
+                    return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 const flags = interaction.message.flags;
                 if (flags.toArray().includes('EPHEMERAL'))
                     return;

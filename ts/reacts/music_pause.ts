@@ -15,7 +15,7 @@ export default async function music_pause(interact: ButtonInteraction, amateras:
     
     if (_guild.musicPlayer.state === 'STOPPED') return interact.reply({content: `停止状态无法使用暂停`, ephemeral: true})
     if (_guild.musicPlayer.state === 'PLAYING') {
-        await _guild.musicPlayer.pause()
+        await _guild.musicPlayer.control.pause()
         interact.deferUpdate()
     }
 }

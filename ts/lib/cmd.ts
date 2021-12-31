@@ -8,4 +8,5 @@ export default class cmd {
     static Reverse = "\x1b[7m"
     static Hidden = "\x1b[8m"
     static Yellow = "\x1b[33m%s\x1b[0m"
+    static Green = "\x1b[32m%s\x1b[0m"
 }

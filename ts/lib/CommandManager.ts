@@ -24,7 +24,7 @@ export class CommandManager {
         if (!admin) throw new Error('Amateras Fatal Error: System Admin User fetch failed')
 
         this.#collection.findOne({id: admin.id})
-        await this.deploy() // Deploy command setup to Guild
+        await this.deploy() // Deploy command setup 
         const appCommands = await this.#amateras.client.application!.commands.fetch()
         if (this.#commands) {
             for (const appCommand of appCommands) {

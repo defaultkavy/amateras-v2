@@ -7,8 +7,10 @@ import { _Guild } from "./_Guild";
 import { Track, TrackData } from "./Track";
 import { Music } from "./Music";
 import { Player } from "./Player";
-import { PlayerMusic } from "./PlayerMusic";
 import { cloneObj } from "./terminal";
+import { PlayerMusic } from "./PlayerMusic";
+import { MusicPlayerControl } from "./MusicPlayerControl";
+import { MusicPlayerNotify } from "./MusicPlayerNotify";
 
 export class MusicPlayer {
     #amateras: Amateras;
@@ -16,8 +18,10 @@ export class MusicPlayer {
     #_guild: _Guild;
     #data?: MusicPlayerData;
     id: string;
+    control: MusicPlayerControl;
     channel?: TextChannel;
     message?: Message;
+    notify: MusicPlayerNotify;
     enabled: boolean;
     connection?: VoiceConnection
     audioPlayer?: AudioPlayer
@@ -29,6 +33,8 @@ export class MusicPlayer {
         this.#collection = amateras.db.collection('music_player')
         this.#_guild = _guild
         this.id = _guild.id
+        this.control = new MusicPlayerControl(this, amateras)
+        this.notify = new MusicPlayerNotify(this, amateras)
         this.enabled = false
         this.queue = []
         this.prevQueue = []
@@ -66,113 +72,120 @@ export class MusicPlayer {
 
     async initMessage() {
         if (this.channel) {
+            if (this.message && !this.message.deleted) {
+                await this.message.edit({embeds: [embed.call(this)], components: components.call(this)})
+                return
+            }
+
             if (this.#data && this.#data.message) {
                 try {
                     const message = await this.channel.messages.fetch(this.#data.message)
                     if (message) {
                         this.message = message
-                        await this.message.edit({embeds: [this.embed()], components: this.components()})
+                        await this.message.edit({embeds: [embed.call(this)], components: components.call(this)})
                     } else {
-                        this.message = await this.channel.send({embeds: [this.embed()], components: this.components()})
+                        this.message = await this.channel.send({embeds: [embed.call(this)], components: components.call(this)})
                         await this.save()
                     }
                 } catch(err) {
-                    this.message = await this.channel.send({embeds: [this.embed()], components: this.components()})
+                    console.error(err)
+                    this.message = await this.channel.send({embeds: [embed.call(this)], components: components.call(this)})
                     await this.save()
                 }
             } else {
-                this.message = await this.channel.send({embeds: [this.embed()], components: this.components()})
+                this.message = await this.channel.send({embeds: [embed.call(this)], components: components.call(this)})
                 await this.save()
             }
         }
-    }
 
-    embed() {
-        let embed: MessageEmbedOptions = {}
-        if (this.queue[0] && this.audioPlayer) {
-            const music = this.queue[0].music
-            embed = {
-                author: {
-                    name: music.author ? music.author.name : undefined,
-                    url: music.author ? music.author.url : undefined,
-                    iconURL: music.author ? music.author.avatar : undefined
-                },
-                color: this.state === 'PLAYING' ? 'GREEN' : this.state === 'PAUSE' ? 'DARKER_GREY' : 'DARK_BUT_NOT_BLACK',
-                title: music.title,
-                description: `${this.queue[0].player.mention()} 点了这首歌`,
-                thumbnail: {
-                    height: music.thumbnail ? music.thumbnail.height : undefined,
-                    width: music.thumbnail ? music.thumbnail.height : undefined,
-                    url: music.thumbnail ? music.thumbnail.url : undefined
-                },
-                fields: [
-                    {
-                        name: `天照已播放过这首歌 ${music.plays} 次`,
-                        value: `曾有 ${music.players} 人播放过这首歌`
-                    }
-                ]
+        function embed(this: MusicPlayer) {
+            let embed: MessageEmbedOptions = {}
+            if (this.queue[0] && this.audioPlayer) {
+                const music = this.queue[0].music
+                embed = {
+                    author: {
+                        name: music.author ? music.author.name : undefined,
+                        url: music.author ? music.author.url : undefined,
+                        iconURL: music.author ? music.author.avatar : undefined
+                    },
+                    color: this.state === 'PLAYING' ? 'GREEN' : this.state === 'PAUSE' ? 'DARKER_GREY' : 'DARK_BUT_NOT_BLACK',
+                    title: music.title,
+                    url: music.url,
+                    description: `${this.queue[0].player.mention()} 点了这首歌`,
+                    image: {
+                        height: music.thumbnail ? music.thumbnail.height : undefined,
+                        width: music.thumbnail ? music.thumbnail.width : undefined,
+                        url: music.thumbnail ? music.thumbnail.url : undefined
+                    },
+                    fields: [
+                        {
+                            name: `天照已播放过这首歌 ${music.plays} 次`,
+                            value: `曾有 ${music.players} 人播放过这首歌`
+                        }
+                    ]
 
+                }
+            } else {
+                embed = {
+                    author: {
+                        name: `天照音乐`
+                    },
+                    color: 'DARK_BUT_NOT_BLACK',
+                    title: `没有播放的曲目`,
+                    description: `在此频道发送 YouTube Music 链接即可播放音乐`
+                }
             }
-        } else {
-            embed = {
-                author: {
-                    name: `天照音乐`
-                },
-                color: 'DARK_BUT_NOT_BLACK',
-                title: `没有播放的曲目`,
-                description: `在此频道发送 YouTube Music 链接即可播放音乐`
-            }
+            return embed
         }
-        return embed
-    }
 
-    components() {
-        const actionRow1 = new MessageActionRow
-        actionRow1.addComponents({
-            label: `播放`,
-            style: `PRIMARY`,
-            customId: `music_play`,
-            disabled: this.state === 'PLAYING' ? true : false,
-            type: 'BUTTON'
-        })
-        actionRow1.addComponents({
-            label: `暂停`,
-            style: `SECONDARY`,
-            customId: `music_pause`,
-            disabled: this.state === 'STOPPED' ? true : false,
-            type: 'BUTTON'
-        })
-        actionRow1.addComponents({
-            label: `停止`,
-            style: `SECONDARY`,
-            customId: `music_stop`,
-            disabled: this.state === 'STOPPED' ? true : false,
-            type: 'BUTTON'
-        })
-        const actionRow2 = new MessageActionRow
-        actionRow2.addComponents({
-            label: `上首`,
-            style: `SECONDARY`,
-            customId: `music_prev`,
-            disabled: this.prevQueue[0] ? false : true,
-            type: 'BUTTON'
-        })
-        actionRow2.addComponents({
-            label: `下首`,
-            style: `SECONDARY`,
-            customId: `music_next`,
-            disabled: this.queue[1] ? false : true,
-            type: 'BUTTON'
-        })
-        actionRow2.addComponents({
-            label: ``,
-            style: `DANGER`,
-            customId: `music_like`,
-            emoji: `🤍`,
-            disabled: this.queue[0] ? false : true,
-            type: 'BUTTON'
-        })
-        return [actionRow1, actionRow2]
+        function components(this: MusicPlayer) {
+            const actionRow1 = new MessageActionRow
+            actionRow1.addComponents({
+                label: `播放`,
+                style: `PRIMARY`,
+                customId: `music_play`,
+                disabled: this.state === 'PLAYING' ? true : false,
+                type: 'BUTTON'
+            })
+            actionRow1.addComponents({
+                label: `暂停`,
+                style: `SECONDARY`,
+                customId: `music_pause`,
+                disabled: this.state === 'STOPPED' ? true : false,
+                type: 'BUTTON'
+            })
+            actionRow1.addComponents({
+                label: `停止`,
+                style: `SECONDARY`,
+                customId: `music_stop`,
+                disabled: this.state === 'STOPPED' ? true : false,
+                type: 'BUTTON'
+            })
+            const actionRow2 = new MessageActionRow
+            actionRow2.addComponents({
+                label: `上首`,
+                style: `SECONDARY`,
+                customId: `music_prev`,
+                disabled: this.prevQueue[0] ? false : true,
+                type: 'BUTTON'
+            })
+            actionRow2.addComponents({
+                label: `下首`,
+                style: `SECONDARY`,
+                customId: `music_next`,
+                disabled: this.queue[1] ? false : true,
+                type: 'BUTTON'
+            })
+            actionRow2.addComponents({
+                label: ``,
+                style: `DANGER`,
+                customId: `music_like`,
+                emoji: `🤍`,
+                disabled: this.queue[0] ? false : true,
+                type: 'BUTTON'
+            })
+            return [actionRow1, actionRow2]
+        }
     }
 
     async initAudioPlayer() {
@@ -185,19 +198,19 @@ export class MusicPlayer {
             // Set listener when song is end
             this.audioPlayer.on('stateChange', (oldState, newState) => {
                 if (this.state === 'CHANGING') {
-                    this.play()
+                    this.control.play()
                     return 
                 } 
                 if (oldState.status === AudioPlayerStatus.Playing) {
                     if (newState.status === AudioPlayerStatus.Idle || newState.status === 'autopaused') {
-                        this.next()
+                        this.control.next()
                     }
                 }
             })
 
             this.audioPlayer.on('error', (err) => {
                 console.error(err)
-                this.next()
+                this.control.next()
             })
         }
     }
@@ -235,88 +248,6 @@ export class MusicPlayer {
         }
     }
 
-    async play() {
-        if (!this.queue[0]) return this.stop()
-        // Init audio player
-        await this.initAudioPlayer()
-        // If audio player is playing, return
-        if (this.audioPlayer && this.audioPlayer.state.status === 'playing') return
-        // Join voice channel
-        await this.join(this.queue[0].channel)
-        // Check connection and audio player is valid
-        if (!this.connection || !this.audioPlayer) return
-        // Subscribe audio player to voice connection
-        this.connection.subscribe(this.audioPlayer)
-        //const info = await ytdl.getInfo(this.queue[0].music.url)
-        if (!this.queue[0]) return
-        this.queue[0].resource = ytdl(this.queue[0].music.url) //, {format: ytdl.chooseFormat(info.formats, { quality: '140' })}) //
-        const resource = createAudioResource(this.queue[0].resource)
-        // Play
-        this.audioPlayer.play(resource)
-        this.state = 'PLAYING'
-        this.initMessage()
-    }
-
-    next() {
-        if (!this.queue[1]) return this.stop()
-        const endTrack = this.queue.shift()
-        if (!endTrack) return
-        this.prevQueue.unshift(endTrack)
-        this.state = 'CHANGING'
-        if (this.audioPlayer) {
-            if (this.audioPlayer.state.status === 'idle') {
-                this.play()
-            } else {
-                this.audioPlayer.stop()
-            }
-        }
-        // Listener
-    }
-
-    prev() {
-        if (!this.prevQueue[0]) return
-        const prevTrack = this.prevQueue.shift()
-        if (!prevTrack) return
-        this.queue.unshift(prevTrack)
-        this.state = 'CHANGING'
-        if (this.audioPlayer) {
-            this.audioPlayer.stop()
-        } else {
-            this.play()
-        }
-        // Listener
-    }
-
-    async stop() {
-        const endTrack = this.queue.shift()
-        if (!endTrack) return
-        this.prevQueue.unshift(endTrack)
-        if (!this.audioPlayer) return
-        this.audioPlayer.stop()
-        this.audioPlayer = undefined
-        if (!this.connection) return
-        this.connection.destroy()
-        this.state = 'STOPPED'
-        this.queue = []
-        await this.initMessage()
-    }
-
-    async pause() {
-        if (!this.audioPlayer) return
-        this.audioPlayer.pause()
-        this.state = 'PAUSE'
-        await this.initMessage()
-    }
-
-    async resume() {
-        if (!this.audioPlayer) return
-        if (this.audioPlayer.state.status === AudioPlayerStatus.Paused) {
-            this.audioPlayer.unpause()
-            this.state = 'PLAYING'
-            await this.initMessage()
-        }
-    }
-
     async addSong(data: TrackData) {
         const track = new Track(data, this.#amateras)
         this.queue.push(track)
@@ -324,19 +255,21 @@ export class MusicPlayer {
         await data.music.record()
         // Record to user profile
         const playerMusic = await data.player.musics.add(data.music)
-        if (playerMusic instanceof PlayerMusic) await playerMusic.record()
-        this.initMessage()
+        if (playerMusic instanceof PlayerMusic) playerMusic.record()
+        await this.initMessage()
         return track
     }
 
     async random(player: Player, channel: VoiceChannel | StageChannel) {
         await player.musics.fetchAll()
         for (const playerMusic of player.musics.getTop()) {
-            await this.addSong({
+            const data: TrackData = {
                 music: playerMusic.music,
                 channel: channel,
                 player: player
-            })
+            }
+            const track = new Track(data, this.#amateras)
+            this.queue.push(track)
         }
     }
 
@@ -356,7 +289,7 @@ export class MusicPlayer {
             music: music,
             player: player
         })
-        this.play()
+        await this.control.play()
     }
 
     /**

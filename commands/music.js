@@ -49,24 +49,24 @@ function execute(interact, amateras) {
                         channel: channel,
                         player: player
                     });
-                    _guild.musicPlayer.play();
+                    _guild.musicPlayer.control.play();
                     interact.reply('play');
                     break;
                 case 'next':
-                    _guild.musicPlayer.next();
+                    _guild.musicPlayer.control.next();
                     interact.reply('next');
                     break;
                 case 'prev':
-                    _guild.musicPlayer.prev();
+                    _guild.musicPlayer.control.prev();
                     interact.reply('prev');
                     break;
                 case 'stop':
-                    _guild.musicPlayer.stop();
+                    _guild.musicPlayer.control.stop();
                     interact.reply('stop');
                     break;
                 case 'random':
                     yield _guild.musicPlayer.random(player, channel);
-                    _guild.musicPlayer.play();
+                    _guild.musicPlayer.control.play();
                     interact.reply('random');
                     break;
             }

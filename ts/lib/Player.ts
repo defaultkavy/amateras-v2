@@ -6,13 +6,14 @@ import { Lobby } from "./Lobby";
 import { PlayerMissionManager } from "./PlayerMissionManager";
 import { PlayerMusicManager } from "./PlayerMusicManager";
 import { Reward } from "./Reward";
-import { cloneObj, removeArrayItem } from "./terminal";
+import { cloneObj, msTime, removeArrayItem } from "./terminal";
 import { V } from "./V";
 import Wallet from "./Wallet";
 
 export class Player {
     #amateras: Amateras
     id: string;
+    name?: string;
     exp?: number | null;
     description?: string | null;
     color?: ColorResolvable | null;
@@ -32,6 +33,7 @@ export class Player {
     rewards: Map<string, Reward>;
     get?: User
     musics: PlayerMusicManager;
+    bot: boolean;
     /**
      * @namespace
      * @param player The player data object.
@@ -58,11 +60,16 @@ export class Player {
         this.#rewards = data.rewards
         this.rewards = new Map
         this.musics = new PlayerMusicManager(this, amateras)
+        this.bot = data.bot ? data.bot : false
     }
 
     async init() {
         try {
             this.get = await this.#amateras.client.users.fetch(this.id)
+            if (this.get) {
+                this.bot = this.get.bot
+                this.name = this.get.username
+            }
         } catch(err) {
             new Err(`Player fetch failed: (User)${ this.id }`)
             return 404
@@ -270,38 +277,102 @@ export class Player {
 
     async infoEmbed(interaction: Interaction) {
         const member = await interaction.guild!.members.fetch(this.id)
-        const embed: MessageEmbedOptions = {
-            author: {
-                name: 'Player'
-            },
-            title: member ? member.displayName : undefined,
-            description: this.description ? this.description : undefined,
-            thumbnail: {
-                url: (await interaction.client.users.fetch(this.id)).displayAvatarURL({ size: 512 })
-            },
-            color: this.color ? this.color : undefined,
-            footer: {
-                text: this.id
-            },
-            fields: [
-                {
-                    name: `LV.${this.level}`,
-                    value: `Exp.${this.exp}`,
-                    inline: true
-                },
-                {
-                    name: this.aka ? `${this.aka}` : 'none',
-                    value: `${(this.wallets)[0].balance}G`,
-                    inline: true
-                },
-                {
-                    name: 'Links',
-                    value: (this.youtube ? `[YouTube](https://youtube.com/channel/${this.youtube}) ` : '')
-                        + (this.twitter ? `[Twitter](https://twitter.com/${this.twitter}) ` : '-')
+        if (!this.get) return {}
+        if (this.bot) {
+            if (this.id === this.#amateras.id) {
+                const time = this.#amateras.client.uptime ? msTime(this.#amateras.client.uptime) : undefined
+                let display = ''
+                if (time) {
+                    if (time.year > 0) display += `${time.year} 年 `
+                    if (time.day > 0) display += `${time.day} 天 `
+                    if (time.hour > 0) display += `${time.hour} 时 `
+                    if (time.minute > 0) display += `${time.minute} 分 `
+                    if (time.second > 0) display += `${time.second} 秒 `
                 }
-            ]
+                const embed: MessageEmbedOptions = {
+                    author: {
+                        name: 'AMATERAS'
+                    },
+                    title: `天照`,
+                    description: `来自异世界公会的天照全天聆听你的请求！`,
+                    thumbnail: {
+                        url: this.get.displayAvatarURL({ format: 'webp', size: 1024})
+                    },
+                    color: 'DARK_BUT_NOT_BLACK',
+                    fields: [
+                        {
+                            name: `天照已运行超过 ${display}`,
+                            value: `目前在 ${(await this.#amateras.client.guilds.fetch()).size} 个伺服器中待机`,
+                            inline: false
+                        },
+                        {
+                            name: `系统剩余金额`,
+                            value: `${this.wallets[0].balance}G`,
+                            inline: true
+                        },
+                        {
+                            name: `生日`,
+                            value: `1 月 1 日`,
+                            inline: true
+                        }
+                    ],
+                    footer: {
+                        text: this.id
+                    }
+                }
+                return embed
+            } else {
+
+                const embed: MessageEmbedOptions = {
+                    author: {
+                        name: 'Bot'
+                    },
+                    title: member ? member.displayName : undefined,
+                    description: this.description ? this.description : undefined,
+                    thumbnail: {
+                        url: this.get.displayAvatarURL({ size: 512 })
+                    },
+                    color: `DARK_BUT_NOT_BLACK`,
+                    footer: {
+                        text: this.id
+                    },
+                }
+                return embed
+            }
+        } else {
+            const embed: MessageEmbedOptions = {
+                author: {
+                    name: 'Player'
+                },
+                title: member ? member.displayName : undefined,
+                description: this.description ? this.description : undefined,
+                thumbnail: {
+                    url: (this.get.displayAvatarURL({ size: 512 }))
+                },
+                color: this.color ? this.color : undefined,
+                footer: {
+                    text: this.id
+                },
+                fields: [
+                    {
+                        name: `LV.${this.level}`,
+                        value: `Exp.${this.exp}`,
+                        inline: true
+                    },
+                    {
+                        name: this.aka ? `${this.aka}` : 'none',
+                        value: `${(this.wallets)[0].balance}G`,
+                        inline: true
+                    },
+                    {
+                        name: 'Links',
+                        value: (this.youtube ? `[YouTube](https://youtube.com/channel/${this.youtube}) ` : '')
+                            + (this.twitter ? `[Twitter](https://twitter.com/${this.twitter}) ` : '-')
+                    }
+                ]
+            }
+            return embed
         }
-        return embed
     }
 
     /**
@@ -375,6 +446,7 @@ export class Player {
 
 export interface PlayerData {
     id: string;
+    name?: string;
     exp?: number;
     description?: string;
     color?: import('discord.js').ColorResolvable;
@@ -386,5 +458,6 @@ export interface PlayerData {
     wallets?: string[];
     missions?: PlayerMissionData;
     class?: ('PLAYER' | 'VTUBER')[];
-    rewards?: string[]
+    rewards?: string[],
+    bot?: boolean
 }

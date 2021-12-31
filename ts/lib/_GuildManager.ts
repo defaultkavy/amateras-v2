@@ -1,6 +1,7 @@
+import { Guild } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
-import { _Guild } from "./_Guild";
+import { _Guild, _GuildData } from "./_Guild";
 
 export class _GuildManager {
     #amateras: Amateras;
@@ -15,22 +16,39 @@ export class _GuildManager {
     async init() {
         const guilds = this.#amateras.client.guilds.cache
         for (const guild of guilds.values()) {
-            const _guildData = <_GuildData>await this.#collection.findOne({id: guild.id})
-            if (_guildData) {
-                // Guild data exist
-                const _guild = new _Guild(_guildData, guild, this.#amateras)
-                this.cache.set(_guild.id, _guild)
-                await _guild.init()
-            } else {
-                // Guild data not exist, create one to database
-                const _newGuildData: _GuildData = {
-                    id: guild.id,
-                    moderators: [guild.ownerId]
-                }
-                const _guild = new _Guild(_newGuildData, guild, this.#amateras)
-                await _guild.init()
-                await _guild.save()
+            await this.create(guild)
+        }
+        await this.checkAvailable()
+    }
+
+    async create(guild: Guild) {
+        const _guildData = <_GuildData>await this.#collection.findOne({id: guild.id})
+        if (_guildData) {
+            // Guild data exist
+            const _guild = new _Guild(_guildData, guild, this, this.#amateras)
+            this.cache.set(_guild.id, _guild)
+            await _guild.init()
+        } else {
+            // Guild data not exist, create one to database
+            const _newGuildData: _GuildData = {
+                id: guild.id,
+                moderators: [guild.ownerId]
+            }
+            const _guild = new _Guild(_newGuildData, guild, this, this.#amateras)
+            await _guild.init()
+            await _guild.save()
+        }
+    }
+
+    async checkAvailable() {
+        const guilds = this.#amateras.client.guilds.cache
+        const list = <_GuildData[]>await this.#collection.find({available: true}).toArray()
+        for (const guildData of list) {
+            if (!guilds.has(guildData.id)) {
+                guildData.available = false
+                await this.#collection.replaceOne({id: guildData.id}, guildData)
             }
         }
+
     }
 }

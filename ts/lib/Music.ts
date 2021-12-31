@@ -1,29 +1,34 @@
 import { Collection } from "mongodb";
 import ytdl from "ytdl-core";
 import Amateras from "./Amateras";
-import { cloneObj } from "./terminal";
+import { Player } from "./Player";
+import { cloneObj, removeArrayItem } from "./terminal";
 
 export class Music {
     #amateras: Amateras;
     #collection: Collection;
+    #data: MusicData;
     id: string;
     url: string;
     plays: number;
     players: number;
+    likes: string[]
     title?: string;
     thumbnail?: ytdl.thumbnail;
     author?: MusicAuthor;
     constructor(data: MusicData, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('music')
+        this.#data = data
         this.id = data.id
         this.url = data.url
         this.plays = data.plays ? data.plays : 0
         this.players = data.players ? data.players : 0
+        this.likes = data.likes ? data.likes : []
     }
 
     async init() {
-        await this.update()
+        
     }
 
     async save() {
@@ -59,13 +64,36 @@ export class Music {
         this.plays += 1
         await this.save()
     }
+
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Already exist
+     */
+    async addLike(id: string) {
+        if (this.likes.includes(id)) 101
+        this.likes.push(id)
+        await this.save()
+        return 100
+    }
+
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Already removed
+     */
+    async removeLike(id: string) {
+        if (!this.likes.includes(id)) 101
+        removeArrayItem(this.likes, id)
+        await this.save()
+        return 100
+    }
 }
 
 export interface MusicData {
     id: string,
     url: string,
-    plays: number,
-    players: number
+    plays?: number,
+    players?: number
+    likes?: string[]
 }
 
 export interface MusicAuthor {

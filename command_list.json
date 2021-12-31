@@ -1,8 +1,8 @@
 {
     "commands": [
         {
-            "name": "ping",
-            "description": "Replies with pong!"
+            "name": "info",
+            "description": "关于天照"
         },
         {
             "name": "oppai",
