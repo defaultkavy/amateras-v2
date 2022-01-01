@@ -53,7 +53,6 @@ export function idGenerator(length: number) {
 export function removeArrayItem<T>(arr: Array<T>, value: T): Array<T> { 
     if (typeof value === 'number' || typeof value === 'string') {
         const index = arr.indexOf(value);
-        console.debug(value)
         if (index > -1) {
           arr.splice(index, 1);
         }

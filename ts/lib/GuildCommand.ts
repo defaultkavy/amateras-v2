@@ -39,6 +39,7 @@ export class GuildCommand {
                 this.permissions.push(ownerPermission)
             }
         }
+        if (this.#amateras.debug === true) return
         let deployedPermissions = await this.permissionFetch()
         // If permissions is different in Database and Discord server
         if (!arrayEqual(deployedPermissions, this.permissions)) {

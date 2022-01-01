@@ -1,7 +1,7 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, Message } from "discord.js";
 import Amateras from "../lib/Amateras";
 
-export default async function music_prev(interact: ButtonInteraction, amateras: Amateras) {
+export default async function music_repeat(interact: ButtonInteraction, amateras: Amateras) {
     const player = await amateras.players.fetch(interact.user.id)
     if (player === 404) return
 
@@ -13,8 +13,13 @@ export default async function music_prev(interact: ButtonInteraction, amateras: 
     if (!member) return
     if (!member.voice.channel) return interact.reply({content: `你必须在一个语音频道内`, ephemeral: true})
     
-    if (_guild.musicPlayer.repeatState !== 'ALL' && !_guild.musicPlayer.prevQueue[0]) return interact.reply({content: `这已经是第一首曲目`, ephemeral: true})
+    const result = _guild.musicPlayer.control.repeat()
     interact.deferUpdate()
-    _guild.musicPlayer.control.prev()
-    _guild.musicPlayer.notify.push(player, `上一首`, 3000)
+    if (result === 'ALL') {
+        _guild.musicPlayer.notify.push(player, `曲列循环`, 3000)
+    } else if (result === 'ONE') {
+        _guild.musicPlayer.notify.push(player, `单曲循环`, 3000)
+    } else {
+        _guild.musicPlayer.notify.push(player, `关闭循环`, 3000)
+    }
 }

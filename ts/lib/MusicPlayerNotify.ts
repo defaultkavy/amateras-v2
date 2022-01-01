@@ -16,59 +16,38 @@ export class MusicPlayerNotify {
     }
 
     async init() {
-        if (!this.#player.channel) return
-
-        if (this.message && !this.message.deleted) {
-            
-            if (!this.notifications[0]) {
-                try {
-                    await this.message.delete()
-                    this.message = undefined
-                } catch {
-                    
-                }
-                return
-            } else {
-                this.message.edit({embeds: [embed.call(this)]})
-                setTimeout(this.timeout.bind(this, this.notifications[this.notifications.length - 1]), 3000)
-            }
-
-        } else {
-            this.message = await this.#player.channel.send({embeds: [embed.call(this)]})
-            setTimeout(this.timeout.bind(this, this.notifications[this.notifications.length - 1]), 3000)
+        let description = ''
+        for (const notification of this.notifications) {
+            description += `${notification.player.mention()} - ${notification.content}\n`
         }
-
-        function embed(this: MusicPlayerNotify) {
-            let description = ''
-            for (const notification of this.notifications) {
-                description += `${notification.player.mention()} - ${notification.content}\n`
+        const embed: MessageEmbedOptions = {
+            description: description,
+            color: this.#player.state === 'PLAYING' ? 'GREEN' : this.#player.state === 'PAUSE' ? 'DARKER_GREY' : this.#player.queue[0] && !this.#player.queue[0].music.updated ? 'NAVY' : 'DARK_BUT_NOT_BLACK',
+            footer: {
+                text: `Notification`
             }
-            const embed: MessageEmbedOptions = {
-                description: description,
-                footer: {
-                    text: `Notification`
-                }
-            }
-            return embed
         }
+        return embed
     }
 
-    async add(player: Player, content: string) {
-        this.notifications.push({
+    async push(player: Player, content: string, duration: number) {
+        const notification: MusicPlayerNotification = {
             player: player,
-            content: content
-        })
+            content: content,
+            duration: duration
+        }
+        this.notifications.push(notification)
+        this.#player.update(duration)
+        setTimeout(() => {
+            this.notifications = removeArrayItem(this.notifications, notification)
+            this.#player.update()
+        }, duration)
         await this.init()
-    }
-
-    timeout(this: MusicPlayerNotify, notification: MusicPlayerNotification) {
-        this.notifications = removeArrayItem(this.notifications, notification)
-        console.debug(this.notifications)
-        this.init()
     }
 }
 
 export interface MusicPlayerNotification {
     player: Player
     content: string
+    duration: number
 }

@@ -24,10 +24,11 @@ function music_prev(interact, amateras) {
             return;
         if (!member.voice.channel)
             return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
-        if (!_guild.musicPlayer.prevQueue[0])
+        if (_guild.musicPlayer.repeatState !== 'ALL' && !_guild.musicPlayer.prevQueue[0])
             return interact.reply({ content: `这已经是第一首曲目`, ephemeral: true });
-        _guild.musicPlayer.control.prev();
         interact.deferUpdate();
+        _guild.musicPlayer.control.prev();
+        _guild.musicPlayer.notify.push(player, `上一首`, 3000);
     });
 }
 exports.default = music_prev;

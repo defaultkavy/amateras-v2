@@ -1,3 +1,4 @@
 # ignore node modules
 node_modules/
 /bot_config.json
+/test.js

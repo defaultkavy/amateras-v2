@@ -1,5 +1,5 @@
 import { AudioPlayer, AudioPlayerState, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
-import { Message, MessageActionRow, MessageEmbedOptions, StageChannel, TextChannel, VoiceChannel } from "discord.js";
+import { Message, MessageActionRow, MessageEmbedOptions, MessageOptions, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import { Collection } from "mongodb";
 import ytdl from "ytdl-core";
 import Amateras from "./Amateras";
@@ -28,6 +28,10 @@ export class MusicPlayer {
     queue: Track[];
     prevQueue: Track[];
     state: 'PLAYING' | 'PAUSE' | 'STOPPED' | 'CHANGING';
+    repeatState: 'OFF' | 'ONE' | 'ALL'
+    updateQueue: number[]
+    timer: NodeJS.Timer;
+    messageUpdating: boolean;
     constructor(_guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('music_player')
@@ -39,6 +43,10 @@ export class MusicPlayer {
         this.queue = []
         this.prevQueue = []
         this.state = 'STOPPED'
+        this.repeatState = 'OFF'
+        this.updateQueue = []
+        this.timer = setInterval(this.interval.bind(this), 500) // InitMessage interval
+        this.messageUpdating = false
     }
 
     async init() {
@@ -71,10 +79,17 @@ export class MusicPlayer {
     }
 
     async initMessage() {
+        this.messageUpdating = true
         if (this.channel) {
+
+            const messageOptions: MessageOptions = {
+                embeds: [embed.call(this)],
+                components: components.call(this)
+            }
+            if ( this.notify.notifications.length > 0) messageOptions.embeds?.unshift(await this.notify.init())
             if (this.message && !this.message.deleted) {
-                await this.message.edit({embeds: [embed.call(this)], components: components.call(this)})
-                return
+                await this.message.edit(messageOptions)
+                return this.messageUpdating = false
             }
 
             if (this.#data && this.#data.message) {
@@ -82,25 +97,34 @@ export class MusicPlayer {
                     const message = await this.channel.messages.fetch(this.#data.message)
                     if (message) {
                         this.message = message
-                        await this.message.edit({embeds: [embed.call(this)], components: components.call(this)})
+                        await this.message.edit(messageOptions)
                     } else {
-                        this.message = await this.channel.send({embeds: [embed.call(this)], components: components.call(this)})
+                        this.message = await this.channel.send(messageOptions)
                         await this.save()
                     }
                 } catch(err) {
                     console.error(err)
-                    this.message = await this.channel.send({embeds: [embed.call(this)], components: components.call(this)})
+                    this.message = await this.channel.send(messageOptions)
                     await this.save()
                 }
             } else {
-                this.message = await this.channel.send({embeds: [embed.call(this)], components: components.call(this)})
+                this.message = await this.channel.send(messageOptions)
                 await this.save()
             }
         }
-
+        this.messageUpdating = false
         function embed(this: MusicPlayer) {
             let embed: MessageEmbedOptions = {}
-            if (this.queue[0] && this.audioPlayer) {
+            if (this.queue[0] && !this.queue[0].music.updated) {
+                embed = {
+                    author: {
+                        name: `天照音乐`
+                    },
+                    color: 'NAVY',
+                    title: `加载中`,
+                    description: `在此频道发送 YouTube Music 链接即可播放音乐`
+                }
+            } else if (this.queue[0] && this.audioPlayer) {
                 const music = this.queue[0].music
                 embed = {
                     author: {
@@ -120,7 +144,23 @@ export class MusicPlayer {
                     fields: [
                         {
                             name: `天照已播放过这首歌 ${music.plays} 次`,
-                            value: `曾有 ${music.players} 人播放过这首歌`
+                            value: `曾有 ${music.players} 人播放过这首歌`,
+                            inline: false
+                        },
+                        {
+                            name: `收藏`,
+                            value: `${music.likes.length} 人`,
+                            inline: true
+                        },
+                        {
+                            name: `黑名单`,
+                            value: `${music.dislikes.length} 人`,
+                            inline: true
+                        },
+                        {
+                            name: `播放状态`,
+                            value: `${this.state === 'PLAYING' ? '▶️' : '⏸️'} ${this.repeatState === 'ALL' ? '🔁' : this.repeatState === 'ONE' ? '🔂' : ''} - ${this.repeatState === 'ALL' ? this.queue.length + this.prevQueue.length : this.queue.length} 首歌`,
+                            inline: true
                         }
                     ]
 
@@ -161,26 +201,40 @@ export class MusicPlayer {
                 disabled: this.state === 'STOPPED' ? true : false,
                 type: 'BUTTON'
             })
+            actionRow1.addComponents({
+                label: ``,
+                style: `DANGER`,
+                customId: `music_like`,
+                emoji: `🤍`,
+                disabled: this.queue[0] ? false : true,
+                type: 'BUTTON'
+            })
             const actionRow2 = new MessageActionRow
             actionRow2.addComponents({
                 label: `上首`,
                 style: `SECONDARY`,
                 customId: `music_prev`,
-                disabled: this.prevQueue[0] ? false : true,
+                disabled: this.repeatState === 'ALL' ? false : this.prevQueue[0] ? false : true,
                 type: 'BUTTON'
             })
             actionRow2.addComponents({
                 label: `下首`,
                 style: `SECONDARY`,
                 customId: `music_next`,
-                disabled: this.queue[1] ? false : true,
+                disabled: this.repeatState === 'ALL' ? false : this.queue[1] ? false : true,
                 type: 'BUTTON'
             })
             actionRow2.addComponents({
-                label: ``,
-                style: `DANGER`,
-                customId: `music_like`,
-                emoji: `🤍`,
+                label: `循环`,
+                style: `SECONDARY`,
+                customId: `music_repeat`,
+                disabled: false,
+                type: 'BUTTON'
+            })
+            actionRow2.addComponents({
+                emoji: `💔`,
+                style: `SECONDARY`,
+                customId: `music_dislike`,
                 disabled: this.queue[0] ? false : true,
                 type: 'BUTTON'
             })
@@ -203,7 +257,11 @@ export class MusicPlayer {
                 } 
                 if (oldState.status === AudioPlayerStatus.Playing) {
                     if (newState.status === AudioPlayerStatus.Idle || newState.status === 'autopaused') {
-                        this.control.next()
+                        if (this.repeatState === 'ONE') {
+                            this.control.play()
+                            return
+                        }
+                        if (this.state !== 'STOPPED') this.control.next()
                     }
                 }
             })
@@ -236,7 +294,7 @@ export class MusicPlayer {
     }
 
     async save() {
-        const data = cloneObj(this, ['queue', 'prevQueue', 'audioPlayer', 'connection'])
+        const data = cloneObj(this, ['queue', 'prevQueue', 'audioPlayer', 'connection', 'updateQueue', 'timer', 'messageUpdating'])
         data.channel = this.channel ? this.channel.id : undefined
         data.message = this.message ? this.message.id : undefined
 
@@ -256,21 +314,37 @@ export class MusicPlayer {
         // Record to user profile
         const playerMusic = await data.player.musics.add(data.music)
         if (playerMusic instanceof PlayerMusic) playerMusic.record()
-        await this.initMessage()
+        await this.update()
         return track
     }
 
     async random(player: Player, channel: VoiceChannel | StageChannel) {
         await player.musics.fetchAll()
+        let _m = []
+        console.time('music')
         for (const playerMusic of player.musics.getTop()) {
+            console.time('push')
             const data: TrackData = {
                 music: playerMusic.music,
                 channel: channel,
                 player: player
             }
+            if (!playerMusic.music.updated) playerMusic.music.update()
             const track = new Track(data, this.#amateras)
             this.queue.push(track)
+            _m.push({
+                like: playerMusic.like,
+                dislike: playerMusic.dislike,
+                counts: playerMusic.counts
+            })
+            console.timeEnd('push')
         }
+        console.timeEnd('music')
+    }
+
+    async setRepeat(state: 'OFF' | 'ONE' | 'ALL') {
+        this.repeatState = state
+        this.update()
     }
 
     /**
@@ -283,13 +357,20 @@ export class MusicPlayer {
         if (!message.member) return 102
         const music = await this.#amateras.musics.add(message.content)
         if (!(music instanceof Music)) return 101
+        if (!music.updated) await music.update()
         if (!message.member.voice.channel) return 103
-        await this.addSong({
-            channel: message.member.voice.channel,
-            music: music,
-            player: player
-        })
-        await this.control.play()
+        const channel = message.member.voice.channel
+        add.call(this,music, channel, player) // Not waiting, return music
+        return music
+
+        async function add(this: MusicPlayer, music: Music, channel: VoiceChannel | StageChannel, player: Player) {
+            await this.addSong({
+                channel: channel,
+                music: music,
+                player: player
+            })
+            this.control.play()
+        }
     }
 
     /**
@@ -300,7 +381,7 @@ export class MusicPlayer {
         this.enabled = true
         this.channel = channel
         if (this.message && !this.message.deleted) this.message.delete()
-        await this.initMessage()
+        await this.init()
         await this.save()
         return this.channel
     }
@@ -318,6 +399,35 @@ export class MusicPlayer {
         if (this.message && !this.message.deleted) this.message.delete()
         await this.save()
         return 100
+    }
+
+    async update(time?: number) {
+        if (!this.updateQueue[0] && this.messageUpdating === false) {
+            await this.initMessage()
+            return
+        }
+        const timestamp = + new Date()
+        if (!time) time = 0
+        const outdate = timestamp + time
+        this.updateQueue.push(outdate)
+    }
+
+    async interval(this: MusicPlayer) {
+        if (!this.updateQueue[0]) return
+        // Get now timestamp
+        const timestamp = + new Date
+        // Init message when init function is not running
+        if (this.messageUpdating === false) {
+            await this.initMessage()
+            // Delete the old update
+            const newUpdate = []
+            for (const update of this.updateQueue) {
+                if (update > timestamp) {
+                    newUpdate.push(update)
+                }
+            }
+            this.updateQueue = newUpdate
+        }
     }
 }
 

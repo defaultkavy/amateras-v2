@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Music_1 = require("../lib/Music");
 module.exports = {
     name: 'messageCreate',
     once: false,
@@ -46,10 +47,15 @@ module.exports = {
             // Music
             if (_guild && _guild.musicPlayer.channel) {
                 if (_guild.musicPlayer.channel.id === message.channelId) {
-                    _guild.musicPlayer.link(message, player);
                     if (!message.deleted)
                         message.delete();
-                    _guild.musicPlayer.notify.add(player, `你添加了歌曲`);
+                    const music = yield _guild.musicPlayer.link(message, player);
+                    if (music instanceof Music_1.Music) {
+                        _guild.musicPlayer.notify.push(player, `添加了歌曲 - ${music.title}`, 3000);
+                    }
+                    else {
+                        _guild.musicPlayer.notify.push(player, `链接错误`, 3000);
+                    }
                 }
             }
         });

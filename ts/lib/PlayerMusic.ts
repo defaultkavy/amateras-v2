@@ -12,6 +12,7 @@ export class PlayerMusic {
     counts: number;
     player: Player;
     like: boolean;
+    dislike: boolean;
     constructor(data: PlayerMusicData, music: Music, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('player_music')
@@ -20,6 +21,7 @@ export class PlayerMusic {
         this.music = music
         this.counts = data.counts
         this.like = data.like ? data.like : false
+        this.dislike = data.dislike ? data.dislike : false
     }
 
     async init() {
@@ -47,7 +49,9 @@ export class PlayerMusic {
      * @returns 101 - Already exist in music likes
      */
     async setLike() {
+        this.dislike = false
         this.like = true
+        await this.music.removeDislike(this.player.id)
         if (await this.music.addLike(this.player.id) === 101) return 101
         await this.save()
         return 100
@@ -63,6 +67,30 @@ export class PlayerMusic {
         await this.save()
         return 100
     }
+
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Already exist in music likes
+     */
+    async setDislike() {
+        this.like = false
+        this.dislike = true
+        await this.music.removeLike(this.player.id)
+        if (await this.music.addDislike(this.player.id) === 101) return 101
+        await this.save()
+        return 100
+    }
+
+    /**
+     * @returns 100 - Success
+     * @returns 101 - No exist in music likes
+     */
+    async unsetDislike() {
+        this.dislike = false
+        if (await this.music.removeDislike(this.player.id) === 101) return 101
+        await this.save()
+        return 100
+    }
 }
 
 export interface PlayerMusicData {
@@ -70,4 +98,5 @@ export interface PlayerMusicData {
     counts: number,
     player: Player,
     like: boolean
+    dislike: boolean
 }

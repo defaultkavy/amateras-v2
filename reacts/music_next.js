@@ -24,10 +24,11 @@ function music_next(interact, amateras) {
             return;
         if (!member.voice.channel)
             return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
-        if (!_guild.musicPlayer.queue[1])
+        if (_guild.musicPlayer.repeatState !== 'ALL' && !_guild.musicPlayer.queue[1])
             return interact.reply({ content: `没有下一首了`, ephemeral: true });
-        _guild.musicPlayer.control.next();
         interact.deferUpdate();
+        _guild.musicPlayer.control.next();
+        _guild.musicPlayer.notify.push(player, `下一首`, 3000);
     });
 }
 exports.default = music_next;

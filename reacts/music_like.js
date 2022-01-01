@@ -26,12 +26,12 @@ function music_like(interact, amateras) {
         const result = yield playerMusic.setLike();
         interact.deferUpdate();
         if (result === 100) {
-            _guild.musicPlayer.notify.add(player, '加入了收藏');
+            _guild.musicPlayer.notify.push(player, '加入了收藏', 3000);
             return;
         }
         else {
             playerMusic.unsetLike();
-            _guild.musicPlayer.notify.add(player, '从收藏中移除');
+            _guild.musicPlayer.notify.push(player, '从收藏中移除', 3000);
         }
     });
 }

@@ -15,16 +15,19 @@ export default async function music_play(interact: ButtonInteraction, amateras: 
     
     if (_guild.musicPlayer.state === 'PLAYING') return interact.reply({content: `正在播放中`, ephemeral: true})
     if (_guild.musicPlayer.state === 'STOPPED') {
-        interact.deferReply()
+        interact.deferUpdate()
+        console.time('random')
         await _guild.musicPlayer.random(player, member.voice.channel)
+        console.timeEnd('random')
+        console.time('play')
         _guild.musicPlayer.control.play()
-        const reply = <Message>await interact.followUp({content: `随机播放`})
-        setTimeout(() => {
-            if (!reply.deleted) reply.delete()
-        }, 3000);
+        console.timeEnd('play')
+        _guild.musicPlayer.notify.push(player, `随机播放`, 3000)
+        
     }
     if (_guild.musicPlayer.state === 'PAUSE') {
-        await _guild.musicPlayer.control.resume()
         interact.deferUpdate()
+        await _guild.musicPlayer.control.resume()
+        _guild.musicPlayer.notify.push(player, `继续播放`, 3000)
     }
 }

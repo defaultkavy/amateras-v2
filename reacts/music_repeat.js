@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-function music_pause(interact, amateras) {
+function music_repeat(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
         if (player === 404)
@@ -24,14 +24,18 @@ function music_pause(interact, amateras) {
             return;
         if (!member.voice.channel)
             return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
-        if (_guild.musicPlayer.state === 'STOPPED')
-            return interact.reply({ content: `停止状态无法使用暂停`, ephemeral: true });
-        if (_guild.musicPlayer.state === 'PLAYING') {
-            interact.deferUpdate();
-            yield _guild.musicPlayer.control.pause();
-            _guild.musicPlayer.notify.push(player, `暂停`, 3000);
+        const result = _guild.musicPlayer.control.repeat();
+        interact.deferUpdate();
+        if (result === 'ALL') {
+            _guild.musicPlayer.notify.push(player, `曲列循环`, 3000);
+        }
+        else if (result === 'ONE') {
+            _guild.musicPlayer.notify.push(player, `单曲循环`, 3000);
+        }
+        else {
+            _guild.musicPlayer.notify.push(player, `关闭循环`, 3000);
         }
     });
 }
-exports.default = music_pause;
-//# sourceMappingURL=music_pause.js.map
+exports.default = music_repeat;
+//# sourceMappingURL=music_repeat.js.map

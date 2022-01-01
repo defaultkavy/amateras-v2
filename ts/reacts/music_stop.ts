@@ -14,6 +14,7 @@ export default async function music_stop(interact: ButtonInteraction, amateras: 
     if (!member.voice.channel) return interact.reply({content: `你必须在一个语音频道内`, ephemeral: true})
     
     if (_guild.musicPlayer.state === 'STOPPED') return interact.reply({content: `已停止`, ephemeral: true})
-    await _guild.musicPlayer.control.stop()
     interact.deferUpdate()
+    await _guild.musicPlayer.control.stop()
+    _guild.musicPlayer.notify.push(player, `停止播放`, 3000)
 }

@@ -68,7 +68,6 @@ export default class MissionManager {
         await mission.init()
         // Assign mission to owner
         mission.owner.missions.requested.active.add(mission)
-        console.debug(mission.owner.missions.requested.active.cache.get(mission.id) === mission)
         // Save expire date to database
         this.saveMissionDate(mission)
         // Transfer coins to Amateras

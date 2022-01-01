@@ -21,6 +21,7 @@ import { MusicManager } from './MusicManager';
 export default class Amateras {
     client: Client;
     id: string;
+    debug: boolean;
     guilds: _GuildManager;
     //commands: CommandManager;
     globalCommands?: Command[];
@@ -41,6 +42,7 @@ export default class Amateras {
     constructor(client: Client, db: Db, admin: string) {
         this.client = client;
         this.id = client.user!.id;
+        this.debug = true
         this.db = db;
         this.commands = new CommandManager(this);
         this.players = new PlayerManager(this)

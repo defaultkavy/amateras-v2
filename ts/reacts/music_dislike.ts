@@ -1,7 +1,7 @@
 import { ButtonInteraction } from "discord.js";
 import Amateras from "../lib/Amateras";
 
-export default async function music_like(interact: ButtonInteraction, amateras: Amateras) {
+export default async function music_dislike(interact: ButtonInteraction, amateras: Amateras) {
     const player = await amateras.players.fetch(interact.user.id)
     if (player === 404) return
 
@@ -13,13 +13,13 @@ export default async function music_like(interact: ButtonInteraction, amateras: 
     if (!current) return interact.reply({content: `操作无效`, ephemeral: true})
 
     const playerMusic = await player.musics.add(current.music)
-    const result = await playerMusic.setLike()
+    const result = await playerMusic.setDislike()
     interact.deferUpdate()
     if (result === 100) {
-        _guild.musicPlayer.notify.push(player, '加入了收藏', 3000)
+        _guild.musicPlayer.notify.push(player, '加入了黑名单', 3000)
         return 
     } else {
-        playerMusic.unsetLike()
-        _guild.musicPlayer.notify.push(player, '从收藏中移除', 3000)
+        playerMusic.unsetDislike()
+        _guild.musicPlayer.notify.push(player, '从黑名单中移除', 3000)
     }
 }
