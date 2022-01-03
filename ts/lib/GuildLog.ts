@@ -69,12 +69,14 @@ export class GuildLog {
         })
         this.#messageId = this.message.id
         this.#_guild.save()
+        return this.message
     }
 
     private async fetchMessage() {
         if (this.#messageId) {
             try {
                 const message = await this.channel.messages.fetch(this.#messageId)
+                if (message.author.id !== this.#amateras.id) return this.newMessage()
                 this.message = message
                 this.#messageId = message.id
                 return message

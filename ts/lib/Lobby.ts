@@ -65,14 +65,14 @@ export class Lobby {
             this.voiceChannel = <VoiceChannel> this.#_guild.get.channels.cache.get(this.#voiceChannel)
             this.textChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#textChannel)
             this.infoChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#infoChannel)
+            if (this.voiceChannel.deleted && this.textChannel.deleted) {
+                this.state = 'CLOSED'
+            }
         } catch {
             console.error(`Channel is deleted.`)
             this.state = 'CLOSED'
             await this.save()
             return false
-        }
-        if (this.voiceChannel.deleted && this.textChannel.deleted) {
-            this.state = 'CLOSED'
         }
         const player = await this.#amateras.players.fetch(this.#owner)
         if (player === 404) return
@@ -161,12 +161,12 @@ export class Lobby {
             if (!this.voiceChannel.deleted) await this.voiceChannel.delete()
             if (!this.infoChannel.deleted) await this.infoChannel.delete()
             if (this.categoryChannel.children.size !== 0) {
-                for (const channel of this.categoryChannel.children.entries()) {
-                    if (!channel[1].deleted) await channel[1].delete()
+                for (const channel of this.categoryChannel.children.values()) {
+                    if (!channel.deleted) await channel.delete()
                 }
             }
             if (!this.categoryChannel.deleted) await this.categoryChannel.delete()
-        } catch { }
+        } catch(err) { console.error('Lobby delete channel failed. \n' + err)}
         this.state = 'CLOSED'
         if (this.lobbyMessage && !this.lobbyMessage.deleted) this.lobbyMessage.delete()
         await this.save()

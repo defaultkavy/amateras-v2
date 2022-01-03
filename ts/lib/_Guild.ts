@@ -48,7 +48,7 @@ export class _Guild {
     }
 
     async init() {
-        console.log(cmd.Green, `Guild Initializing: ${this.id}`)
+        console.log(cmd.Green, `Guild Initializing: ${this.get.name}`)
         console.time('| Guild Command deployed')
         await this.commands.init()
         console.timeEnd('| Guild Command deployed')
@@ -71,7 +71,7 @@ export class _Guild {
         await this.musicPlayer.init()
         console.timeEnd('| Music loaded')
         await this.save()
-        console.log(cmd.Green, `Guild Initialized: ${this.id}`)
+        console.log(cmd.Green, `Guild Initialized: ${this.get.name}`)
         this.ready = true
     }
 
