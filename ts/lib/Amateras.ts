@@ -16,6 +16,7 @@ import { Log } from "./Log";
 import { System } from './System';
 import { CommandManager } from './CommandManager';
 import { MusicManager } from './MusicManager';
+const { system } = require('../command_list.json')
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {
@@ -42,7 +43,7 @@ export default class Amateras {
     constructor(client: Client, db: Db, admin: string) {
         this.client = client;
         this.id = client.user!.id;
-        this.debug = true
+        this.debug = system.debug
         this.db = db;
         this.commands = new CommandManager(this);
         this.players = new PlayerManager(this)
