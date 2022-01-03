@@ -6,6 +6,7 @@ import { Lobby } from "./Lobby";
 import { cloneObj, removeArrayItem } from "./terminal";
 import { _Channel } from "./_Channel";
 import { _Guild } from "./_Guild";
+import { _TextChannel } from "./_TextChannel";
 
 export class LobbyManager {
     #amateras: Amateras;
@@ -39,12 +40,12 @@ export class LobbyManager {
         }
         try {
             if (!this.#data.channel) return
-            const channel = await this.#_guild.channels.fetch(this.#data.channel)
-            if (channel === 404) { 
+            const _channel = await this.#_guild.channels.fetch(this.#data.channel)
+            if (!(_channel instanceof _TextChannel)) { 
                 new Err(`Lobby channel fetch failed`)
                 return 404
             }
-            this.channel = <TextChannel>channel.get
+            this.channel = _channel.get
             if (this.#data.message) {
                 try {
                     this.message = await this.channel.messages.fetch(this.#data.message)
