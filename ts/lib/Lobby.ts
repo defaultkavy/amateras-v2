@@ -14,14 +14,10 @@ export class Lobby {
     #collection: Collection;
     #data: LobbyData
     #_guild: _Guild;
-    #categoryChannel: string;
-    categoryChannel: CategoryChannel;
-    #voiceChannel: string;
-    voiceChannel: VoiceChannel;
-    #textChannel: string;
-    textChannel: TextChannel;
-    #infoChannel: string;
-    infoChannel: TextChannel;
+    categoryChannel?: CategoryChannel;
+    voiceChannel?: VoiceChannel;
+    textChannel?: TextChannel;
+    infoChannel?: TextChannel;
     #owner: string;
     owner: Player;
     #member: string[];
@@ -44,27 +40,24 @@ export class Lobby {
         this.member = new Map
         this.#vFolder = data.vFolder
         this.vFolder = new Map
-        this.#categoryChannel = data.categoryChannel
-        this.categoryChannel = <CategoryChannel>{}
-        this.#voiceChannel = data.voiceChannel
-        this.voiceChannel = <VoiceChannel>{}
-        this.#textChannel = data.textChannel
-        this.textChannel = <TextChannel>{}
-        this.#infoChannel = data.infoChannel
-        this.infoChannel = <TextChannel>{}
         this.state = data.state
         this.#manager = manager
         this.#messages = data.messages
         this.messages = new Map
     }
 
+    /**
+     * @returns 100 - Success
+     * @returns 404 - Channel fetch failed
+     * @returns 405 - Player fetch failed
+     */
     async init() {
         
         try {
-            this.categoryChannel = <CategoryChannel> this.#_guild.get.channels.cache.get(this.#categoryChannel)
-            this.voiceChannel = <VoiceChannel> this.#_guild.get.channels.cache.get(this.#voiceChannel)
-            this.textChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#textChannel)
-            this.infoChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#infoChannel)
+            this.categoryChannel = <CategoryChannel> this.#_guild.get.channels.cache.get(this.#data.categoryChannel)
+            this.voiceChannel = <VoiceChannel> this.#_guild.get.channels.cache.get(this.#data.voiceChannel)
+            this.textChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#data.textChannel)
+            this.infoChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#data.infoChannel)
             if (this.voiceChannel.deleted && this.textChannel.deleted) {
                 this.state = 'CLOSED'
             }
@@ -72,10 +65,10 @@ export class Lobby {
             console.error(`Channel is deleted.`)
             this.state = 'CLOSED'
             await this.save()
-            return false
+            return 404
         }
         const player = await this.#amateras.players.fetch(this.#owner)
-        if (player === 404) return
+        if (player === 404) return 405
         this.owner = player
         this.owner.joinLobby(this)
         for (const memberId of this.#member) {
@@ -129,15 +122,15 @@ export class Lobby {
             }
         }
         await this.initLobbyMessage()
-        return true
+        return 100
     }
 
     async save() {
         const data = cloneObj(this)
-        data.categoryChannel = this.#categoryChannel
-        data.textChannel = this.#textChannel
-        data.voiceChannel = this.#voiceChannel
-        data.infoChannel = this.#infoChannel
+        data.categoryChannel = this.categoryChannel ? this.categoryChannel.id : undefined
+        data.textChannel = this.textChannel ? this.textChannel.id : undefined
+        data.voiceChannel = this.voiceChannel ? this.voiceChannel.id : undefined
+        data.infoChannel = this.infoChannel ? this.infoChannel.id : undefined
         data.owner = this.#owner
         data.member = [...this.member.keys()]
         data.vFolder = this.#vFolder
@@ -157,16 +150,23 @@ export class Lobby {
 
     async close() {
         try {
-            if (!this.textChannel.deleted) await this.textChannel.delete()
-            if (!this.voiceChannel.deleted) await this.voiceChannel.delete()
-            if (!this.infoChannel.deleted) await this.infoChannel.delete()
-            if (this.categoryChannel.children.size !== 0) {
-                for (const channel of this.categoryChannel.children.values()) {
-                    if (!channel.deleted) await channel.delete()
+            if (this.textChannel && !this.textChannel.deleted) await this.textChannel.delete()
+            if (this.voiceChannel && !this.voiceChannel.deleted) await this.voiceChannel.delete()
+            if (this.infoChannel && !this.infoChannel.deleted) await this.infoChannel.delete()
+            if (this.categoryChannel) {
+                if (this.categoryChannel.children.size !== 0) {
+                    for (const channel of this.categoryChannel.children.values()) {
+                        if (!channel.deleted) await channel.delete()
+                    }
+                }
+                if (!this.categoryChannel.deleted) {
+                await this.categoryChannel.delete()
                 }
             }
-            if (!this.categoryChannel.deleted) await this.categoryChannel.delete()
-        } catch(err) { console.error('Lobby delete channel failed. \n' + err)}
+        } catch(err) { 
+            console.error('Lobby delete channel failed. Retry. \n' + err)
+            if (this.categoryChannel) await this.categoryChannel.delete()
+        }
         this.state = 'CLOSED'
         if (this.lobbyMessage && !this.lobbyMessage.deleted) this.lobbyMessage.delete()
         await this.save()
@@ -177,6 +177,7 @@ export class Lobby {
     /**
      * @returns 100 - Success
      * @returns 101 - Member already in lobby
+     * @returns 102 - Missing channel
      * @returns 404 - Player fetch failed
      */
     async addMember(id: string) {
@@ -185,6 +186,7 @@ export class Lobby {
         if (player === 404) return 404
         this.member.set(player.id, player)
         player.joinLobby(this)
+        if (!this.textChannel || !this.categoryChannel || !this.voiceChannel || !this.infoChannel) return 102
         const member = await this.textChannel.guild.members.fetch(id)
         this.textChannel.send({content: `${member}加入了房间`})
         if (player.v) await player.v.sendInfoLobby(this)
@@ -200,9 +202,11 @@ export class Lobby {
     /**
      * @returns 100 - Success
      * @returns 101 - Member not in lobby
+     * @returns 102 - Missing channel
      */
     async removeMember(id: string) {
         if (!this.member.get(id)) return 101
+        if (!this.textChannel || !this.categoryChannel || !this.voiceChannel || !this.infoChannel) return 102
         const member = await this.textChannel.guild.members.fetch(id)
         const player = this.member.get(id)
         if (member.voice.channel === this.voiceChannel) {
@@ -284,7 +288,7 @@ export class Lobby {
                     value: `${this.member.size + 1}人`
                 }
             ],
-            timestamp: new Date(this.infoChannel.createdTimestamp)
+            timestamp: this.infoChannel ? new Date(this.infoChannel.createdTimestamp) : undefined
         }
 
         return embed

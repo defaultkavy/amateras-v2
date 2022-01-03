@@ -72,6 +72,7 @@ export class V {
         }
         const embed = this.infoEmbed()
         if (embed === 101) return 101
+        if (!lobby.infoChannel) return 102
         const message = <Message>await lobby.infoChannel.send({embeds: [embed]})
 
         const _message = await this.#amateras.messages.create(message)

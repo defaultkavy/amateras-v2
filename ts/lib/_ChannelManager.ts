@@ -57,7 +57,7 @@ export class _ChannelManager {
             }
             let _channel
             if (channel instanceof TextChannel) {
-                _channel = new _Channel(channel, this.#amateras)
+                _channel = new _TextChannel(channel, this.#amateras)
             }
             if (!_channel) return 404
             this.cache.set(id, _channel)

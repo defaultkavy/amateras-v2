@@ -25,7 +25,7 @@ export default async function invite(interact: CommandInteraction, amateras: Ama
         interact.reply({ content: '对象已在你的房间中', ephemeral: true })
     } else {
         guild.log.send(`${await guild.log.name(interact.user.id)} 邀请 ${await guild.log.name(userId)} 加入房间`)
-        if (interact.channelId === lobby.textChannel.id) {
+        if (lobby.textChannel && interact.channelId === lobby.textChannel.id) {
             await interact.deferReply()
             interact.deleteReply()
             return

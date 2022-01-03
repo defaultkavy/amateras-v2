@@ -9,13 +9,12 @@ export default async function lobby(interact: CommandInteraction, amateras: Amat
     _guild = amateras.guilds.cache.get(interact.guild.id)
 
     if (!_guild) return
-    const lobby = await _guild.lobby?.fetch(interact.user.id)
-
-    if (lobby === 101 || lobby === 404) return interact.reply({content: '你没有创建房间', ephemeral: true})
-    const currentLobby = await _guild.lobby?.fetchByCategory((<TextChannel>interact.channel).parent?.id!)
+    const lobby = await _guild.lobby.fetch(interact.user.id)
+    if (!(lobby instanceof Lobby)) return interact.reply({content: '你没有创建房间', ephemeral: true})
+    const currentLobby = await _guild.lobby.fetchByCategory((<TextChannel>interact.channel).parent?.id!)
 
     const player = await amateras.players.fetch(interact.user.id)
-    if (player === 404) return interact.reply({content: `Error: Player fetch failed`})
+    if (player === 404) return interact.reply({content: `Error: Player fetch failed`, ephemeral: true})
     
     for (const subcmd0 of interact.options.data) {
         switch (subcmd0.name) {
@@ -54,7 +53,7 @@ export default async function lobby(interact: CommandInteraction, amateras: Amat
                     interact.reply({ content: '对象已在你的房间中', ephemeral: true })
                 } else {
                     _guild.log.send(`${await _guild.log.name(interact.user.id)} 邀请 ${await _guild.log.name(userId)} 加入房间`)
-                    if (interact.channelId === lobby.textChannel.id) return interact.deferReply()
+                    if (lobby.textChannel && interact.channelId === lobby.textChannel.id) return interact.deferReply()
                     interact.reply({content: '已邀请', ephemeral: true})
                 }
             break;
@@ -77,7 +76,7 @@ export default async function lobby(interact: CommandInteraction, amateras: Amat
                     interact.reply({ content: '对象不在你的房间中', ephemeral: true })
                 } else {
                     _guild.log.send(`${await _guild.log.name(interact.user.id)} 将 ${await _guild.log.name(userId)} 移出房间`)
-                    if (interact.channelId === lobby.textChannel.id) return interact.deferReply()
+                    if (lobby.textChannel && interact.channelId === lobby.textChannel.id) return interact.deferReply()
                     interact.reply({ content: '已移除', ephemeral: true })
                 }
             break;

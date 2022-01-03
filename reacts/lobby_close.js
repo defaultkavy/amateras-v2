@@ -11,17 +11,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 function lobby_close(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!interact.guild)
-            return;
-        const _guild = amateras.guilds.cache.get(interact.guild.id);
-        if (!_guild)
-            return console.error('_guild is' + _guild);
-        const lobby = yield _guild.lobby.fetch(interact.user.id);
-        if (lobby === 101 || lobby === 404)
-            return interact.reply({ content: '房间不存在。', ephemeral: true });
-        yield lobby.close();
-        interact.reply({ content: '房间已关闭~', ephemeral: true });
-        _guild.log.send(`${yield _guild.log.name(interact.user.id)} 关闭了房间`);
+        try {
+            interact.deferReply({ ephemeral: true });
+            if (!interact.guild)
+                return;
+            const _guild = amateras.guilds.cache.get(interact.guild.id);
+            if (!_guild)
+                return console.error('_guild is' + _guild);
+            if (!_guild.lobby.enabled)
+                return interact.followUp({ content: '房间系统尚未开启', ephemeral: true });
+            const lobby = yield _guild.lobby.fetch(interact.user.id);
+            if (lobby === 101 || lobby === 404)
+                return interact.followUp({ content: '房间不存在。', ephemeral: true });
+            yield lobby.close();
+            interact.followUp({ content: '房间已关闭~', ephemeral: true });
+            _guild.log.send(`${yield _guild.log.name(interact.user.id)} 关闭了房间`);
+        }
+        catch (err) {
+            console.debug(err);
+        }
     });
 }
 exports.default = lobby_close;
