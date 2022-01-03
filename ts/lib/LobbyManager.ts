@@ -40,7 +40,7 @@ export class LobbyManager {
         try {
             if (!this.#data.channel) return
             const channel = await this.#_guild.channels.fetch(this.#data.channel)
-            if (channel === 404 || channel == 101) { 
+            if (channel === 404) { 
                 new Err(`Lobby channel fetch failed`)
                 return 404
             }

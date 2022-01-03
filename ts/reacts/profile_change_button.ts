@@ -1,4 +1,4 @@
-import { ButtonInteraction, MessageActionRow, MessageButton, MessageSelectMenu, SelectMenuInteraction } from "discord.js"
+import { ButtonInteraction, Guild, GuildMember, MessageActionRow, MessageButton, MessageSelectMenu, SelectMenuInteraction } from "discord.js"
 import Amateras from "../lib/Amateras"
 
 export default async function profile_change_button(interact: ButtonInteraction, amateras: Amateras) {
@@ -17,7 +17,8 @@ export default async function profile_change_button(interact: ButtonInteraction,
         button.style = 'PRIMARY'
         button.customId = '#profile_change_button'
     } else if (message.embeds[0].author && message.embeds[0].author.name === 'VTuber') {
-        embed = await player.infoEmbed(interact)
+        if (!(interact.member instanceof GuildMember)) return
+        embed = await player.infoEmbed(interact.member)
         button.label = '切换到 VTuber'
         button.style = 'PRIMARY'
         button.customId = '#profile_change_button'

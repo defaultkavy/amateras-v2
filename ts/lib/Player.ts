@@ -34,6 +34,7 @@ export class Player {
     get?: User
     musics: PlayerMusicManager;
     bot: boolean;
+    joinedDate: number;
     /**
      * @namespace
      * @param player The player data object.
@@ -61,6 +62,7 @@ export class Player {
         this.rewards = new Map
         this.musics = new PlayerMusicManager(this, amateras)
         this.bot = data.bot ? data.bot : false
+        this.joinedDate = data.joinedDate ? data.joinedDate : + new Date
     }
 
     async init() {
@@ -253,7 +255,8 @@ export class Player {
     }
 
     async sendInfo(interaction: CommandInteraction, share: boolean) {
-        const embed = await this.infoEmbed(interaction)
+        if (!(interaction.member instanceof GuildMember)) return
+        const embed = await this.infoEmbed(interaction.member)
         // Create Button
         const comp: MessageActionRow[] = []
         if (this.v && share) {
@@ -275,9 +278,15 @@ export class Player {
         }
     }
 
-    async infoEmbed(interaction: Interaction) {
-        const member = await interaction.guild!.members.fetch(this.id)
+    async infoEmbed(member: GuildMember) {
         if (!this.get) return {}
+        let joinedSystemDate, joinedGuildDate
+        if (member.joinedTimestamp) {
+            const date = new Date(member.joinedTimestamp)
+            joinedGuildDate = `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`
+            const date2 = new Date(this.joinedDate)
+            joinedSystemDate = `${date2.getFullYear()} 年 ${date2.getMonth() + 1} 月 ${date2.getDate()} 日`
+        }
         if (this.bot) {
             if (this.id === this.#amateras.id) {
                 const time = this.#amateras.client.uptime ? msTime(this.#amateras.client.uptime) : undefined
@@ -303,18 +312,23 @@ export class Player {
                         {
                             name: `天照已运行超过 ${display}`,
                             value: `目前在 ${(await this.#amateras.client.guilds.fetch()).size} 个伺服器中待机`,
-                            inline: false
+                            inline: true
                         },
                         {
                             name: `系统剩余金额`,
                             value: `${this.wallets[0].balance}G`,
-                            inline: true
+                            inline: false
                         },
                         {
                             name: `生日`,
                             value: `1 月 1 日`,
                             inline: true
-                        }
+                        },
+                        {
+                            name: `${joinedGuildDate} 加入伺服器`,
+                            value: `${joinedSystemDate} 正式启动`,
+                            inline: false
+                        },
                     ],
                     footer: {
                         text: this.id
@@ -360,14 +374,14 @@ export class Player {
                         inline: true
                     },
                     {
-                        name: this.aka ? `${this.aka}` : 'none',
+                        name: this.aka ? `${this.aka}` : '-',
                         value: `${(this.wallets)[0].balance}G`,
                         inline: true
                     },
                     {
-                        name: 'Links',
-                        value: (this.youtube ? `[YouTube](https://youtube.com/channel/${this.youtube}) ` : '')
-                            + (this.twitter ? `[Twitter](https://twitter.com/${this.twitter}) ` : '-')
+                        name: `${joinedGuildDate} 加入伺服器`,
+                        value: `${joinedSystemDate} 成为玩家`,
+                        inline: false
                     }
                 ]
             }
@@ -460,4 +474,5 @@ export interface PlayerData {
     class?: ('PLAYER' | 'VTUBER')[];
     rewards?: string[],
     bot?: boolean
+    joinedDate?: number
 }

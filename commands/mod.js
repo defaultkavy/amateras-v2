@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const terminal_1 = require("../lib/terminal");
+const _TextChannel_1 = require("../lib/_TextChannel");
 exports.default = execute;
 function execute(interaction, amateras) {
     var _a, _b;
@@ -312,7 +313,7 @@ function execute(interaction, amateras) {
             case 'permission':
                 if (!subcmd0.options)
                     return;
-                let user, role, enable;
+                var user, role, enable;
                 for (const subcmd1 of subcmd0.options) {
                     switch (subcmd1.name) {
                         case 'user':
@@ -342,7 +343,7 @@ function execute(interaction, amateras) {
                     if (enable) {
                         const set = yield _guild.setModerator(user, 'USER');
                         if ((0, terminal_1.equalOneOf)(set, [101, 102, 405, 404]))
-                            return interaction.reply({ content: `Error: Setting failed` });
+                            return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
                         // Check if nothing change
                         if (set === 105)
                             return interaction.reply({ content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
@@ -350,7 +351,7 @@ function execute(interaction, amateras) {
                     else if (enable === false) {
                         const set = yield _guild.removeModerator(user, 'USER');
                         if ((0, terminal_1.equalOneOf)(set, [101, 102, 405, 404]))
-                            return interaction.reply({ content: `Error: Setting failed` });
+                            return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
                         if (set === 105)
                             return interaction.reply({ content: `${player.mention()} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
                     }
@@ -360,7 +361,7 @@ function execute(interaction, amateras) {
                 if (role) {
                     const _role = yield _guild.roles.fetch(role);
                     if (_role === 404)
-                        return interaction.reply({ content: `Error: Role fetch failed` });
+                        return interaction.reply({ content: `Error: Role fetch failed`, ephemeral: true });
                     if (enable === undefined) {
                         return interaction.reply({ content: `${_role.mention} mod 权限更改为：${((_b = _guild.commands.cache.get('mod')) === null || _b === void 0 ? void 0 : _b.hasPermission(role)) ? '开' : '关'}`, ephemeral: true });
                     }
@@ -369,7 +370,7 @@ function execute(interaction, amateras) {
                     if (enable) {
                         const set = yield _guild.setModerator(role, 'ROLE');
                         if ((0, terminal_1.equalOneOf)(set, [101, 102, 405, 404]))
-                            return interaction.reply({ content: `Error: Setting failed` });
+                            return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
                         if (set === 105)
                             return interaction.reply({ content: `${_role.mention} mod 权限保持为：${enable ? '开' : '关'}`, ephemeral: true });
                     }
@@ -384,6 +385,96 @@ function execute(interaction, amateras) {
                 }
                 // User and Role part is not filled
                 return interaction.reply({ content: '请选择目标', ephemeral: true });
+                break;
+            case 'role':
+                if (!subcmd0.options)
+                    return;
+                for (const subcmd1 of subcmd0.options) {
+                    if (!subcmd1.options)
+                        return;
+                    switch (subcmd1.name) {
+                        case 'default_role':
+                            var role, enable;
+                            for (const subcmd2 of subcmd1.options) {
+                                switch (subcmd2.name) {
+                                    case 'role':
+                                        role = subcmd2.value;
+                                        break;
+                                    case 'enable':
+                                        enable = subcmd2.value;
+                                        break;
+                                }
+                            }
+                            if (role) {
+                                const _role = yield _guild.roles.fetch(role);
+                                if (_role === 404)
+                                    return interaction.reply({ content: `Error: Role fetch failed` });
+                                if (enable === undefined) {
+                                    console.debug(_role.isDefaultRole);
+                                    return interaction.reply({ content: `${_role.mention()} 默认身分组设定为：${_role.isDefaultRole ? '开' : '关'}`, ephemeral: true });
+                                }
+                                if (enable) {
+                                    const set = yield _guild.roles.setDefaultRole(role);
+                                    if (set === 101)
+                                        return interaction.reply({ content: `${_role.mention()} 默认身分组设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                    else if (set === 404)
+                                        return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
+                                }
+                                else if (enable === false) {
+                                    const set = yield _guild.roles.unsetDefaultRole(role);
+                                    if (set === 101)
+                                        return interaction.reply({ content: `${_role.mention()} 默认身分组设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                    else if (set === 404)
+                                        return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
+                                }
+                                return interaction.reply({ content: `${_role.mention()} 默认身分组设定更改更改为：${enable ? '开' : '关'}`, ephemeral: true });
+                            }
+                            // User and Role part is not filled
+                            return interaction.reply({ content: '请选择目标', ephemeral: true });
+                            break;
+                    }
+                }
+                break;
+            case 'channel':
+                if (!subcmd0.options)
+                    return;
+                for (const subcmd1 of subcmd0.options) {
+                    switch (subcmd1.name) {
+                        case 'welcome_channel':
+                            const _channel = yield _guild.channels.fetch(interaction.channelId);
+                            if (!(_channel instanceof _TextChannel_1._TextChannel))
+                                return interaction.reply({ content: `Error: Channel fetch failed`, ephemeral: true });
+                            if (subcmd1.options) {
+                                var enable;
+                                for (const subcmd2 of subcmd1.options) {
+                                    switch (subcmd2.name) {
+                                        case 'enable':
+                                            enable = subcmd2.value;
+                                            break;
+                                    }
+                                }
+                                if (enable) {
+                                    const set = yield _guild.channels.setWelcome(_channel.id);
+                                    if (set === 101)
+                                        return interaction.reply({ content: `${_channel.get} 欢迎频道设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                    else if (set === 404)
+                                        return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
+                                }
+                                else if (enable === false) {
+                                    const set = yield _guild.channels.unsetWelcome(_channel.id);
+                                    if (set === 101)
+                                        return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                    else if (set === 404)
+                                        return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
+                                }
+                                return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定更改更改为：${enable ? '开' : '关'}`, ephemeral: true });
+                            }
+                            else {
+                                return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定更改为：${_channel.isWelcomeChannel ? '开' : '关'}`, ephemeral: true });
+                            }
+                            break;
+                    }
+                }
                 break;
         }
     });

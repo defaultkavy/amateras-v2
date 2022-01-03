@@ -25,7 +25,7 @@ export class GuildCommandManager {
 
     async init() {
         if (!this.#commandsList) return console.log('| Guild Command Disabled')
-        if (await this.edited()) await this.deploy() // Deploy command setup to Guild
+        if (await this.edited() === true) await this.deploy() // Deploy command setup to Guild
 
         const appCommands = await this.#_guild.get.commands.fetch()
         
@@ -50,7 +50,7 @@ export class GuildCommandManager {
         const collection = this.#amateras.db.collection('sys')
         const data = await collection.findOne({name: 'guild_commands'})
         // Check if database no record OR record different with commandsList
-        if (!data || (data && !objectEqual(data.commands, this.#commandsList))) {
+        if (!data || (data && JSON.stringify(data.commands) !== JSON.stringify(this.#commandsList))) {
             // [] reset guild list
             await this.record([])
             return true

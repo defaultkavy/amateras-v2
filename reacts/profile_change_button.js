@@ -29,7 +29,9 @@ function profile_change_button(interact, amateras) {
             button.customId = '#profile_change_button';
         }
         else if (message.embeds[0].author && message.embeds[0].author.name === 'VTuber') {
-            embed = yield player.infoEmbed(interact);
+            if (!(interact.member instanceof discord_js_1.GuildMember))
+                return;
+            embed = yield player.infoEmbed(interact.member);
             button.label = '切换到 VTuber';
             button.style = 'PRIMARY';
             button.customId = '#profile_change_button';
