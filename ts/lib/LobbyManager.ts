@@ -33,13 +33,16 @@ export class LobbyManager {
         this.enabled = false
     }
 
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Lobby data undefined
+     * @returns 102 - Lobby Manager init failed
+     */
     async init() {
-        if (!this.#data) {
-            this.enabled = false
-            return
-        }
+        if (!this.#data) return 101
         try {
-            if (!this.#data.channel) return
+            console.debug(this.#data)
+            if (!this.#data.channel) return 101
             const _channel = await this.#_guild.channels.fetch(this.#data.channel)
             if (!(_channel instanceof _TextChannel)) { 
                 new Err(`Lobby channel fetch failed`)
@@ -55,28 +58,33 @@ export class LobbyManager {
             }
             try {
                 if (this.message) {
-                    this.thread = this.message.thread
+                this.thread = this.message.thread
                     if (!this.thread) {
-                        this.thread = await this.message.startThread({name: `房间列表`, autoArchiveDuration: 60})
+                this.thread = await this.message.startThread({name: `房间列表`, autoArchiveDuration: 60})
                     }
                 }
             } catch {
                 new Err(`Lobby thread message fetch failed`)
             }
-            if (this.#data.lobbies && this.#data.lobbies.length !== 0) {
+            if (this.#data.lobbies && this.#data.lobbies[0]) {
                 for (const lobbyId of this.#data.lobbies) {
                     const lobbyData = <LobbyData>await this.#collection.findOne({owner: lobbyId, state: "OPEN"})
                     if (lobbyData) {
                         const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
                         this.cache.set(lobbyId, lobby)
-                        if (await lobby.init()) this.#resolve.set(lobby.categoryChannel.id, lobby)
-                        else this.cache.delete(lobbyId)
+                        if (await lobby.init() !== 100) {
+                            this.cache.delete(lobbyId)
+                            continue
+                        }
+                        if (lobby.categoryChannel) this.#resolve.set(lobby.categoryChannel.id, lobby)
                     }
                 }
             }
             await this.updateInitMessage()
+            this.enabled = true
+            return 100
         } catch {
-            return 404
+            return 102
         }
     }
 
@@ -126,7 +134,7 @@ export class LobbyManager {
             const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
             this.cache.set(id, lobby)
             await lobby.init()
-            this.#resolve.set(lobby.categoryChannel.id, lobby)
+            if (lobby.categoryChannel) this.#resolve.set(lobby.categoryChannel!.id, lobby)
             return lobby
         } else return 404
     }
@@ -143,7 +151,7 @@ export class LobbyManager {
             const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
             this.cache.set(lobby.owner.id, lobby)
             await lobby.init()
-            this.#resolve.set(lobby.categoryChannel.id, lobby)
+            if (lobby.categoryChannel) this.#resolve.set(lobby.categoryChannel.id, lobby)
             return lobby
         }
         return 
@@ -214,8 +222,10 @@ export class LobbyManager {
                 }
             ]
         }
-        lobby.textChannel.send({embeds: [embed]})
-        lobby.textChannel.send({content: `${member}创建了房间`})
+        if (lobby.textChannel) {
+            lobby.textChannel.send({embeds: [embed]})
+            lobby.textChannel.send({content: `${member}创建了房间`})
+        }
         this.#_guild.log.send(`${await this.#_guild.log.name(id)} 创建了房间`)
         if (lobby.owner.v) lobby.owner.v.sendInfoLobby(lobby)
 

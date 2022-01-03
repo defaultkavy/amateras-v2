@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Lobby_1 = require("../lib/Lobby");
 function lobby(interact, amateras) {
-    var _a, _b, _c;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         let _guild;
         if (!interact.guild)
@@ -18,13 +19,13 @@ function lobby(interact, amateras) {
         _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
-        const lobby = yield ((_a = _guild.lobby) === null || _a === void 0 ? void 0 : _a.fetch(interact.user.id));
-        if (lobby === 101 || lobby === 404)
+        const lobby = yield _guild.lobby.fetch(interact.user.id);
+        if (!(lobby instanceof Lobby_1.Lobby))
             return interact.reply({ content: '你没有创建房间', ephemeral: true });
-        const currentLobby = yield ((_b = _guild.lobby) === null || _b === void 0 ? void 0 : _b.fetchByCategory((_c = interact.channel.parent) === null || _c === void 0 ? void 0 : _c.id));
+        const currentLobby = yield _guild.lobby.fetchByCategory((_a = interact.channel.parent) === null || _a === void 0 ? void 0 : _a.id);
         const player = yield amateras.players.fetch(interact.user.id);
         if (player === 404)
-            return interact.reply({ content: `Error: Player fetch failed` });
+            return interact.reply({ content: `Error: Player fetch failed`, ephemeral: true });
         for (const subcmd0 of interact.options.data) {
             switch (subcmd0.name) {
                 case 'create':
@@ -65,7 +66,7 @@ function lobby(interact, amateras) {
                     }
                     else {
                         _guild.log.send(`${yield _guild.log.name(interact.user.id)} 邀请 ${yield _guild.log.name(userId)} 加入房间`);
-                        if (interact.channelId === lobby.textChannel.id)
+                        if (lobby.textChannel && interact.channelId === lobby.textChannel.id)
                             return interact.deferReply();
                         interact.reply({ content: '已邀请', ephemeral: true });
                     }
@@ -91,7 +92,7 @@ function lobby(interact, amateras) {
                     }
                     else {
                         _guild.log.send(`${yield _guild.log.name(interact.user.id)} 将 ${yield _guild.log.name(userId)} 移出房间`);
-                        if (interact.channelId === lobby.textChannel.id)
+                        if (lobby.textChannel && interact.channelId === lobby.textChannel.id)
                             return interact.deferReply();
                         interact.reply({ content: '已移除', ephemeral: true });
                     }
