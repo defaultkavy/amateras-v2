@@ -41,7 +41,6 @@ export class LobbyManager {
     async init() {
         if (!this.#data) return 101
         try {
-            console.debug(this.#data)
             if (!this.#data.channel) return 101
             const _channel = await this.#_guild.channels.fetch(this.#data.channel)
             if (!(_channel instanceof _TextChannel)) { 
