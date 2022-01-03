@@ -21,15 +21,12 @@ module.exports = {
                     }
                 }
             }
-            console.debug(2)
 
             if (player instanceof Player) {
                 const member = await _guild.member(player.id)
                 const _channel = _guild.channels.welcomeChannel
-                console.debug(member, _channel)
-                if (_channel instanceof _TextChannel && member instanceof GuildMember) {
-                console.debug(4)
-                _channel.get.send({content: `${player.mention()} 欢迎加入`, embeds: [await player.infoEmbed(member)]})
+                    if (_channel instanceof _TextChannel && member instanceof GuildMember) {
+                    _channel.get.send({content: `${player.mention()} 欢迎加入`, embeds: [await player.infoEmbed(member)]})
                 }
             }
         }

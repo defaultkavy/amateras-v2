@@ -32,13 +32,10 @@ module.exports = {
                         }
                     }
                 }
-                console.debug(2);
                 if (player instanceof Player_1.Player) {
                     const member = yield _guild.member(player.id);
                     const _channel = _guild.channels.welcomeChannel;
-                    console.debug(member, _channel);
                     if (_channel instanceof _TextChannel_1._TextChannel && member instanceof discord_js_1.GuildMember) {
-                        console.debug(4);
                         _channel.get.send({ content: `${player.mention()} 欢迎加入`, embeds: [yield player.infoEmbed(member)] });
                     }
                 }
