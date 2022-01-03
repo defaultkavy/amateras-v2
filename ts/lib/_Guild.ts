@@ -5,9 +5,9 @@ import { ForumManager } from "./ForumManager";
 import { LobbyManager, LobbyManagerData } from "./LobbyManager";
 import { GuildLog } from "./GuildLog";
 import { cloneObj, removeArrayItem } from "./terminal";
-import { _ChannelManager } from "./_ChannelManager";
+import { _ChannelManager, _ChannelManagerData } from "./_ChannelManager";
 import { GuildCommandManager } from "./GuildCommandManager";
-import { _RoleManager } from "./_RoleManager";
+import { _RoleManager, _RoleManagerData } from "./_RoleManager";
 import { Err } from "./Err";
 import { MusicPlayer } from "./MusicPlayer";
 import { _GuildManager } from "./_GuildManager";
@@ -21,7 +21,6 @@ export class _Guild {
     get: Guild;
     log: GuildLog;
     lobby: LobbyManager;
-    #forums?: ForumManagerData;
     forums: ForumManager;
     commands: GuildCommandManager;
     roles: _RoleManager;
@@ -39,10 +38,9 @@ export class _Guild {
         this.commands = new GuildCommandManager(data.commands, this, this.#amateras)
         this.log = new GuildLog(data.log, this, this.#amateras)
         this.lobby = new LobbyManager(data.lobby, this, this.#amateras)
-        this.#forums = data.forums
-        this.forums = <ForumManager>{}
-        this.roles = new _RoleManager(this, this.#amateras)
-        this.channels = new _ChannelManager(this, this.#amateras)
+        this.forums = new ForumManager(data.forums, this, this.#amateras)
+        this.roles = new _RoleManager(data.roles, this, this.#amateras)
+        this.channels = new _ChannelManager(data.channels, this, this.#amateras)
         this.moderators = data.moderators ? data.moderators : [guild.ownerId]
         this.musicPlayer = new MusicPlayer(this, amateras)
         this.available = data.available ? data.available : true
@@ -60,10 +58,12 @@ export class _Guild {
         console.time('| Lobby loaded')
         await this.lobby.init()
         console.timeEnd('| Lobby loaded')
-        this.forums = new ForumManager(this.#forums, this, this.#amateras)
         console.time('| Forum loaded')
         await this.forums.init()
         console.timeEnd('| Forum loaded')
+        console.time('| Channel loaded')
+        await this.channels.init()
+        console.timeEnd('| Channel loaded')
         console.time('| Role loaded')
         await this.roles.init()
         console.timeEnd('| Role loaded')
@@ -78,9 +78,10 @@ export class _Guild {
     async save() {
         const data = cloneObj(this, ['get', 'roles', 'channels', 'musicPlayer', 'ready'])
         data.commands = this.commands.toData()
-        data.log = this.log ? this.log.toData() : undefined
-        data.lobby = this.lobby ? this.lobby.toData() : undefined
-        data.forums = this.forums ? this.forums.toData() : undefined
+        data.log = this.log.toData()
+        data.lobby = this.lobby.toData()
+        data.forums = this.forums.toData()
+        data.roles = this.roles.toData()
         const guild = await this.#collection.findOne({ id: this.id })
         if (guild) {
             await this.#collection.replaceOne({ id: this.id }, data)
@@ -179,4 +180,6 @@ export interface _GuildData {
     commands?: GuildCommandManagerData;
     moderators: string[];
     available?: boolean;
+    roles?: _RoleManagerData
+    channels?: _ChannelManagerData
 }

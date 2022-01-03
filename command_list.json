@@ -362,7 +362,7 @@
                 },
                 {
                     "name": "lobby",
-                    "description": "房间系统设定",
+                    "description": "房间系统相关设定",
                     "type": 2,
                     "options": [
                         {
@@ -420,7 +420,7 @@
                 },
                 {
                     "name": "music",
-                    "description": "音乐系统设定",
+                    "description": "音乐系统相关设定",
                     "type": 2,
                     "options": [
                         {
@@ -480,6 +480,52 @@
                             "description": "开关",
                             "type": 5,
                             "required": false
+                        }
+                    ]
+                },
+                {
+                    "name": "role",
+                    "description": "身分组相关设定",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "default_role",
+                            "description": "设定身份组为默认身分组。当新用户加入伺服器后，天照会直接给予该用户此身份（在用户已经同意了伺服器条规后）",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "enable",
+                                    "description": "开关",
+                                    "type": 5,
+                                    "required": false
+                                },
+                                {
+                                    "name": "role",
+                                    "description": "身份组选择",
+                                    "type": 8,
+                                    "required": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "channel",
+                    "description": "频道相关设定",
+                    "type": 2,
+                    "options": [
+                        {
+                            "name": "welcome_channel",
+                            "description": "设定此频道为欢迎频道。当新用户加入伺服器后，天照会发送欢迎讯息在此频道",
+                            "type": 1,
+                            "options": [
+                                {
+                                    "name": "enable",
+                                    "description": "开关",
+                                    "type": 5,
+                                    "required": false
+                                }
+                            ]
                         }
                     ]
                 }

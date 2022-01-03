@@ -165,14 +165,6 @@ interface ForumData {
     state: "OPEN" | "CLOSED"
 }
 
-interface _ChannelManagerData {
-    lobby?: string[]
-}
-
-interface _ChannelData {
-    id: string;
-}
-
 interface LobbyData {
     owner: string;
     member: string[];

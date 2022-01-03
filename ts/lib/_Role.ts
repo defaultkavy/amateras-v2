@@ -7,14 +7,16 @@ export class _Role {
     #amateras: Amateras;
     get: Role
     id: string;
+    isDefaultRole: boolean;
     constructor(role: Role, amateras: Amateras) {
         this.#amateras = amateras
         this.id = role.id
         this.get = role
+        this.isDefaultRole = false
     }
 
     async init() {
-
+        
     }
 
     /**
