@@ -256,7 +256,9 @@ export class Lobby {
     }
 
     async initLobbyMessage() {
+        const unsetThreadArchived = () => this.#manager.thread ? this.#manager.thread.archived ? this.#manager.thread.edit({archived: false}).catch(() => undefined) : this.#manager.thread : undefined
         if (this.#manager.thread) {
+            if (!await unsetThreadArchived()) return
             if (this.lobbyMessage) {
                 if (this.lobbyMessage.deleted) {
                     this.lobbyMessage = await this.#manager.thread.send({embeds: [this.lobbyMessageEmbed()]})

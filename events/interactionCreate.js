@@ -23,11 +23,13 @@ module.exports = {
             const guild = interaction.guild;
             const _guild = guild ? amateras.guilds.cache.get(guild.id) : undefined;
             if (interaction.isCommand()) { // If slash command message sent
+                if (!amateras.ready && interaction.commandName !== 'sys')
+                    return interaction.reply({ content: '天照进入休眠中，无法使用请求', ephemeral: true });
                 // Check _guild init ready
                 if (_guild && _guild.ready === false)
                     return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 // Return when command run in special channel
-                if (guild && interaction.commandName !== 'mod') {
+                if (guild && interaction.commandName !== 'mod' && interaction.commandName !== 'sys') {
                     if (_guild) {
                         if (interaction.channelId) {
                             if (_guild.lobby.channel && interaction.channelId === _guild.lobby.channel.id ||
@@ -53,6 +55,8 @@ module.exports = {
                 }
             }
             else if (interaction.isSelectMenu()) { // If menu selected
+                if (!amateras.ready)
+                    return interaction.reply({ content: '天照进入休眠中，无法使用请求', ephemeral: true });
                 if (_guild && _guild.ready === false)
                     return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 const flags = interaction.message.flags;
@@ -98,6 +102,8 @@ module.exports = {
                 }
             }
             else if (interaction.isContextMenu()) { // If context menu clicked
+                if (!amateras.ready)
+                    return interaction.reply({ content: '天照进入休眠中，无法使用请求', ephemeral: true });
                 if (_guild && _guild.ready === false)
                     return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 if (fs_1.default.existsSync(`./context/${interaction.commandName}.js`)) {
@@ -109,6 +115,8 @@ module.exports = {
                 }
             }
             else if (interaction.isButton()) { // If button clicked
+                if (!amateras.ready)
+                    return interaction.reply({ content: '天照进入休眠中，无法使用请求', ephemeral: true });
                 if (_guild && _guild.ready === false)
                     return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true });
                 const flags = interaction.message.flags;

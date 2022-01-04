@@ -171,7 +171,7 @@ export class MusicPlayer {
                         name: `天照音乐`
                     },
                     color: 'DARK_BUT_NOT_BLACK',
-                    title: `没有播放的曲目`,
+                    title: this.#amateras.ready ? `没有播放的曲目` : '天照休眠中',
                     description: `在此频道发送 YouTube Music 链接即可播放音乐`
                 }
             }

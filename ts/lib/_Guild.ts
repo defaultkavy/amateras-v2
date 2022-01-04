@@ -1,9 +1,9 @@
-import { Guild, TextChannel } from "discord.js";
+import { Guild, GuildMember, TextChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { ForumManager } from "./ForumManager";
 import { LobbyManager, LobbyManagerData } from "./LobbyManager";
-import { GuildLog } from "./GuildLog";
+import { GuildLog, LogData } from "./GuildLog";
 import { cloneObj, removeArrayItem } from "./terminal";
 import { _ChannelManager, _ChannelManagerData } from "./_ChannelManager";
 import { GuildCommandManager } from "./GuildCommandManager";
@@ -29,6 +29,7 @@ export class _Guild {
     musicPlayer: MusicPlayer;
     available: boolean;
     ready: boolean;
+    amateras?: GuildMember
     constructor(data: _GuildData, guild: Guild, manager: _GuildManager, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = this.#amateras.db.collection('guilds')
@@ -48,6 +49,7 @@ export class _Guild {
     }
 
     async init() {
+        this.amateras = await this.get.members.fetch(this.#amateras.id).catch(() => undefined)
         console.log(cmd.Green, `Guild Initializing: ${this.get.name}`)
         console.time('| Guild Command deployed')
         await this.commands.init()
@@ -76,12 +78,13 @@ export class _Guild {
     }
 
     async save() {
-        const data = cloneObj(this, ['get', 'roles', 'channels', 'musicPlayer', 'ready'])
+        const data = cloneObj(this, ['get', 'roles', 'musicPlayer', 'ready', 'amateras'])
         data.commands = this.commands.toData()
         data.log = this.log.toData()
         data.lobby = this.lobby.toData()
         data.forums = this.forums.toData()
         data.roles = this.roles.toData()
+        data.channels = this.channels.toData()
         const guild = await this.#collection.findOne({ id: this.id })
         if (guild) {
             await this.#collection.replaceOne({ id: this.id }, data)

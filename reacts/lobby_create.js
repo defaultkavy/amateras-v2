@@ -34,7 +34,7 @@ function lobby_create(interact, amateras) {
             }
         }
         catch (err) {
-            console.debug(err);
+            console.error(err);
         }
     });
 }

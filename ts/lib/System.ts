@@ -7,10 +7,12 @@ export class System {
     #collection: Collection;
     #adminId: string;
     admin?: User
+    uptime: number
     constructor(admin: string, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('system')
         this.#adminId = admin
+        this.uptime = + new Date
     }
 
     async init() {

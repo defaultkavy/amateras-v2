@@ -3,6 +3,7 @@ import { Routes } from "discord-api-types/v9";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Command } from "./Command";
+import { removeArrayItem } from "./terminal";
 const { global_commands } = require('../command_list.json')
 
 export class CommandManager {
@@ -42,6 +43,43 @@ export class CommandManager {
         }
     }
 
+    async edited() {
+        const collection = this.#amateras.db.collection('sys')
+        const data = await collection.findOne({name: 'commands'})
+        // Check if database no record OR record different with commandsList
+        if (!data || (data && JSON.stringify(data.commands) !== JSON.stringify(this.#commandsList))) {
+            // [] reset guild list
+            await this.record()
+            return true
+        }
+        
+        await this.record(data)
+        return true
+    }
+
+    private async record(data?: any) {
+        const collection = this.#amateras.db.collection('sys')
+        const newData = {
+            name: 'commands',
+            commands: this.#commandsList
+        }
+        if (data) {
+            await collection.replaceOne({name: 'commands'}, newData)
+        } else {
+            await collection.insertOne(newData)
+        }
+    }
+
+    private async removeRecord() {
+        const collection = this.#amateras.db.collection('sys')
+        const data = await collection.findOne({name: 'commands'})
+        if (data) {
+            await collection.replaceOne({name: 'commands'}, data)
+        } else {
+            return
+        }
+    }
+
     async deploy() {
         const rest = new REST({ version: '9' }).setToken(this.#amateras.client.token!);
 
@@ -51,6 +89,7 @@ export class CommandManager {
                 { body: this.#commandsList },
             );
         } catch(err) {
+            await this.removeRecord()
             console.error(err);
         }
     }

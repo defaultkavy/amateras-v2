@@ -21,6 +21,6 @@ export default async function lobby_create(interact: ButtonInteraction, amateras
             interact.followUp({content: `房间已创建！点击这里跳转到你的房间：${createLobby.textChannel}`, ephemeral: true})
         }
     } catch (err) {
-        console.debug(err)
+        console.error(err)
     }
 }

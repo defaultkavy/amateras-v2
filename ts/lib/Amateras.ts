@@ -1,4 +1,4 @@
-import { Client, MessageFlags } from 'discord.js';
+import { Client, Guild, MessageFlags } from 'discord.js';
 import fs from 'fs';
 import { Db } from "mongodb";
 import { PlayerManager } from "./PlayerManager";
@@ -40,6 +40,7 @@ export default class Amateras {
     system: System;
     commands: CommandManager;
     musics: MusicManager;
+    ready: boolean;
     constructor(client: Client, db: Db, admin: string) {
         this.client = client;
         this.id = client.user!.id;
@@ -52,32 +53,50 @@ export default class Amateras {
         this.messages = new _MessageManager(this)
         this.items = new ItemManager(this)
         this.me = <Player>{}
+        this.system = new System(admin, this)
         this.guilds = new _GuildManager(this)
         this.rewards = new RewardManager(this)
         this.transactions = new TransactionManager(this)
         this.characters = new _CharacterManager(this)
         this.log = new Log(this)
-        this.system = new System(admin, this)
         this.musics = new MusicManager(this)
+        this.ready = false
     }
 
     async init() {
         console.log(cmd.Cyan, 'Amateras System Initializing...')
-        console.time('| System Initialized')
-        console.time('| Guilds Initialized')
-        await this.guilds.init()
-        console.timeEnd('| Guilds Initialized')
         const player = await this.players.fetch(this.id)
         if (player === 404) throw new Error('Amateras Fatal Error: Amateras User fetch failed')
         this.me = player
+        console.time('| System Initialized')
         await this.system.init()
+        console.timeEnd('| System Initialized')
+        console.time('| Guilds Initialized')
+        await this.guilds.init()
+        console.timeEnd('| Guilds Initialized')
         console.time('| Global Command Deployed')
         //await this.commands.init()
         console.timeEnd('| Global Command Deployed')
-        console.timeEnd('| System Initialized')
         this.eventHandler()
-        //this.setTimer()
+        this.log.send('天照已上线！', true)
+        this.ready = true
         console.log(cmd.Yellow, 'Amateras Ready.')
+    }
+
+    sleep() {
+        this.ready = false
+        for (const _guild of this.guilds.cache.values()) {
+            _guild.musicPlayer.control.stop()
+        }
+        this.log.send('天照已休眠！', true)
+    }
+    
+    wake() {
+        this.ready = true
+        for (const _guild of this.guilds.cache.values()) {
+            _guild.musicPlayer.update()
+        }
+        this.log.send('天照已上线！', true)
     }
 
     private eventHandler() {

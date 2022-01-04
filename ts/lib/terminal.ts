@@ -215,3 +215,8 @@ export function msTime(duration: number) {
         year: year
     }
 }
+
+export function timestampDate(timestamp: number) {
+    const date = new Date(timestamp)
+    return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`
+}

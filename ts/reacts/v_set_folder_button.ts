@@ -3,7 +3,6 @@ import Amateras from "../lib/Amateras"
 import { VImageFolder } from "../lib/VImageFolder"
 
 export default async function v_set_folder_button(interact: ButtonInteraction, amateras: Amateras, options?: { interactOld: CommandInteraction, messageEle: MessageElement }) {
-    console.debug(1)
     const footer = interact.message.embeds[0].footer
     if (!footer || footer.text !== interact.user.id) {
         interact.reply({content: '你无法更改别人的形象。', ephemeral: true})
@@ -28,7 +27,6 @@ export default async function v_set_folder_button(interact: ButtonInteraction, a
         })
     }
     action.addComponents(select)
-    console.debug(action)
     if (message) message.edit({components: [action]})
     else if (options) options.interactOld.editReply({components: [action]})
     interact.deferUpdate()

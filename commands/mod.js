@@ -166,7 +166,7 @@ function execute(interaction, amateras) {
                                     else
                                         yield lobby.close();
                                     interaction.reply({ content: `${player.mention()} 房间已关闭`, ephemeral: true });
-                                    _guild.log.send(`${yield _guild.log.name(moderator.id)} 关闭了 ${yield _guild.log.name(player.id)} 的房间`, true);
+                                    _guild.log.send(`${yield _guild.log.name(moderator.id)} 关闭了 ${yield _guild.log.name(player.id)} 的房间`, 'MOD');
                                 }
                             }
                             break;
@@ -391,7 +391,7 @@ function execute(interaction, amateras) {
                     return;
                 for (const subcmd1 of subcmd0.options) {
                     if (!subcmd1.options)
-                        return;
+                        return interaction.reply({ content: '请选择目标', ephemeral: true });
                     switch (subcmd1.name) {
                         case 'default_role':
                             var role, enable;
@@ -408,29 +408,33 @@ function execute(interaction, amateras) {
                             if (role) {
                                 const _role = yield _guild.roles.fetch(role);
                                 if (_role === 404)
-                                    return interaction.reply({ content: `Error: Role fetch failed` });
+                                    return interaction.reply({ content: `Error: Role fetch failed`, ephemeral: true });
+                                if (_role.get.tags)
+                                    return interaction.reply({ content: `此身份组无法登记`, ephemeral: true });
+                                const botPosition = _guild.amateras ? _guild.amateras.roles.highest.position : undefined;
+                                if (!botPosition)
+                                    return interaction.reply({ content: `Error: Amateras role fetch failed`, ephemeral: true });
+                                if (_role.get.position > botPosition)
+                                    return interaction.reply({ content: `此身份组权限位置高于天照，天照无法将新成员加入此身份组`, ephemeral: true });
                                 if (enable === undefined) {
-                                    console.debug(_role.isDefaultRole);
                                     return interaction.reply({ content: `${_role.mention()} 默认身分组设定为：${_role.isDefaultRole ? '开' : '关'}`, ephemeral: true });
                                 }
                                 if (enable) {
                                     const set = yield _guild.roles.setDefaultRole(role);
                                     if (set === 101)
-                                        return interaction.reply({ content: `${_role.mention()} 默认身分组设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                        return interaction.reply({ content: `${_role.mention()} 默认身分组设定保持为：${enable ? '开' : '关'}`, ephemeral: true });
                                     else if (set === 404)
                                         return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
                                 }
                                 else if (enable === false) {
                                     const set = yield _guild.roles.unsetDefaultRole(role);
                                     if (set === 101)
-                                        return interaction.reply({ content: `${_role.mention()} 默认身分组设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                        return interaction.reply({ content: `${_role.mention()} 默认身分组设定保持为：${enable ? '开' : '关'}`, ephemeral: true });
                                     else if (set === 404)
                                         return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
                                 }
-                                return interaction.reply({ content: `${_role.mention()} 默认身分组设定更改更改为：${enable ? '开' : '关'}`, ephemeral: true });
+                                return interaction.reply({ content: `${_role.mention()} 默认身分组设定更改为：${enable ? '开' : '关'}`, ephemeral: true });
                             }
-                            // User and Role part is not filled
-                            return interaction.reply({ content: '请选择目标', ephemeral: true });
                             break;
                     }
                 }
@@ -456,21 +460,21 @@ function execute(interaction, amateras) {
                                 if (enable) {
                                     const set = yield _guild.channels.setWelcome(_channel.id);
                                     if (set === 101)
-                                        return interaction.reply({ content: `${_channel.get} 欢迎频道设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                        return interaction.reply({ content: `${_channel.get} 欢迎频道设定保持为：${enable ? '开' : '关'}`, ephemeral: true });
                                     else if (set === 404)
                                         return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
                                 }
                                 else if (enable === false) {
                                     const set = yield _guild.channels.unsetWelcome(_channel.id);
                                     if (set === 101)
-                                        return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定更改保持为：${enable ? '开' : '关'}`, ephemeral: true });
+                                        return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定保持为：${enable ? '开' : '关'}`, ephemeral: true });
                                     else if (set === 404)
                                         return interaction.reply({ content: `Error: Setting failed`, ephemeral: true });
                                 }
-                                return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定更改更改为：${enable ? '开' : '关'}`, ephemeral: true });
+                                return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定更改为：${enable ? '开' : '关'}`, ephemeral: true });
                             }
                             else {
-                                return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定更改为：${_channel.isWelcomeChannel ? '开' : '关'}`, ephemeral: true });
+                                return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定为：${_channel.isWelcomeChannel ? '开' : '关'}`, ephemeral: true });
                             }
                             break;
                     }

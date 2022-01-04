@@ -14,7 +14,7 @@ module.exports = {
     once: false,
     execute(guild, amateras) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.debug(true, `- leave ${guild.name}!`);
+            console.log(true, `- leave ${guild.name}!`);
             const _guild = amateras.guilds.cache.get(guild.id);
             if (_guild) {
                 _guild.leave();

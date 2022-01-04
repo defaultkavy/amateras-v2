@@ -6,7 +6,7 @@ import { Lobby } from "./Lobby";
 import { PlayerMissionManager } from "./PlayerMissionManager";
 import { PlayerMusicManager } from "./PlayerMusicManager";
 import { Reward } from "./Reward";
-import { cloneObj, msTime, removeArrayItem } from "./terminal";
+import { cloneObj, msTime, removeArrayItem, timestampDate } from "./terminal";
 import { V } from "./V";
 import Wallet from "./Wallet";
 
@@ -255,8 +255,9 @@ export class Player {
     }
 
     async sendInfo(interaction: CommandInteraction, share: boolean) {
-        if (!(interaction.member instanceof GuildMember)) return
-        const embed = await this.infoEmbed(interaction.member)
+        const member = interaction.guild ? await interaction.guild.members.fetch(this.id).catch(() => undefined) : undefined
+
+        const embed = await this.infoEmbed(member)
         // Create Button
         const comp: MessageActionRow[] = []
         if (this.v && share) {
@@ -278,15 +279,10 @@ export class Player {
         }
     }
 
-    async infoEmbed(member: GuildMember) {
+    async infoEmbed(member?: GuildMember) {
         if (!this.get) return {}
-        let joinedSystemDate, joinedGuildDate
-        if (member.joinedTimestamp) {
-            const date = new Date(member.joinedTimestamp)
-            joinedGuildDate = `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`
-            const date2 = new Date(this.joinedDate)
-            joinedSystemDate = `${date2.getFullYear()} 年 ${date2.getMonth() + 1} 月 ${date2.getDate()} 日`
-        }
+        const joinedGuildDate = member ? member.joinedTimestamp ? timestampDate(member.joinedTimestamp) : undefined : undefined
+        const joinedSystemDate = timestampDate(this.joinedDate)
         if (this.bot) {
             if (this.id === this.#amateras.id) {
                 const time = this.#amateras.client.uptime ? msTime(this.#amateras.client.uptime) : undefined
@@ -325,8 +321,8 @@ export class Player {
                             inline: true
                         },
                         {
-                            name: `${joinedGuildDate} 加入伺服器`,
-                            value: `${joinedSystemDate} 正式启动`,
+                            name: `资讯`,
+                            value: `\`\`\`${joinedGuildDate} 加入伺服器\n${joinedSystemDate} 正式启动\`\`\``,
                             inline: false
                         },
                     ],
@@ -358,7 +354,7 @@ export class Player {
                 author: {
                     name: 'Player'
                 },
-                title: member ? member.displayName : undefined,
+                title: member ? member.displayName : this.get.username,
                 description: this.description ? this.description : undefined,
                 thumbnail: {
                     url: (this.get.displayAvatarURL({ size: 512 }))
@@ -379,8 +375,8 @@ export class Player {
                         inline: true
                     },
                     {
-                        name: `${joinedGuildDate} 加入伺服器`,
-                        value: `${joinedSystemDate} 成为玩家`,
+                        name: `资讯`,
+                        value: `\`\`\`${joinedGuildDate} 加入伺服器\n${joinedSystemDate} 成为玩家\`\`\``,
                         inline: false
                     }
                 ]

@@ -17,7 +17,6 @@ module.exports = {
     once: false,
     execute(member, amateras) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.debug(1);
             const _guild = amateras.guilds.cache.get(member.guild.id);
             const player = yield amateras.players.fetch(member.id);
             if (_guild) {
