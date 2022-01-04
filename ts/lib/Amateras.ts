@@ -78,8 +78,7 @@ export default class Amateras {
         //await this.commands.init()
         console.timeEnd('| Global Command Deployed')
         this.eventHandler()
-        this.log.send('天照已上线！', true)
-        this.ready = true
+        this.wake()
         console.log(cmd.Yellow, 'Amateras Ready.')
     }
 
