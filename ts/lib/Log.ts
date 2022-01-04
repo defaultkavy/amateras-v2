@@ -6,9 +6,9 @@ export class Log {
         this.#amateras = amateras
     }
 
-    async send(content: string) {
+    async send(content: string, sys?: boolean) {
         for (const guild of this.#amateras.guilds.cache.values()) {
-            guild.log.send(content)
+            guild.log.send(content, sys ? 'SYS' : undefined)
         }
     }
 

@@ -5,6 +5,7 @@ module.exports = {
     name: 'messageReactionAdd',
     once: false,
     async execute(reaction: MessageReaction, user: User, amateras: Amateras) {
+        if (!amateras.ready) return
         await reaction.message.fetch()
         if (user.bot || 
             reaction.message.author && reaction.message.author.bot || 

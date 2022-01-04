@@ -14,6 +14,8 @@ module.exports = {
     once: false,
     execute(reaction, user, amateras) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!amateras.ready)
+                return;
             yield reaction.message.fetch();
             if (user.bot ||
                 reaction.message.author && reaction.message.author.bot ||

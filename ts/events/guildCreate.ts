@@ -7,7 +7,7 @@ module.exports = {
     async execute(guild: Guild, amateras: Amateras) {
         const _guild = amateras.guilds.cache.get(guild.id)
         if (_guild && _guild.available === true) return
-        console.debug(true, `- join ${guild.name}!`)
+        console.log(true, `- join ${guild.name}!`)
         amateras.guilds.create(guild)
     }
 }

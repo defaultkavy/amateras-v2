@@ -494,15 +494,15 @@
                             "type": 1,
                             "options": [
                                 {
-                                    "name": "enable",
-                                    "description": "开关",
-                                    "type": 5,
-                                    "required": false
-                                },
-                                {
                                     "name": "role",
                                     "description": "身份组选择",
                                     "type": 8,
+                                    "required": true
+                                },
+                                {
+                                    "name": "enable",
+                                    "description": "开关",
+                                    "type": 5,
                                     "required": false
                                 }
                             ]
@@ -790,7 +790,17 @@
                 {
                     "name": "data",
                     "description": "...",
-                    "type": 1
+                    "type": "1"
+                },
+                {
+                    "name": "sleep",
+                    "description": "让天照进入休眠",
+                    "type": "1"
+                },
+                {
+                    "name": "wake",
+                    "description": "让天照退出休眠",
+                    "type": "1"
                 }
             ]
         }

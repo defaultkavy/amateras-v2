@@ -179,12 +179,6 @@ interface LobbyData {
     lobbyMessage?: string;
 }
 
-interface LogData {
-    channel?: string;
-    message?: string;
-    messageCount?: number;
-}
-
 interface ItemObj {
     creator: string;
     name: string;

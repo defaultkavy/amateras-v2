@@ -231,6 +231,18 @@ function execute(interact, amateras) {
                     console.timeEnd('V Data loaded');
                     interact.followUp({ content: 'Command: Data', ephemeral: true });
                     break;
+                case 'sleep':
+                    if (!amateras.ready)
+                        return interact.followUp({ content: '天照已休眠，操作无效', ephemeral: true });
+                    interact.followUp({ content: '天照已休眠', ephemeral: true });
+                    amateras.sleep();
+                    break;
+                case 'wake':
+                    if (amateras.ready)
+                        return interact.followUp({ content: '天照已上线，操作无效', ephemeral: true });
+                    interact.followUp({ content: '天照已上线', ephemeral: true });
+                    amateras.wake();
+                    break;
             }
         }
     });

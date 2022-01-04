@@ -26,8 +26,6 @@ export class LobbyManager {
         this.#_guild = _guild
         this.#data = data
         this.cache = new Map
-        this.message
-        this.thread
         this.#resolve = new Map
         this.permissions = this.#data ? this.#data.permissions : []
         this.enabled = false
@@ -57,9 +55,9 @@ export class LobbyManager {
             }
             try {
                 if (this.message) {
-                this.thread = this.message.thread
+                    this.thread = this.message.thread
                     if (!this.thread) {
-                this.thread = await this.message.startThread({name: `房间列表`, autoArchiveDuration: 60})
+                        this.thread = await this.message.startThread({name: `房间列表`, autoArchiveDuration: 60})
                     }
                 }
             } catch {
@@ -95,7 +93,7 @@ export class LobbyManager {
         if (this.channel && this.channel.id === channel.id) return 101
         this.enabled = true
         this.channel = channel
-        if (this.message && !this.message.deleted) this.message.delete()
+        if (this.message && !this.message.deleted) this.message.delete().catch()
         await this.sendInitMessage()
         await this.#_guild.save()
         return this.channel
@@ -112,7 +110,7 @@ export class LobbyManager {
         if (this.channel.id !== channel.id) return 102
         this.enabled = false
         this.channel = undefined
-        if (this.message && !this.message.deleted) this.message.delete()
+        if (this.message && !this.message.deleted) this.message.delete().catch()
         await this.#_guild.save()
         return 100
     }
@@ -259,6 +257,7 @@ export class LobbyManager {
             lobby_create: 'lobby_create',
             lobby_close: 'lobby_close'
         })
+        this.thread = await this.message.startThread({name: `房间列表`, autoArchiveDuration: 60})
 
     }
 

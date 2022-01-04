@@ -72,7 +72,6 @@ export class _RoleManager {
             return 404
         } else {
             if (_role.isDefaultRole === true) return 101
-            console.debug(_role.isDefaultRole)
             _role.isDefaultRole = true
             this.defaultRoles.set(id, _role)
             this.#_guild.save()

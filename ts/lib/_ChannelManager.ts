@@ -12,7 +12,7 @@ export class _ChannelManager {
     #_guild: _Guild;
     #data?: _ChannelManagerData;
     cache: Map<string, _Channel | _TextChannel | _WelcomeChannel>;
-    welcomeChannel?: _Channel;
+    welcomeChannel?: _TextChannel;
     constructor(data: _ChannelManagerData | undefined, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
         this.#_guild = _guild
@@ -36,6 +36,7 @@ export class _ChannelManager {
                 const _channel = this.cache.get(this.#data.welcomeChannel)
                 if (_channel instanceof _TextChannel) {
                     this.welcomeChannel = _channel
+                    this.welcomeChannel.isWelcomeChannel = true
                     await this.welcomeChannel.init()
                 }
             }
@@ -110,7 +111,7 @@ export class _ChannelManager {
 
     toData() {
         const data = cloneObj(this, ['cache'])
-        data.welcomeChannel = this.welcomeChannel
+        data.welcomeChannel = this.welcomeChannel ? this.welcomeChannel.id : undefined
         return data
     }
 }

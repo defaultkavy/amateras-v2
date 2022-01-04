@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 function v_set_folder_button(interact, amateras, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.debug(1);
         const footer = interact.message.embeds[0].footer;
         if (!footer || footer.text !== interact.user.id) {
             interact.reply({ content: '你无法更改别人的形象。', ephemeral: true });
@@ -39,7 +38,6 @@ function v_set_folder_button(interact, amateras, options) {
             });
         }
         action.addComponents(select);
-        console.debug(action);
         if (message)
             message.edit({ components: [action] });
         else if (options)

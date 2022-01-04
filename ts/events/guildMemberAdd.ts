@@ -7,7 +7,6 @@ module.exports = {
     name: 'guildMemberAdd',
     once: false,
     async execute(member: GuildMember, amateras: Amateras) {
-        console.debug(1)
         const _guild = amateras.guilds.cache.get(member.guild.id)
         const player = await amateras.players.fetch(member.id)
         

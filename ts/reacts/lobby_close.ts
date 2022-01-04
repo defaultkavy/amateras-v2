@@ -16,6 +16,6 @@ export default async function lobby_close(interact: ButtonInteraction, amateras:
         _guild.log.send(`${await _guild.log.name(interact.user.id)} 关闭了房间`)
         
     } catch (err) {
-        console.debug(err)
+        console.error(err)
     }
 }
