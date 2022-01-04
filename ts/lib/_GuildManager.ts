@@ -28,6 +28,7 @@ export class _GuildManager {
             const _guild = new _Guild(_guildData, guild, this, this.#amateras)
             this.cache.set(_guild.id, _guild)
             await _guild.init()
+            await _guild.save()
         } else {
             // Guild data not exist, create one to database
             const _newGuildData: _GuildData = {

@@ -27,8 +27,8 @@ export class GuildLog {
     }
 
     async init() {
-        const data = await this.#collection.findOne({id: this.#_guild.id})
-        this.#data = (data as _GuildData).log
+        const data = <_GuildData>await this.#collection.findOne({id: this.#_guild.id})
+        if (data) this.#data = data.log
         this.channel = await this.fetchChannel()
         this.message = await this.fetchMessage()
         this.message = await this.initMessage()
