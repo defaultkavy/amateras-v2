@@ -45,9 +45,9 @@ export class GuildLog {
         async function embed(this: GuildLog) { 
             const member = await this.#_guild.get.members.fetch(this.#amateras.id).catch(() => undefined)
             const embed: MessageEmbedOptions = {
-                title: `天照正在服务中`,
+                title: this.#amateras.ready ? `天照正在服务中` : `天照休眠中`,
                 description: `欢迎使用天照 BOT，输入 / 能够查看所有请求指令。`,
-                color: 'GREEN',
+                color: this.#amateras.ready ? 'GREEN' : 'GREY',
                 fields: [
                     {
                         name: `加入伺服器的时间`,

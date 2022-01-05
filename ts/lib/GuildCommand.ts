@@ -61,9 +61,10 @@ export class GuildCommand {
 
     async save() {
         const data = cloneObj(this, ['get'])
-        const guild = await this.#collection.findOne({ id: this.id })
+        data.guild = this.#_guild.id
+        const guild = await this.#collection.findOne({ id: this.id, guild: this.#_guild.id })
         if (guild) {
-            await this.#collection.replaceOne({ id: this.id }, data)
+            await this.#collection.replaceOne({ id: this.id, guild: this.#_guild.id }, data)
         } else {
             await this.#collection.insertOne(data)
         }

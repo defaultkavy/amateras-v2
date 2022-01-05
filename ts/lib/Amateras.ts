@@ -75,7 +75,7 @@ export default class Amateras {
         await this.guilds.init()
         console.timeEnd('| Guilds Initialized')
         console.time('| Global Command Deployed')
-        //await this.commands.init()
+        await this.commands.init()
         console.timeEnd('| Global Command Deployed')
         this.eventHandler()
         this.wake()
