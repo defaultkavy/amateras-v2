@@ -36,6 +36,7 @@ export class _GuildManager {
                 moderators: [guild.ownerId]
             }
             const _guild = new _Guild(_newGuildData, guild, this, this.#amateras)
+            this.cache.set(_guild.id, _guild)
             await _guild.init()
             await _guild.save()
         }
