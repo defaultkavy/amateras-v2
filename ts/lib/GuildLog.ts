@@ -122,7 +122,7 @@ export class GuildLog {
         let resultContent = '```' + prevContent + `\n` + (type === 'MOD' ? '@MOD ' : type === 'SYS' ? '@SYS ' : '') + time + content + `\`\`\``
         //Check message word count
         if (resultContent.length > 1000) {
-            if (embed.fields.length >= 25) {
+            if (embed.fields.length >= 6) {
                 this.logMessage = await this.newMessage()
                 if (!this.logMessage) return 
                 const newField = this.logMessage.embeds[0].fields[embed.fields.length - 1]
