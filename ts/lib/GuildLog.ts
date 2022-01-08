@@ -21,7 +21,7 @@ export class GuildLog {
         this.#collection = amateras.db.collection('guilds')
         this.#_guild = _guild
         this.#data = data
-        this.messageCount = data ? data.messageCount ? data.messageCount : 1 : 1
+        this.messageCount = data ? data.messageCount ? data.messageCount : 0 : 0
         this.lastLog = data ? data.lastLog : ''
         this.isValid = () => { return !!this.channel && !!this.message && !!this.thread }
     }
@@ -34,7 +34,7 @@ export class GuildLog {
         this.message = await this.initMessage()
         this.thread = await this.fetchThread()
         this.logMessage = await this.fetchLog()
-        this.#_guild.save()
+        await this.#_guild.save()
     }
 
     private async initMessage() {
@@ -121,20 +121,23 @@ export class GuildLog {
         const prevContent = field.value.slice(3, this.logMessage.content.length - 3)
         let resultContent = '```' + prevContent + `\n` + (type === 'MOD' ? '@MOD ' : type === 'SYS' ? '@SYS ' : '') + time + content + `\`\`\``
         //Check message word count
+        const newMessage = async() => {
+            this.logMessage = await this.newMessage()
+            if (!this.logMessage) return 
+            resultContent = '```' + `py\n` + (type === 'MOD' ? '@MOD ' : type === 'SYS' ? '@SYS ' : '') + time + content + `\`\`\``
+        }
         if (resultContent.length > 1000) {
             if (embed.fields.length >= 6) {
-                this.logMessage = await this.newMessage()
-                if (!this.logMessage) return 
-                const newField = this.logMessage.embeds[0].fields[embed.fields.length - 1]
-                resultContent = '```' + newField.value.slice(3, this.message!.content.length - 3) + `\n` + (type === 'MOD' ? '@MOD ' : type === 'SYS' ? '@SYS ' : '') + time + content + `\`\`\``
-
+                await newMessage()
             } else {
                 this.messageCount += 1
                 resultContent = '```' + `py\n` + (type === 'MOD' ? '@MOD ' : type === 'SYS' ? '@SYS ' : '') + time + content + `\`\`\``
                 embed.addField(`${this.messageCount}`, resultContent)
             }
         } else {
-            field.value = resultContent
+            if (embed.fields.length >= 6) {
+                await newMessage()
+            } else field.value = resultContent
         }
         return await this.logMessage.edit({embeds: [embed]})
     }
