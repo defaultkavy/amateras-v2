@@ -1,4 +1,4 @@
-import { ColorResolvable, CommandInteraction, GuildMember, Interaction, Message, MessageActionRow, MessageButton, MessageEmbedOptions, User } from "discord.js";
+import { ColorResolvable, CommandInteraction, ContextMenuInteraction, GuildMember, Interaction, Message, MessageActionRow, MessageButton, MessageEmbedOptions, User } from "discord.js";
 import Amateras from "./Amateras";
 import { Err } from "./Err";
 import { Gender } from "./layout";
@@ -254,7 +254,7 @@ export class Player {
         ]
     }
 
-    async sendInfo(interaction: CommandInteraction, share: boolean) {
+    async sendInfo(interaction: CommandInteraction | ContextMenuInteraction, share: boolean) {
         const member = interaction.guild ? await interaction.guild.members.fetch(this.id).catch(() => undefined) : undefined
 
         const embed = await this.infoEmbed(member)

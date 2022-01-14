@@ -1,0 +1,37 @@
+{
+    "unit": {
+        "persons": "persons",
+        "times": "times"
+    },
+    "log_init": {
+        "serving": "Amateras is online.",
+        "sleeping": "Amateras is offline",
+        "description": "Welcome to using Amateras Bot, type '/' to check all commands.",
+        "join_date": "Joined at",
+        "start_time": "Server started at",
+        "logs": "Logs"
+    },
+    "music_message": {
+        "app_name": "Amateras Music",
+        "loading": "Loading music...",
+        "app_hint": "Send YouTube Music link in this channel to play music",
+        "play_song": "play this song",
+        "system_played": "This song played by Amateras",
+        "user_played": "persons played this song",
+        "likes": "Likes",
+        "unlikes": "Unlikes",
+        "player_status": "Player status",
+        "in_queue": "songs in queue",
+        "empty_queue": "Empty queue",
+        "player_play": "Play",
+        "player_pause": "Pause",
+        "player_stop": "Stop",
+        "player_prev": "Prev",
+        "player_next": "Next",
+        "player_repeat": "Repeat"
+    },
+    "mod": {
+        "lang_changed": "Language changed",
+        "lang_unchanged": "Language keep same"
+    }
+}

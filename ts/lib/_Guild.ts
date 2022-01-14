@@ -29,7 +29,8 @@ export class _Guild {
     musicPlayer: MusicPlayer;
     available: boolean;
     ready: boolean;
-    amateras?: GuildMember
+    amateras?: GuildMember;
+    lang: 'zh-s' | 'en';
     constructor(data: _GuildData, guild: Guild, manager: _GuildManager, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = this.#amateras.db.collection('guilds')
@@ -46,6 +47,7 @@ export class _Guild {
         this.musicPlayer = new MusicPlayer(this, amateras)
         this.available = data.available ? data.available : true
         this.ready = false
+        this.lang = data.lang ? data.lang : 'zh-s'
     }
 
     async init() {
@@ -168,6 +170,20 @@ export class _Guild {
         }
     }
 
+    /**
+     * @returns 100 - Success
+     * @returns 101 - Already set 
+     */
+    async setLanguage(lang: 'zh-s' | 'en') {
+        if (this.lang === lang) return 101
+        this.lang = lang
+        await this.log.initMessage()
+        await this.musicPlayer.initMessage()
+        await this.lobby.updateInitMessage()
+        await this.save()
+        return 100
+    }
+
     async leave() {
         this.available = false
         await this.save()
@@ -185,4 +201,5 @@ export interface _GuildData {
     available?: boolean;
     roles?: _RoleManagerData
     channels?: _ChannelManagerData
+    lang?: 'zh-s' | 'en'
 }

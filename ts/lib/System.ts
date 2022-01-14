@@ -1,17 +1,20 @@
 import { User } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
+const { system } = require('../bot_config.json')
 
 export class System {
     #amateras: Amateras;
     #collection: Collection;
     #adminId: string;
     admin?: User
+    lang: "zh-s" | "zh-t" | "en"
     uptime: number
     constructor(admin: string, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('system')
         this.#adminId = admin
+        this.lang = system.lang
         this.uptime = + new Date
     }
 
