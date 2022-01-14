@@ -47,7 +47,7 @@ export class _Guild {
         this.musicPlayer = new MusicPlayer(this, amateras)
         this.available = data.available ? data.available : true
         this.ready = false
-        this.lang = data.lang ? data.lang : 'zh-s'
+        this.lang = data.lang ? data.lang : amateras.system.lang
     }
 
     async init() {

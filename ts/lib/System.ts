@@ -8,7 +8,7 @@ export class System {
     #collection: Collection;
     #adminId: string;
     admin?: User
-    lang: "zh-s" | "zh-t" | "en"
+    lang: "zh-s" | "en"
     uptime: number
     constructor(admin: string, amateras: Amateras) {
         this.#amateras = amateras
