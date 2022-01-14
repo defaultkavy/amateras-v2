@@ -1,4 +1,4 @@
-import { Message, MessageActionRow, MessageButton, MessageEmbedOptions, OverwriteResolvable, TextChannel, ThreadChannel } from "discord.js";
+import { Message, MessageActionRow, MessageButton, MessageEmbedOptions, NewsChannel, OverwriteResolvable, TextChannel, ThreadChannel } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Err } from "./Err";
@@ -13,7 +13,7 @@ export class LobbyManager {
     #collection: Collection;
     #_guild: _Guild;
     #data?: LobbyManagerData;
-    channel?: TextChannel;
+    channel?: TextChannel | NewsChannel;
     cache: Map<string, Lobby>
     message?: Message;
     thread?: ThreadChannel | null;
@@ -46,6 +46,7 @@ export class LobbyManager {
                 return 404
             }
             this.channel = _channel.get
+            if (!this.channel) return
             if (this.#data.message) {
                 try {
                     this.message = await this.channel.messages.fetch(this.#data.message)
