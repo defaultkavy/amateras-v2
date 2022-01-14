@@ -3,6 +3,7 @@ import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { cloneObj, timestampDate } from "./terminal";
 import { _Guild, _GuildData } from "./_Guild";
+import { log_init } from '../lang.json'
 
 export class GuildLog {
     readonly #amateras: Amateras;
@@ -37,30 +38,31 @@ export class GuildLog {
         await this.#_guild.save()
     }
 
-    private async initMessage() {
+    async initMessage() {
         if (!this.channel) return undefined
         if (!this.message) return this.channel.send({embeds: [await embed.call(this)]}).catch()
         else return this.message.edit({ embeds: [await embed.call(this)] }).catch()
 
         async function embed(this: GuildLog) { 
             const member = await this.#_guild.get.members.fetch(this.#amateras.id).catch(() => undefined)
+            const lang = this.#_guild.lang
             const embed: MessageEmbedOptions = {
-                title: this.#amateras.ready ? `天照正在服务中` : `天照休眠中`,
-                description: `欢迎使用天照 BOT，输入 / 能够查看所有请求指令。`,
+                title: this.#amateras.ready ? log_init.sleeping[lang] : log_init.sleeping[lang],
+                description: log_init.description[lang],
                 color: this.#amateras.ready ? 'GREEN' : 'GREY',
                 fields: [
                     {
-                        name: `加入伺服器的时间`,
+                        name: log_init.join_date[lang],
                         value: member ? member.joinedTimestamp ? timestampDate(member.joinedTimestamp) : '-' : '-',
                         inline: true
                     },
                     {
-                        name: `本次开机时间`,
+                        name: log_init.start_time[lang],
                         value: `${timestampDate(this.#amateras.system.uptime)}`,
                         inline: true
                     },
                     {
-                        name: `消息记录`,
+                        name: log_init.logs[lang],
                         value: `\`\`\`py\n${this.lastLog ? this.lastLog : '-'}\`\`\``
                     }
                 ]
