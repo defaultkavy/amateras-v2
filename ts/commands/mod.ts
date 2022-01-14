@@ -2,12 +2,14 @@ import { CommandInteraction, TextChannel } from 'discord.js';
 import Amateras from '../lib/Amateras';
 import { equalOneOf } from '../lib/terminal';
 import { _TextChannel } from '../lib/_TextChannel';
+import { mod } from '../lang.json'
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {
     const subcmd0 = interaction.options.data[0]
     const _guild = amateras.guilds.cache.get(interaction.guild!.id)
     if (!_guild) return interaction.reply({ content: 'Unknown _Guild', ephemeral: true })
+    const lang = _guild.lang
     // Get moderator player profile
     const moderator = await amateras.players.fetch(interaction.user.id)
     if (moderator === 404) return interaction.reply({content: `管理员不存在`, ephemeral: true})
@@ -404,6 +406,24 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                             return interaction.reply({content: `${_channel.mention()} 欢迎频道设定更改为：${enable ? '开' : '关'}`, ephemeral: true})
                         } else {
                             return interaction.reply({content: `${_channel.mention()} 欢迎频道设定为：${_channel.isWelcomeChannel ? '开' : '关'}`, ephemeral: true})
+                        }
+                    break;
+                }
+            }
+        break;
+
+        case 'language':
+            if (!subcmd0.options) return
+            for (const subcmd1 of subcmd0.options) {
+                switch (subcmd1.name) {
+                    case 'set':
+                        const lang = subcmd1.value as 'zh-s' | 'en'
+            
+                        if (lang) {
+                            if (await _guild.setLanguage(lang) === 101) return interaction.reply({content: mod.lang_unchanged[lang]})
+                            interaction.reply({content: mod.lang_changed[lang], ephemeral: true})
+                        } else {
+                            interaction.reply({content: 'Error: value is undefined', ephemeral: true})
                         }
                     break;
                 }

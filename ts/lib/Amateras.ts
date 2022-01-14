@@ -46,6 +46,7 @@ export default class Amateras {
         this.id = client.user!.id;
         this.debug = system.debug
         this.db = db;
+        this.ready = false
         this.commands = new CommandManager(this);
         this.players = new PlayerManager(this)
         this.wallets = new WalletManager(this)
@@ -60,7 +61,6 @@ export default class Amateras {
         this.characters = new _CharacterManager(this)
         this.log = new Log(this)
         this.musics = new MusicManager(this)
-        this.ready = false
     }
 
     async init() {

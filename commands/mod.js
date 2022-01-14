@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const terminal_1 = require("../lib/terminal");
 const _TextChannel_1 = require("../lib/_TextChannel");
+const lang_json_1 = require("../lang.json");
 exports.default = execute;
 function execute(interaction, amateras) {
     var _a, _b;
@@ -19,6 +20,7 @@ function execute(interaction, amateras) {
         const _guild = amateras.guilds.cache.get(interaction.guild.id);
         if (!_guild)
             return interaction.reply({ content: 'Unknown _Guild', ephemeral: true });
+        const lang = _guild.lang;
         // Get moderator player profile
         const moderator = yield amateras.players.fetch(interaction.user.id);
         if (moderator === 404)
@@ -475,6 +477,25 @@ function execute(interaction, amateras) {
                             }
                             else {
                                 return interaction.reply({ content: `${_channel.mention()} 欢迎频道设定为：${_channel.isWelcomeChannel ? '开' : '关'}`, ephemeral: true });
+                            }
+                            break;
+                    }
+                }
+                break;
+            case 'language':
+                if (!subcmd0.options)
+                    return;
+                for (const subcmd1 of subcmd0.options) {
+                    switch (subcmd1.name) {
+                        case 'set':
+                            const lang = subcmd1.value;
+                            if (lang) {
+                                if ((yield _guild.setLanguage(lang)) === 101)
+                                    return interaction.reply({ content: lang_json_1.mod.lang_unchanged[lang] });
+                                interaction.reply({ content: lang_json_1.mod.lang_changed[lang], ephemeral: true });
+                            }
+                            else {
+                                interaction.reply({ content: 'Error: value is undefined', ephemeral: true });
                             }
                             break;
                     }
