@@ -104,7 +104,7 @@ export class GuildLog {
     private async fetchLog() {
         const data = this.#data ? this.#data.logMessage : undefined
         const messageFetch = () => data && this.thread ? this.thread.messages.fetch(data).catch(() => this.newMessage()) : this.newMessage()
-        const messageCheck = () => this.logMessage ? this.logMessage.deleted ? this.newMessage() : this.logMessage : messageFetch()
+        const messageCheck = async () => this.logMessage ? await this.logMessage.fetch().catch(() => undefined) ? this.newMessage() : this.logMessage : messageFetch()
         return this.thread ? messageCheck() : undefined
     }
 

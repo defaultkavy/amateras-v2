@@ -89,7 +89,7 @@ export class MusicPlayer {
                 components: components.call(this)
             }
             if ( this.notify.notifications.length > 0) messageOptions.embeds?.unshift(await this.notify.init())
-            if (this.message && !this.message.deleted) {
+            if (this.message) {
                 await this.message.edit(messageOptions)
                 return this.messageUpdating = false
             }
@@ -382,7 +382,7 @@ export class MusicPlayer {
         if (this.channel && this.channel.id === channel.id) return 101
         this.enabled = true
         this.channel = channel
-        if (this.message && !this.message.deleted) this.message.delete()
+        if (this.message) this.message.delete().catch()
         await this.init()
         await this.save()
         return this.channel
@@ -398,7 +398,7 @@ export class MusicPlayer {
         if (this.channel.id !== channel.id) return 102
         this.enabled = false
         this.channel = undefined
-        if (this.message && !this.message.deleted) this.message.delete()
+        if (this.message) this.message.delete().catch()
         await this.save()
         return 100
     }

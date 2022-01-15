@@ -94,7 +94,7 @@ export class LobbyManager {
         if (this.channel && this.channel.id === channel.id) return 101
         this.enabled = true
         this.channel = channel
-        if (this.message && !this.message.deleted) this.message.delete().catch()
+        if (this.message) this.message.delete().catch()
         await this.sendInitMessage()
         await this.#_guild.save()
         return this.channel
@@ -111,7 +111,7 @@ export class LobbyManager {
         if (this.channel.id !== channel.id) return 102
         this.enabled = false
         this.channel = undefined
-        if (this.message && !this.message.deleted) this.message.delete().catch()
+        if (this.message) this.message.delete().catch()
         await this.#_guild.save()
         return 100
     }

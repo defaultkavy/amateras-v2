@@ -34,12 +34,12 @@ module.exports = {
         // Music
         if (_guild && _guild.musicPlayer.channel) {
             if (!amateras.ready) {
-                if (!message.deleted) message.delete()
+                message.delete().catch()
                 _guild.musicPlayer.notify.push(player, `天照进入休眠中，无法播放歌曲`, 3000)
                 return
             }
             if (_guild.musicPlayer.channel.id === message.channelId) {
-                if (!message.deleted) message.delete()
+                message.delete().catch()
                 const music = await _guild.musicPlayer.link(message, player)
                 if (music instanceof Music) {
                     _guild.musicPlayer.notify.push(player, `添加了歌曲 - ${music.title}`, 3000)

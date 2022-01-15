@@ -168,7 +168,7 @@ export class Lobby {
             if (this.categoryChannel) await this.categoryChannel.delete()
         }
         this.state = 'CLOSED'
-        if (this.lobbyMessage && !this.lobbyMessage.deleted) this.lobbyMessage.delete()
+        if (this.lobbyMessage) this.lobbyMessage.delete().catch()
         await this.save()
         this.#manager.cache.delete(this.owner.id)
         await this.#manager.updateInitMessage()
@@ -260,7 +260,7 @@ export class Lobby {
         if (this.#manager.thread) {
             if (!await unsetThreadArchived()) return
             if (this.lobbyMessage) {
-                if (this.lobbyMessage.deleted) {
+                if (await this.lobbyMessage.fetch().catch(() => undefined)) {
                     this.lobbyMessage = await this.#manager.thread.send({embeds: [this.lobbyMessageEmbed()]})
                     await this.save()
                 } else {
