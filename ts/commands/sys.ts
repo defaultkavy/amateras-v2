@@ -5,7 +5,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet'
 const config = require('../bot_config.json')
 
 export default async function execute(interact: CommandInteraction, amateras: Amateras) {
-    interact.deferReply({ephemeral: true})
+    await interact.deferReply({ephemeral: true})
     if (interact.user !== amateras.system.admin)
         return interact.followUp({content: '仅限系统管理员使用', ephemeral: true})
     const admin = interact.user

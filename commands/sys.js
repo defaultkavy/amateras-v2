@@ -14,7 +14,7 @@ const config = require('../bot_config.json');
 function execute(interact, amateras) {
     var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
-        interact.deferReply({ ephemeral: true });
+        yield interact.deferReply({ ephemeral: true });
         if (interact.user !== amateras.system.admin)
             return interact.followUp({ content: '仅限系统管理员使用', ephemeral: true });
         const admin = interact.user;
