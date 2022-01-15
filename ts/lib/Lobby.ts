@@ -58,7 +58,6 @@ export class Lobby {
             this.voiceChannel = <VoiceChannel> await this.#_guild.get.channels.fetch(this.#data.voiceChannel)
             this.textChannel = <TextChannel> await this.#_guild.get.channels.fetch(this.#data.textChannel)
             this.infoChannel = <TextChannel> await this.#_guild.get.channels.fetch(this.#data.infoChannel)
-            console.log(!!this.categoryChannel, !!this.voiceChannel, !!this.textChannel, !!this.infoChannel)
         } catch(err) {
             this.state = 'CLOSED'
             await this.save()
