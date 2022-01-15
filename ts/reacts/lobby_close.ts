@@ -3,7 +3,7 @@ import Amateras from "../lib/Amateras"
 
 export default async function lobby_close(interact: ButtonInteraction, amateras: Amateras) {
     try {
-        interact.deferReply({ephemeral: true})
+        await interact.deferReply({ephemeral: true})
         if (!interact.guild) return
         const _guild = amateras.guilds.cache.get(interact.guild.id)
         if (!_guild) return console.error('_guild is' + _guild)

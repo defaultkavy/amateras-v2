@@ -54,15 +54,12 @@ export class Lobby {
     async init() {
         
         try {
-            this.categoryChannel = <CategoryChannel> this.#_guild.get.channels.cache.get(this.#data.categoryChannel)
-            this.voiceChannel = <VoiceChannel> this.#_guild.get.channels.cache.get(this.#data.voiceChannel)
-            this.textChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#data.textChannel)
-            this.infoChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#data.infoChannel)
-            if (await this.voiceChannel.fetch().catch() && await this.textChannel.fetch().catch(() => undefined)) {
-                this.state = 'CLOSED'
-            }
-        } catch {
-            console.error(`Channel is deleted.`)
+            this.categoryChannel = <CategoryChannel> await this.#_guild.get.channels.fetch(this.#data.categoryChannel)
+            this.voiceChannel = <VoiceChannel> await this.#_guild.get.channels.fetch(this.#data.voiceChannel)
+            this.textChannel = <TextChannel> await this.#_guild.get.channels.fetch(this.#data.textChannel)
+            this.infoChannel = <TextChannel> await this.#_guild.get.channels.fetch(this.#data.infoChannel)
+            console.log(!!this.categoryChannel, !!this.voiceChannel, !!this.textChannel, !!this.infoChannel)
+        } catch(err) {
             this.state = 'CLOSED'
             await this.save()
             return 404

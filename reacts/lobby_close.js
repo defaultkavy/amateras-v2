@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function lobby_close(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            interact.deferReply({ ephemeral: true });
+            yield interact.deferReply({ ephemeral: true });
             if (!interact.guild)
                 return;
             const _guild = amateras.guilds.cache.get(interact.guild.id);
