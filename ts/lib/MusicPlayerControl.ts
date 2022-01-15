@@ -49,7 +49,7 @@ export class MusicPlayerControl {
         this.#player.prevQueue.unshift(endTrack)
         this.#player.state = 'CHANGING'
         if (this.#player.audioPlayer) {
-            if (this.#player.audioPlayer.state.status === 'idle') {
+            if (this.#player.audioPlayer.state.status === 'idle' || this.#player.audioPlayer.state.status === AudioPlayerStatus.Paused) {
                 this.play()
             } else {
                 this.#player.audioPlayer.stop()
@@ -71,9 +71,11 @@ export class MusicPlayerControl {
         this.#player.queue.unshift(prevTrack)
         this.#player.state = 'CHANGING'
         if (this.#player.audioPlayer) {
-            this.#player.audioPlayer.stop()
-        } else {
-            this.play()
+            if (this.#player.audioPlayer.state.status === 'idle' || this.#player.audioPlayer.state.status === AudioPlayerStatus.Paused) {
+                this.play()
+            } else {
+                this.#player.audioPlayer.stop()
+            }
         }
         // Listener
     }
