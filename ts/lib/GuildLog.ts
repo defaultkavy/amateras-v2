@@ -47,7 +47,7 @@ export class GuildLog {
             const member = await this.#_guild.get.members.fetch(this.#amateras.id).catch(() => undefined)
             const lang = this.#_guild.lang
             const embed: MessageEmbedOptions = {
-                title: this.#amateras.ready ? _system_.sleeping[lang] : _system_.sleeping[lang],
+                title: this.#amateras.ready ? _system_.serving[lang] : _system_.sleeping[lang],
                 description: _log_init_.description[lang],
                 color: this.#amateras.ready ? 'GREEN' : 'GREY',
                 fields: [
