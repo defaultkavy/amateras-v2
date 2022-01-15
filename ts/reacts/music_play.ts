@@ -31,5 +31,4 @@ export default async function music_play(interact: ButtonInteraction, amateras: 
         await _guild.musicPlayer.control.resume()
         _guild.musicPlayer.notify.push(player, _music_button_.resume[lang], 3000)
     }
-    console.debug(_guild.musicPlayer.state)
 }

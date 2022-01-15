@@ -43,7 +43,6 @@ function music_play(interact, amateras) {
             yield _guild.musicPlayer.control.resume();
             _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.resume[lang], 3000);
         }
-        console.debug(_guild.musicPlayer.state);
     });
 }
 exports.default = music_play;
