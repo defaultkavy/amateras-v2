@@ -3,7 +3,7 @@ import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { cloneObj, timestampDate } from "./terminal";
 import { _Guild, _GuildData } from "./_Guild";
-import { log_init } from '../lang.json'
+import { _log_init_, _system_ } from '../lang.json'
 
 export class GuildLog {
     readonly #amateras: Amateras;
@@ -47,22 +47,22 @@ export class GuildLog {
             const member = await this.#_guild.get.members.fetch(this.#amateras.id).catch(() => undefined)
             const lang = this.#_guild.lang
             const embed: MessageEmbedOptions = {
-                title: this.#amateras.ready ? log_init.sleeping[lang] : log_init.sleeping[lang],
-                description: log_init.description[lang],
+                title: this.#amateras.ready ? _system_.sleeping[lang] : _system_.sleeping[lang],
+                description: _log_init_.description[lang],
                 color: this.#amateras.ready ? 'GREEN' : 'GREY',
                 fields: [
                     {
-                        name: log_init.join_date[lang],
+                        name: _log_init_.join_date[lang],
                         value: member ? member.joinedTimestamp ? timestampDate(member.joinedTimestamp) : '-' : '-',
                         inline: true
                     },
                     {
-                        name: log_init.start_time[lang],
+                        name: _log_init_.start_time[lang],
                         value: `${timestampDate(this.#amateras.system.uptime)}`,
                         inline: true
                     },
                     {
-                        name: log_init.logs[lang],
+                        name: _log_init_.logs[lang],
                         value: `\`\`\`py\n${this.lastLog ? this.lastLog : '-'}\`\`\``
                     }
                 ]
@@ -73,8 +73,8 @@ export class GuildLog {
 
     private async fetchMessage() {
         const data = this.#data ? this.#data.message : undefined
-        const messageFetch = () => data ? this.channel ? this.channel.messages.fetch(data).catch(() => undefined) : undefined : undefined
-        return data ? messageFetch() : undefined
+        const messageFetch = async () => data ? this.channel ? await this.channel.messages.fetch(data).catch(() => undefined) : undefined : undefined
+        return data ? await messageFetch() : undefined
     }
 
     private async fetchChannel() {
@@ -103,9 +103,9 @@ export class GuildLog {
 
     private async fetchLog() {
         const data = this.#data ? this.#data.logMessage : undefined
-        const messageFetch = () => data && this.thread ? this.thread.messages.fetch(data).catch(() => this.newMessage()) : this.newMessage()
-        const messageCheck = async () => this.logMessage ? await this.logMessage.fetch().catch(() => undefined) ? this.newMessage() : this.logMessage : messageFetch()
-        return this.thread ? messageCheck() : undefined
+        const messageFetch = async () => data && this.thread ? await this.thread.messages.fetch(data).catch(() => this.newMessage()) : undefined
+        const messageCheck = async () => this.logMessage ? await this.logMessage.fetch().catch(() => this.newMessage()) : await messageFetch()
+        return this.thread ? await messageCheck() : undefined
     }
 
     /**

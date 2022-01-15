@@ -17,6 +17,7 @@ import { System } from './System';
 import { CommandManager } from './CommandManager';
 import { MusicManager } from './MusicManager';
 const { system } = require('../bot_config.json')
+import { _system_ } from '../lang.json' 
 
 // This is Bot Object, collect all the bot informations.
 export default class Amateras {
@@ -87,7 +88,7 @@ export default class Amateras {
         for (const _guild of this.guilds.cache.values()) {
             _guild.musicPlayer.control.stop()
         }
-        this.log.send('天照已休眠！', true)
+        this.log.sysSend(_system_.sleep)
     }
     
     wake() {
@@ -95,7 +96,7 @@ export default class Amateras {
         for (const _guild of this.guilds.cache.values()) {
             _guild.musicPlayer.update()
         }
-        this.log.send('天照已上线！', true)
+        this.log.sysSend(_system_.wake)
     }
 
     private eventHandler() {

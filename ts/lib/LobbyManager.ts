@@ -7,6 +7,7 @@ import { cloneObj, removeArrayItem } from "./terminal";
 import { _Channel } from "./_Channel";
 import { _Guild } from "./_Guild";
 import { _TextChannel } from "./_TextChannel";
+import { _lobby_init_ } from '../lang.json'
 
 export class LobbyManager {
     #amateras: Amateras;
@@ -240,13 +241,14 @@ export class LobbyManager {
 
     private async sendInitMessage() {
         if (!this.channel) return 101
+        const lang = this.#_guild.lang
         const embed = this.initEmbed()
         const create_button = new MessageButton
-        create_button.label = '创建房间'
+        create_button.label = _lobby_init_.lobby_create[lang]
         create_button.customId = '#lobby_create'
         create_button.style = 'PRIMARY'
         const close_button = new MessageButton
-        close_button.label = '关闭房间'
+        close_button.label = _lobby_init_.lobby_close[lang]
         close_button.customId = '#lobby_close'
         close_button.style = 'DANGER'
         const action = new MessageActionRow
@@ -258,7 +260,7 @@ export class LobbyManager {
             lobby_create: 'lobby_create',
             lobby_close: 'lobby_close'
         })
-        this.thread = await this.message.startThread({name: `房间列表`, autoArchiveDuration: 60})
+        this.thread = await this.message.startThread({name: _lobby_init_.lobby_thread[lang], autoArchiveDuration: 60})
 
     }
 
@@ -270,12 +272,13 @@ export class LobbyManager {
     }
 
     private initEmbed() {
+        const lang = this.#_guild.lang
         const embed: MessageEmbedOptions = {
-            title: '创建你的房间，和好友一起联动',
-            description: '点击下方按钮，将会立即创建一个只对你可见的文字频道和语音频道！\n创建后便可以邀请朋友加入啦！',
+            title: _lobby_init_.title[lang],
+            description: _lobby_init_.description[lang],
             fields: [
                 {
-                    name: '当前已创建的房间',
+                    name: _lobby_init_.room_count[lang],
                     value: this.cache.size + '个'
                 }
             ]

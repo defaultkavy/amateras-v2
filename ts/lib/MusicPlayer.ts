@@ -1,4 +1,4 @@
-import { AudioPlayer, AudioPlayerState, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { Message, MessageActionRow, MessageEmbedOptions, MessageOptions, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import { Collection } from "mongodb";
 import ytdl from "ytdl-core";
@@ -11,7 +11,7 @@ import { cloneObj } from "./terminal";
 import { PlayerMusic } from "./PlayerMusic";
 import { MusicPlayerControl } from "./MusicPlayerControl";
 import { MusicPlayerNotify } from "./MusicPlayerNotify";
-import { unit, music_message, log_init } from '../lang.json'
+import { _unit_, _music_message_, _log_init_, _system_ } from '../lang.json'
 
 export class MusicPlayer {
     #amateras: Amateras;
@@ -120,11 +120,11 @@ export class MusicPlayer {
             if (this.queue[0] && !this.queue[0].music.updated) {
                 embed = {
                     author: {
-                        name: music_message.app_name[lang] // 天照音乐
+                        name: _music_message_.app_name[lang] // 天照音乐
                     },
                     color: 'NAVY',
-                    title: music_message.loading[lang], // 加载中
-                    description: music_message.app_hint[lang] // 在此频道发送 YouTube Music 链接即可播放音乐
+                    title: _music_message_.loading[lang], // 加载中
+                    description: _music_message_.app_hint[lang] // 在此频道发送 YouTube Music 链接即可播放音乐
                 }
             } else if (this.queue[0] && this.audioPlayer) {
                 const music = this.queue[0].music
@@ -137,7 +137,7 @@ export class MusicPlayer {
                     color: this.state === 'PLAYING' ? 'GREEN' : this.state === 'PAUSE' ? 'DARKER_GREY' : 'DARK_BUT_NOT_BLACK',
                     title: music.title,
                     url: music.url,
-                    description: `${this.queue[0].player.mention()} ${music_message.play_song[lang]}`, // 点了这首歌
+                    description: `${this.queue[0].player.mention()} ${_music_message_.play_song[lang]}`, // 点了这首歌
                     image: {
                         height: music.thumbnail ? music.thumbnail.height : undefined,
                         width: music.thumbnail ? music.thumbnail.width : undefined,
@@ -145,23 +145,23 @@ export class MusicPlayer {
                     },
                     fields: [
                         {
-                            name: `${music_message.system_played[lang]} ${music.plays} ${unit.times[lang]}`, // 天照已播放过这首歌
-                            value: `${music.players} ${music_message.user_played[lang]}`,
+                            name: `${_music_message_.system_played[lang]} ${music.plays} ${_unit_.times[lang]}`, // 天照已播放过这首歌
+                            value: `${music.players} ${_music_message_.user_played[lang]}`,
                             inline: false
                         },
                         {
-                            name: music_message.likes[lang],
-                            value: `${music.likes.length} ${unit.persons[lang]}`,
+                            name: _music_message_.likes[lang],
+                            value: `${music.likes.length} ${_unit_.persons[lang]}`,
                             inline: true
                         },
                         {
-                            name: music_message.unlikes[lang],
-                            value: `${music.dislikes.length} ${unit.persons[lang]}`,
+                            name: _music_message_.unlikes[lang],
+                            value: `${music.dislikes.length} ${_unit_.persons[lang]}`,
                             inline: true
                         },
                         {
-                            name: music_message.player_status[lang],
-                            value: `${this.state === 'PLAYING' ? '▶️' : '⏸️'} ${this.repeatState === 'ALL' ? '🔁' : this.repeatState === 'ONE' ? '🔂' : ''} - ${this.repeatState === 'ALL' ? this.queue.length + this.prevQueue.length : this.queue.length} ${music_message.in_queue[lang]}`,
+                            name: _music_message_.player_status[lang],
+                            value: `${this.state === 'PLAYING' ? '▶️' : '⏸️'} ${this.repeatState === 'ALL' ? '🔁' : this.repeatState === 'ONE' ? '🔂' : ''} - ${this.repeatState === 'ALL' ? this.queue.length + this.prevQueue.length : this.queue.length} ${_music_message_.in_queue[lang]}`,
                             inline: true
                         }
                     ]
@@ -170,11 +170,11 @@ export class MusicPlayer {
             } else {
                 embed = {
                     author: {
-                        name: music_message.app_name[lang]
+                        name: _music_message_.app_name[lang]
                     },
                     color: 'DARK_BUT_NOT_BLACK',
-                    title: this.#amateras.ready ? music_message.empty_queue[lang] : log_init.sleeping[lang], // 没有播放的曲目
-                    description: music_message.app_hint[lang]
+                    title: this.#amateras.ready ? _music_message_.empty_queue[lang] : _system_.sleeping[lang], // 没有播放的曲目
+                    description: _music_message_.app_hint[lang]
                 }
             }
             return embed
@@ -183,21 +183,21 @@ export class MusicPlayer {
         function components(this: MusicPlayer) {
             const actionRow1 = new MessageActionRow
             actionRow1.addComponents({
-                label: music_message.player_play[lang],
+                label: _music_message_.player_play[lang],
                 style: `PRIMARY`,
                 customId: `music_play`,
                 disabled: this.state === 'PLAYING' ? true : false,
                 type: 'BUTTON'
             })
             actionRow1.addComponents({
-                label: music_message.player_pause[lang],
+                label: _music_message_.player_pause[lang],
                 style: `SECONDARY`,
                 customId: `music_pause`,
                 disabled: this.state === 'STOPPED' ? true : false,
                 type: 'BUTTON'
             })
             actionRow1.addComponents({
-                label: music_message.player_stop[lang],
+                label: _music_message_.player_stop[lang],
                 style: `SECONDARY`,
                 customId: `music_stop`,
                 disabled: this.state === 'STOPPED' ? true : false,
@@ -213,21 +213,21 @@ export class MusicPlayer {
             })
             const actionRow2 = new MessageActionRow
             actionRow2.addComponents({
-                label: music_message.player_prev[lang],
+                label: _music_message_.player_prev[lang],
                 style: `SECONDARY`,
                 customId: `music_prev`,
                 disabled: this.repeatState === 'ALL' ? false : this.prevQueue[0] ? false : true,
                 type: 'BUTTON'
             })
             actionRow2.addComponents({
-                label: music_message.player_next[lang],
+                label: _music_message_.player_next[lang],
                 style: `SECONDARY`,
                 customId: `music_next`,
                 disabled: this.repeatState === 'ALL' ? false : this.queue[1] ? false : true,
                 type: 'BUTTON'
             })
             actionRow2.addComponents({
-                label: music_message.player_repeat[lang],
+                label: _music_message_.player_repeat[lang],
                 style: `SECONDARY`,
                 customId: `music_repeat`,
                 disabled: false,

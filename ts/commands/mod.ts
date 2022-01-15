@@ -2,7 +2,7 @@ import { CommandInteraction, TextChannel } from 'discord.js';
 import Amateras from '../lib/Amateras';
 import { equalOneOf } from '../lib/terminal';
 import { _TextChannel } from '../lib/_TextChannel';
-import { mod } from '../lang.json'
+import { _mod_ } from '../lang.json'
 
 export default execute
 async function execute(interaction: CommandInteraction, amateras: Amateras) {
@@ -420,8 +420,8 @@ async function execute(interaction: CommandInteraction, amateras: Amateras) {
                         const lang = subcmd1.value as 'zh-s' | 'en'
             
                         if (lang) {
-                            if (await _guild.setLanguage(lang) === 101) return interaction.reply({content: mod.lang_unchanged[lang]})
-                            interaction.reply({content: mod.lang_changed[lang], ephemeral: true})
+                            if (await _guild.setLanguage(lang) === 101) return interaction.reply({content: _mod_.lang_unchanged[lang]})
+                            interaction.reply({content: _mod_.lang_changed[lang], ephemeral: true})
                         } else {
                             interaction.reply({content: 'Error: value is undefined', ephemeral: true})
                         }

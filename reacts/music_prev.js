@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const lang_json_1 = require("../lang.json");
 function music_prev(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
@@ -19,16 +20,20 @@ function music_prev(interact, amateras) {
         const _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
+        const lang = _guild.lang;
         const member = yield interact.guild.members.fetch(interact.user.id);
         if (!member)
             return;
         if (!member.voice.channel)
-            return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
-        if (_guild.musicPlayer.repeatState !== 'ALL' && !_guild.musicPlayer.prevQueue[0])
-            return interact.reply({ content: `这已经是第一首曲目`, ephemeral: true });
+            return interact.reply({ content: lang_json_1._music_button_.not_in_voice[lang], ephemeral: true });
+        if (_guild.musicPlayer.repeatState !== 'ALL' && !_guild.musicPlayer.prevQueue[0]) {
+            interact.deferUpdate();
+            _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.no_prev[lang], 3000);
+            return;
+        }
         interact.deferUpdate();
         _guild.musicPlayer.control.prev();
-        _guild.musicPlayer.notify.push(player, `上一首`, 3000);
+        _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.prev[lang], 3000);
     });
 }
 exports.default = music_prev;

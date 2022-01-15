@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const lang_json_1 = require("../lang.json");
 function music_stop(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
@@ -19,16 +20,17 @@ function music_stop(interact, amateras) {
         const _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
+        const lang = _guild.lang;
         const member = yield interact.guild.members.fetch(interact.user.id);
         if (!member)
             return;
         if (!member.voice.channel)
-            return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
+            return interact.reply({ content: lang_json_1._music_button_.not_in_voice[lang], ephemeral: true });
         if (_guild.musicPlayer.state === 'STOPPED')
-            return interact.reply({ content: `已停止`, ephemeral: true });
+            return interact.reply({ content: lang_json_1._music_button_.is_stoped[lang], ephemeral: true });
         interact.deferUpdate();
         yield _guild.musicPlayer.control.stop();
-        _guild.musicPlayer.notify.push(player, `停止播放`, 3000);
+        _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.stop[lang], 3000);
     });
 }
 exports.default = music_stop;

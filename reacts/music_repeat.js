@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const lang_json_1 = require("../lang.json");
 function music_repeat(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
@@ -19,21 +20,22 @@ function music_repeat(interact, amateras) {
         const _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
+        const lang = _guild.lang;
         const member = yield interact.guild.members.fetch(interact.user.id);
         if (!member)
             return;
         if (!member.voice.channel)
-            return interact.reply({ content: `你必须在一个语音频道内`, ephemeral: true });
+            return interact.reply({ content: lang_json_1._music_button_.not_in_voice[lang], ephemeral: true });
         const result = _guild.musicPlayer.control.repeat();
         interact.deferUpdate();
         if (result === 'ALL') {
-            _guild.musicPlayer.notify.push(player, `曲列循环`, 3000);
+            _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.repeat_all[lang], 3000);
         }
         else if (result === 'ONE') {
-            _guild.musicPlayer.notify.push(player, `单曲循环`, 3000);
+            _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.repeat_one[lang], 3000);
         }
         else {
-            _guild.musicPlayer.notify.push(player, `关闭循环`, 3000);
+            _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.repeat_off[lang], 3000);
         }
     });
 }

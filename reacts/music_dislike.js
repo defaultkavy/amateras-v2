@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const lang_json_1 = require("../lang.json");
 function music_dislike(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = yield amateras.players.fetch(interact.user.id);
@@ -19,19 +20,20 @@ function music_dislike(interact, amateras) {
         const _guild = amateras.guilds.cache.get(interact.guild.id);
         if (!_guild)
             return;
+        const lang = _guild.lang;
         const current = _guild.musicPlayer.queue[0];
         if (!current)
-            return interact.reply({ content: `操作无效`, ephemeral: true });
+            return;
         const playerMusic = yield player.musics.add(current.music);
         const result = yield playerMusic.setDislike();
         interact.deferUpdate();
         if (result === 100) {
-            _guild.musicPlayer.notify.push(player, '加入了黑名单', 3000);
+            _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.add_dislike[lang], 3000);
             return;
         }
         else {
             playerMusic.unsetDislike();
-            _guild.musicPlayer.notify.push(player, '从黑名单中移除', 3000);
+            _guild.musicPlayer.notify.push(player, lang_json_1._music_button_.remove_dislike[lang], 3000);
         }
     });
 }

@@ -1,17 +1,21 @@
 {
-    "unit": {
+    "_unit_": {
         "persons": "人",
         "times": "次"
     },
-    "log_init": {
+    "_system_": {
         "serving": "天照正在服务中",
         "sleeping": "天照休眠中",
+        "sleep": "天照已休眠！",
+        "wake": "天照已上线！"
+    },
+    "_log_init_": {
         "description": "欢迎使用天照 BOT，输入 / 能够查看所有请求指令。",
         "join_date": "加入伺服器的时间",
         "start_time": "本次开机时间",
         "logs": "消息记录"
     },
-    "music_message": {
+    "_music_message_": {
         "app_name": "天照音乐",
         "loading": "加载中",
         "app_hint": "在此频道发送 YouTube Music 链接即可播放音乐",
@@ -30,8 +34,48 @@
         "player_next": "下首",
         "player_repeat": "循环"
     },
-    "mod": {
+    "_music_button_": {
+        "is_playing": "正在播放中",
+        "not_in_voice": "你必须在一个语音频道内",
+        "shuffle": "随机播放",
+        "resume": "继续播放",
+        "prev": "上一首",
+        "no_prev": "这已经是第一首曲目",
+        "repeat_all": "曲列循环",
+        "repeat_one": "单曲循环",
+        "repeat_off": "关闭循环",
+        "is_stoped": "已停止",
+        "stop": "停止播放",
+        "pause": "暂停",
+        "next": "下一首",
+        "no_next": "没有下一首了",
+        "add_like": "加入了喜欢",
+        "remove_like": "从喜欢中移除",
+        "add_dislike": "加入了不喜欢",
+        "remove_dislike": "从不喜欢中移除"
+    },
+    "_lobby_init_": {
+        "title": "创建你的房间",
+        "description": "点击下方按钮，将会立即创建一个只对你可见的文字频道和语音频道！\n创建后便可以邀请朋友加入啦！",
+        "room_count": "当前已创建的房间",
+        "lobby_create": "创建房间",
+        "lobby_close": "关闭房间",
+        "lobby_thread": "房间列表"
+    },
+    "_reward_": {
+        "get_reward": "获得奖励"
+    },
+    "_command_err_": {
+        "param_empty": "请输入参数"
+    },
+    "_mod_": {
         "lang_changed": "语言已更换",
         "lang_unchanged": "语言保持设定"
+    },
+    "_coin_": {
+        "transfer": "汇给",
+        "err_same_acc": "对象不能是同样的账户",
+        "err_balances_exceed": "你的资产余额不足:",
+        "err_number": "请输入有效数字"
     }
 }

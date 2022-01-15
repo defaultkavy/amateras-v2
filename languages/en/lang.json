@@ -1,17 +1,21 @@
 {
-    "unit": {
+    "_unit_": {
         "persons": "persons",
         "times": "times"
     },
-    "log_init": {
+    "_system_": {
         "serving": "Amateras is online.",
         "sleeping": "Amateras is offline",
+        "sleep": "Amateras offline!",
+        "wake": "Amateras online!"
+    },
+    "_log_init_": {
         "description": "Welcome to using Amateras Bot, type '/' to check all commands.",
         "join_date": "Joined at",
         "start_time": "Server started at",
         "logs": "Logs"
     },
-    "music_message": {
+    "_music_message_": {
         "app_name": "Amateras Music",
         "loading": "Loading music...",
         "app_hint": "Send YouTube Music link in this channel to play music",
@@ -28,10 +32,50 @@
         "player_stop": "Stop",
         "player_prev": "Prev",
         "player_next": "Next",
-        "player_repeat": "Repeat"
+        "player_repeat": "Loop"
     },
-    "mod": {
+    "_music_button_": {
+        "is_playing": "Player is playing",
+        "not_in_voice": "You must join a voice channel",
+        "shuffle": "Shuffle",
+        "resume": "Resume",
+        "prev": "Previous song",
+        "no_prev": "This is the first song in queue",
+        "repeat_all": "Loop queue",
+        "repeat_one": "Loop single song",
+        "repeat_off": "Loop closed",
+        "is_stoped": "Player is stopped",
+        "stop": "Stop",
+        "pause": "Pause",
+        "next": "Next song",
+        "no_next": "This is the last song in queue",
+        "add_like": "Add to like list",
+        "remove_like": "Remove from like list",
+        "add_dislike": "Add to dislike list",
+        "remove_dislike": "Remove from dislike list"
+    },
+    "_lobby_init_": {
+        "title": "Create your lobby",
+        "description": "Click the button to create the lobby that only you can access.\nYou can invite others to your lobby after created.",
+        "room_count": "Created Lobbies",
+        "lobby_create": "Create Lobby",
+        "lobby_close": "Close Lobby",
+        "lobby_thread": "Lobby list"
+    },
+    "_reward_": {
+        "get_reward": "get reward"
+    },
+    "_command_err_": {
+        "param_empty": "Please fill in parameters"
+    },
+    "_mod_": {
         "lang_changed": "Language changed",
         "lang_unchanged": "Language keep same"
+    },
+    "_coin_": {
+        "transfer": "transfer to",
+        "err_same_acc": "You cannot send to yourself",
+        "err_balances_exceed": "Your balances is exceed:",
+        "err_number": "Numbers not valid"
     }
 }

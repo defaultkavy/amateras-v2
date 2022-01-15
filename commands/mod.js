@@ -491,8 +491,8 @@ function execute(interaction, amateras) {
                             const lang = subcmd1.value;
                             if (lang) {
                                 if ((yield _guild.setLanguage(lang)) === 101)
-                                    return interaction.reply({ content: lang_json_1.mod.lang_unchanged[lang] });
-                                interaction.reply({ content: lang_json_1.mod.lang_changed[lang], ephemeral: true });
+                                    return interaction.reply({ content: lang_json_1._mod_.lang_unchanged[lang] });
+                                interaction.reply({ content: lang_json_1._mod_.lang_changed[lang], ephemeral: true });
                             }
                             else {
                                 interaction.reply({ content: 'Error: value is undefined', ephemeral: true });

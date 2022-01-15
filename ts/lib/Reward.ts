@@ -2,6 +2,7 @@ import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Player } from "./Player";
 import { cloneObj, idGenerator } from "./terminal";
+import { _reward_ } from '../lang.json'
 
 export class Reward {
     #amateras: Amateras;
@@ -54,7 +55,7 @@ export class Reward {
             this.count = 0
             this.times += 1
             await this.#amateras.me.wallets[0].transfer(this.owner.wallets[0].id, this.pay, `Reward complete: ${ this.name }`, true)
-            this.#amateras.log.send(`${await this.#amateras.log.name(this.owner.id)} 获得奖励 ${this.pay}G`)
+            this.#amateras.log.send(`${await this.#amateras.log.name(this.owner.id)} `, _reward_.get_reward, ` ${this.pay}G`)
         }
         await this.save()
     }
