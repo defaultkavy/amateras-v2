@@ -14,7 +14,7 @@ module.exports = {
             if (_guild.roles.defaultRoles.size > 0) {
                 for (const _role of _guild.roles.defaultRoles.values()) {
                     try {
-                        if (!_role.get.deleted) member.roles.add(_role.get)
+                        if (await _role.fetch()) member.roles.add(_role.get)
                     } catch(err) {
                         console.error('Error: Member join set default role failed: \n' + err)
                     }

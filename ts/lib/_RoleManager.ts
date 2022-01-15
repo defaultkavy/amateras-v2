@@ -23,7 +23,7 @@ export class _RoleManager {
 
     async init() {
         for (const role of this.#_guild.get.roles.cache.values()) {
-            const _role = new _Role(role, this.#amateras)
+            const _role = new _Role(role, this.#_guild, this.#amateras)
             this.cache.set(role.id, _role)
             await _role.init()
         }
@@ -51,7 +51,7 @@ export class _RoleManager {
                 new Err(`Role fetch failed. (Role)${ id }`)
                 return 404 // Role not found
             }
-            const _role = new _Role(role, this.#amateras)
+            const _role = new _Role(role, this.#_guild, this.#amateras)
             this.cache.set(id, _role)
             await _role.init()
             return _role

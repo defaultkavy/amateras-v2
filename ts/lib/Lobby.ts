@@ -58,7 +58,7 @@ export class Lobby {
             this.voiceChannel = <VoiceChannel> this.#_guild.get.channels.cache.get(this.#data.voiceChannel)
             this.textChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#data.textChannel)
             this.infoChannel = <TextChannel> this.#_guild.get.channels.cache.get(this.#data.infoChannel)
-            if (this.voiceChannel.deleted && this.textChannel.deleted) {
+            if (await this.voiceChannel.fetch().catch() && await this.textChannel.fetch().catch(() => undefined)) {
                 this.state = 'CLOSED'
             }
         } catch {
@@ -150,22 +150,20 @@ export class Lobby {
 
     async close() {
         try {
-            if (this.textChannel && !this.textChannel.deleted) await this.textChannel.delete()
-            if (this.voiceChannel && !this.voiceChannel.deleted) await this.voiceChannel.delete()
-            if (this.infoChannel && !this.infoChannel.deleted) await this.infoChannel.delete()
+            if (this.textChannel) await this.textChannel.delete().catch()
+            if (this.voiceChannel) await this.voiceChannel.delete().catch()
+            if (this.infoChannel) await this.infoChannel.delete().catch()
             if (this.categoryChannel) {
                 if (this.categoryChannel.children.size !== 0) {
                     for (const channel of this.categoryChannel.children.values()) {
-                        if (!channel.deleted) await channel.delete()
+                        await channel.delete().catch()
                     }
                 }
-                if (!this.categoryChannel.deleted) {
-                await this.categoryChannel.delete()
-                }
+                await this.categoryChannel.delete().catch()
             }
         } catch(err) { 
             console.error('Lobby delete channel failed. Retry. \n' + err)
-            if (this.categoryChannel) await this.categoryChannel.delete()
+            if (this.categoryChannel) await this.categoryChannel.delete().catch()
         }
         this.state = 'CLOSED'
         if (this.lobbyMessage) this.lobbyMessage.delete().catch()
@@ -251,7 +249,7 @@ export class Lobby {
 
     async deleteMessage(id: string) {
         const _message = this.messages.get(id)
-        if (_message && !_message.get.deleted) await _message.get.delete()
+        if (_message) await _message.get.delete().catch()
         this.messages.delete(id)
     }
 

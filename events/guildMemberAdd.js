@@ -23,7 +23,7 @@ module.exports = {
                 if (_guild.roles.defaultRoles.size > 0) {
                     for (const _role of _guild.roles.defaultRoles.values()) {
                         try {
-                            if (!_role.get.deleted)
+                            if (yield _role.fetch())
                                 member.roles.add(_role.get);
                         }
                         catch (err) {

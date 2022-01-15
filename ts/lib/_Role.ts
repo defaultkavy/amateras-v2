@@ -2,14 +2,17 @@ import { Role } from "discord.js";
 import Amateras from "./Amateras";
 import { Player } from "./Player";
 import { V } from "./V";
+import { _Guild } from "./_Guild";
 
 export class _Role {
     #amateras: Amateras;
+    #_guild: _Guild;
     get: Role
     id: string;
     isDefaultRole: boolean;
-    constructor(role: Role, amateras: Amateras) {
+    constructor(role: Role, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
+        this.#_guild = _guild
         this.id = role.id
         this.get = role
         this.isDefaultRole = false
@@ -17,6 +20,15 @@ export class _Role {
 
     async init() {
         
+    }
+
+    async fetch() {
+        const fetch = await this.#_guild.get.roles.fetch(this.id).catch(() => undefined)
+        // If role deleted, unset default role automatic
+        if (!fetch) {
+            this.#_guild.roles.unsetDefaultRole(this.id)
+        }
+        return fetch
     }
 
     /**
