@@ -12,6 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 function profile_change_button(interact, amateras) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (!interact.guild)
+            return;
+        const _guild = amateras.guilds.cache.get(interact.guild.id);
+        if (!_guild)
+            return;
         const id = interact.message.embeds[0].footer.text;
         const player = yield amateras.players.fetch(id);
         if (player === 404)
@@ -29,9 +34,10 @@ function profile_change_button(interact, amateras) {
             button.customId = '#profile_change_button';
         }
         else if (message.embeds[0].author && message.embeds[0].author.name === 'VTuber') {
-            if (!(interact.member instanceof discord_js_1.GuildMember))
+            const member = yield _guild.member(id);
+            if (member === 404)
                 return;
-            embed = yield player.infoEmbed(interact.member);
+            embed = yield player.infoEmbed(member);
             button.label = '切换到 VTuber';
             button.style = 'PRIMARY';
             button.customId = '#profile_change_button';
