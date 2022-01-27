@@ -2,6 +2,9 @@ import { ButtonInteraction, Guild, GuildMember, MessageActionRow, MessageButton,
 import Amateras from "../lib/Amateras"
 
 export default async function profile_change_button(interact: ButtonInteraction, amateras: Amateras) {
+    if (!interact.guild) return
+    const _guild = amateras.guilds.cache.get(interact.guild.id)
+    if (!_guild) return
     const id = interact.message.embeds[0].footer!.text!
     const player = await amateras.players.fetch(id)
     if (player === 404) return
@@ -17,8 +20,9 @@ export default async function profile_change_button(interact: ButtonInteraction,
         button.style = 'PRIMARY'
         button.customId = '#profile_change_button'
     } else if (message.embeds[0].author && message.embeds[0].author.name === 'VTuber') {
-        if (!(interact.member instanceof GuildMember)) return
-        embed = await player.infoEmbed(interact.member)
+        const member = await _guild.member(id)
+        if (member === 404) return 
+        embed = await player.infoEmbed(member)
         button.label = '切换到 VTuber'
         button.style = 'PRIMARY'
         button.customId = '#profile_change_button'
