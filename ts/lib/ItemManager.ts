@@ -4,7 +4,7 @@ import { Item } from "./Item";
 
 export class ItemManager {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<ItemData>;
     cache: Map<string, Item>
 
     constructor(amateras: Amateras) {
@@ -14,7 +14,7 @@ export class ItemManager {
     }
 
     async fetch(id: string) {
-        const data = <ItemData>await this.#collection?.findOne({ id: id })
+        const data = await this.#collection?.findOne({ id: id })
         if (!data) {
             console.error(`Item "${id}" fetch failed.`)
             return

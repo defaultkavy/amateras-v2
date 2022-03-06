@@ -6,18 +6,18 @@ import { _Message } from "./_Message";
 
 export default class _MessageManager {
     #amateras: Amateras
-    #collection: Collection
+    #collection: Collection<MsgData>
     cache: Map<string, _Message>
     constructor(amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('messages')
+        this.#collection = amateras.db.collection<MsgData>('messages')
         this.cache = new Map
         
     }
 
     async fetch(msgId: string) {
         if (!msgId) return // Mission create will fetch msg with undefined string
-        const msgData = <MsgData>await this.#collection.findOne({ id: msgId })
+        const msgData = await this.#collection.findOne({ id: msgId })
         if (!msgData) return
         if (this.cache.has(msgId)) {
             return this.cache.get(msgId)

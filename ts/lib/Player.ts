@@ -90,7 +90,7 @@ export class Player {
         }
         if (!this.class) this.class = ['PLAYER']
         if (this.class.includes('VTUBER')) {
-            const vData = <VData>await this.#amateras.db.collection('v').findOne({id: this.id})
+            const vData = await this.#amateras.db.collection<VData>('v').findOne({id: this.id})
             if (vData) {
                 const v = await this.#amateras.players.v.fetch(this.id)
                 if (v instanceof V) {

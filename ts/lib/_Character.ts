@@ -5,7 +5,7 @@ import { checkImage, cloneObj, idGenerator, validURL } from "./terminal";
 
 export class _Character {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<_CharacterData>;
     id: string;
     name: string;
     description: string;
@@ -16,7 +16,7 @@ export class _Character {
 
     constructor(character: _CharacterData, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('characters')
+        this.#collection = amateras.db.collection<_CharacterData>('characters')
         this.id = character.id
         this.name = character.name
         this.description = character.description
@@ -31,7 +31,7 @@ export class _Character {
 
     }
 
-    static async createId(collection: Collection) {
+    static async createId(collection: Collection<_CharacterData>) {
         let found = false
         let newId = ''
         while (!found) {

@@ -6,7 +6,7 @@ import { checkImage, cloneObj, idGenerator, validURL } from "./terminal";
 
 export class Item {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<ItemData>;
     id: string;
     #creator: string;
     creator: Player;
@@ -20,7 +20,7 @@ export class Item {
     message: Message;
     constructor(itemData: ItemData, amateras: Amateras){
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('items')
+        this.#collection = amateras.db.collection<ItemData>('items')
         this.id = itemData.id
         this.#creator = itemData.creator
         this.creator = <Player>{}
@@ -67,7 +67,7 @@ export class Item {
         return { status: { success: true, message: 'saved.' }, mission: this}
     }
 
-    static async createId(collection: Collection) {
+    static async createId(collection: Collection<ItemData>) {
         let found = false
         let newId = ''
         while (!found) {

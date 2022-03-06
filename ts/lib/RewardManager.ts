@@ -4,12 +4,12 @@ import { Reward } from "./Reward";
 
 export class RewardManager {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<RewardData>;
     cache: Map<string, Reward>;
 
     constructor(amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('rewards')
+        this.#collection = amateras.db.collection<RewardData>('rewards')
         this.cache = new Map
     }
 
@@ -18,7 +18,7 @@ export class RewardManager {
         if (reward) {
             return reward
         }
-        const rewardData = <RewardData>await this.#collection.findOne({id: id})
+        const rewardData = await this.#collection.findOne({id: id})
         if (rewardData) {
             reward = new Reward(rewardData, this.#amateras)
             this.cache.set(id, reward)

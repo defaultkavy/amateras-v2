@@ -5,17 +5,17 @@ import { V } from "./V";
 
 export class VManager {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<VData>;
     cache: Map<string, V>;
     constructor(amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('v')
+        this.#collection = amateras.db.collection<VData>('v')
         this.cache = new Map()
     }
 
     async fetch(id: string) {
         const player = await this.#amateras.players.fetch(id)
-        const data = <VData>await this.#collection.findOne({id: id})
+        const data = await this.#collection.findOne({id: id})
         if (!data) {
             return 404 // V not found in Database
         } else if (player === 404) {

@@ -5,11 +5,11 @@ import { _Guild, _GuildData } from "./_Guild";
 
 export class _GuildManager {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<_GuildData>;
     cache: Map<string, _Guild>
     constructor(amateras: Amateras) {
         this.#amateras = amateras;
-        this.#collection = amateras.db.collection('guilds');
+        this.#collection = amateras.db.collection<_GuildData>('guilds');
         this.cache = new Map
     }
 
@@ -22,7 +22,7 @@ export class _GuildManager {
     }
 
     async create(guild: Guild) {
-        const _guildData = <_GuildData>await this.#collection.findOne({id: guild.id})
+        const _guildData = await this.#collection.findOne({id: guild.id})
         if (_guildData) {
             // Guild data exist
             const _guild = new _Guild(_guildData, guild, this, this.#amateras)

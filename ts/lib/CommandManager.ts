@@ -11,10 +11,10 @@ export class CommandManager {
     #commandsList: [];
     #commands?: {[key: string]: string};
     cache: Map<string, Command>
-    #collection: Collection;
+    #collection: Collection<CommandData>;
     constructor(amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('commands')
+        this.#collection = amateras.db.collection<CommandData>('commands')
         this.#commandsList = global_commands
         this.cache = new Map
     }
@@ -29,7 +29,7 @@ export class CommandManager {
         const appCommands = await this.#amateras.client.application!.commands.fetch()
         if (this.#commands) {
             for (const appCommand of appCommands) {
-                const data = <CommandData | null>await this.#collection.findOne({id: appCommand[0]})
+                const data = await this.#collection.findOne({id: appCommand[0]})
                 const command = new Command(data, appCommand[1], this.#amateras)
                 this.cache.set(appCommand[1].name, command)
                 await command.init()

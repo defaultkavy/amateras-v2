@@ -38,7 +38,7 @@ export class Reward {
         this.owner = player
     }
     
-    static async createId(collection: Collection) {
+    static async createId(collection: Collection<RewardData>) {
         let found = false
         let newId = ''
         while (!found) {

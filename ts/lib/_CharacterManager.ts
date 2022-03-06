@@ -4,12 +4,11 @@ import { _Character } from "./_Character";
 
 export class _CharacterManager {
     #amateras: Amateras;
-    #collection: Collection;
     cache: Map<string, _Character>
-
+    #collection: Collection<_CharacterData>;
     constructor(amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('characters')
+        this.#collection = amateras.db.collection<_CharacterData>('characters')
         this.cache = new Map()
     }
 
@@ -18,7 +17,7 @@ export class _CharacterManager {
         if (character) {
             return character
         }
-        const data = <_CharacterData>await this.#collection.findOne({id: id})
+        const data = await this.#collection.findOne({id: id})
         if (data) {
             const character = new _Character(data, this.#amateras)
             this.cache.set(id, character)

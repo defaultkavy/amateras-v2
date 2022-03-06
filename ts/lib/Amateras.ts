@@ -111,29 +111,4 @@ export default class Amateras {
             }
         }
     }
-
-    private setTimer() {
-        const time = new Date()
-        const now = new Date()
-        time.setDate(time.getDate() + 1)
-        time.setHours(0,0,0,0)
-
-        const expiredMission = async () => {
-            if (!this.db) return
-            const collection = this.db?.collection('mission_expire')
-            const doc = <MissionDateData> (await collection.find({ expire_date: time }).toArray())[0]
-            if (!doc) return
-            for (const missionId of doc.missions) {
-                const mission = await this.missions?.fetch(missionId)
-                if (mission) {
-                    if (mission.enable) mission.setMessageButtonExpire()
-                } else {
-                    console.error(`Mission "${missionId}" fetch failed. (Amateras.js)`)
-                    return
-                }
-            }
-        }
-        
-        setTimeout(expiredMission.bind(this), time.getTime() - now.getTime())
-    }
 }

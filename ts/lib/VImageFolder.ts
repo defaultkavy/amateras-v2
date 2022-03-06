@@ -6,7 +6,7 @@ import { VImageFolderManager } from "./VImageFolderManager";
 
 export class VImageFolder {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<VImageData>;
     #images: string[]
     images: Map<string, VImage>
     id: string;
@@ -14,7 +14,7 @@ export class VImageFolder {
     manager: VImageFolderManager;
     constructor(data: VImageFolderData, manager: VImageFolderManager, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('v_images')
+        this.#collection = amateras.db.collection<VImageData>('v_images')
         this.#images = data.images
         this.images = new Map
         this.id = data.id
@@ -24,7 +24,7 @@ export class VImageFolder {
 
     async init() {
         for (const imageId of this.#images) {
-            const imageData = <VImageData>await this.#collection.findOne({id: imageId})
+            const imageData = await this.#collection.findOne({id: imageId})
             if (imageData) {
                 const image = new VImage(imageData, this.#amateras)
                 this.images.set(imageId, image)

@@ -1,3 +1,4 @@
+import { WithId } from "mongodb";
 import Amateras from "./Amateras";
 import { Player, PlayerData } from "./Player";
 import { VManager } from "./VManager";
@@ -22,12 +23,12 @@ export class PlayerManager {
         if (cache) {
             return cache
         }
-        const collection = this.#amateras.db!.collection('player')
-        let playerData = await collection.findOne({ id: id })
+        const collection = this.#amateras.db.collection<PlayerData>('player')
+        let playerData: PlayerData | WithId<PlayerData> | null = await collection.findOne({ id: id })
         if (!playerData) {
             playerData = { id: id }
         }
-        const player = new Player(<PlayerData>playerData, this.#amateras)
+        const player = new Player(playerData, this.#amateras)
         this.cache.set(id, player)
         if (await player.init() === 404) {
             this.cache.delete(id)

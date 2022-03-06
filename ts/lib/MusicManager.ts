@@ -5,11 +5,11 @@ import { Music, MusicData } from "./Music";
 
 export class MusicManager {
     #amateras: Amateras;
-    #collection: Collection
+    #collection: Collection<MusicData>
     cache: Map<string, Music>
     constructor(amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('music')
+        this.#collection = amateras.db.collection<MusicData>('music')
         this.cache = new Map
     }
 
@@ -23,7 +23,7 @@ export class MusicManager {
     async fetch(id: string) {
         const get = this.cache.get(id)
         if (get) return get
-        const data = <MusicData>await this.#collection.findOne({id: id})
+        const data = await this.#collection.findOne({id: id})
         if (data) {
             const music = new Music(data, this.#amateras)
             this.cache.set(id, music)

@@ -14,7 +14,7 @@ export class VImage {
         this.url = data.url
     }
     
-    static async createId(collection: Collection) {
+    static async createId(collection: Collection<VImageData>) {
         let found = false
         let newId = ''
         while (!found) {

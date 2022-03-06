@@ -6,7 +6,7 @@ import { cloneObj } from "./terminal";
 
 export default class MissionManager {
     #amateras: Amateras
-    #collection: Collection | undefined
+    #collection: Collection<MissionData> | undefined
     #missionDate?: Collection;
     cache: Map<string, Mission>
     constructor(amateras: Amateras) {
@@ -21,7 +21,7 @@ export default class MissionManager {
      * @param missionId The target mission ID.
      */
     async fetch(missionId: string): Promise<Mission | undefined> {
-        const missionData = <MissionData>await this.#collection?.findOne({ id: missionId })
+        const missionData = await this.#collection?.findOne({ id: missionId })
         if (!missionData) {
             console.error(`Mission "${missionId}" fetch failed. (MissionManager.js)`)
             return
@@ -81,7 +81,7 @@ export default class MissionManager {
     }
 
     private async saveMissionDate(mission: Mission) {
-        const find = <MissionDateData>await this.#missionDate?.findOne({ expire_date: mission.expire })
+        const find = await this.#missionDate?.findOne({ expire_date: mission.expire })
         if (!find) {
             this.#missionDate?.insertOne({expire_date: mission.expire, missions: [mission.id]})
         } else {

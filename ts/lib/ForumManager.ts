@@ -8,13 +8,13 @@ import { _Guild } from "./_Guild";
 
 export class ForumManager {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<ForumData>;
     #forums?: string[];
     cache: Map<string, Forum>;
     #_guild: _Guild;
     constructor(data: ForumManagerData | undefined, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('forums')
+        this.#collection = amateras.db.collection<ForumData>('forums')
         this.#_guild = _guild
         this.#forums = data ? data.list : undefined
         this.cache = new Map()
@@ -23,7 +23,7 @@ export class ForumManager {
     async init() {
         if (this.#forums && this.#forums.length > 0) {
             for (const forumId of this.#forums) {
-                const forumData = <ForumData>await this.#collection.findOne({id: forumId})
+                const forumData = await this.#collection.findOne({id: forumId})
                 if (forumData && forumData.state === 'OPEN') {
                     const forum = new Forum(forumData, this.#_guild, this, this.#amateras)
                     this.cache.set(forumId, forum)

@@ -1,9 +1,10 @@
+import { Collection } from "mongodb"
 import Amateras from "./Amateras"
 import Wallet from "./Wallet"
 
 export default class WalletManager {
     #amateras
-    #collection
+    #collection: Collection<WalletData>
     cache: Map<string, Wallet>
     constructor(amateras: Amateras) {
         this.#amateras = amateras
@@ -15,7 +16,7 @@ export default class WalletManager {
         if (wallet) {
             return wallet
         } else {
-            const walletData = <WalletData>await this.#collection.findOne({id: id})
+            const walletData = await this.#collection.findOne({id: id})
             if (walletData) {
                 const wallet = new Wallet(walletData, this.#amateras)
                 this.cache.set(wallet.id, wallet)

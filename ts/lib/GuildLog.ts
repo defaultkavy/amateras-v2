@@ -7,7 +7,7 @@ import { _log_init_, _system_ } from '../lang.json'
 
 export class GuildLog {
     readonly #amateras: Amateras;
-    readonly #collection: Collection;
+    readonly #collection: Collection<_GuildData>;
     readonly #_guild: _Guild;
     #data: LogData | undefined;
     channel?: TextChannel | NewsChannel;
@@ -19,7 +19,7 @@ export class GuildLog {
     isValid: () => this is Valid;
     constructor(data: LogData | undefined, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('guilds')
+        this.#collection = amateras.db.collection<_GuildData>('guilds')
         this.#_guild = _guild
         this.#data = data
         this.messageCount = data ? data.messageCount ? data.messageCount : 0 : 0
@@ -28,7 +28,7 @@ export class GuildLog {
     }
 
     async init() {
-        const data = <_GuildData>await this.#collection.findOne({id: this.#_guild.id})
+        const data = await this.#collection.findOne({id: this.#_guild.id})
         if (data) this.#data = data.log
         this.channel = await this.fetchChannel()
         this.message = await this.fetchMessage()

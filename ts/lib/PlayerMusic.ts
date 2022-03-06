@@ -13,7 +13,7 @@ export class PlayerMusic {
     player: Player;
     like: boolean;
     dislike: boolean;
-    constructor(data: PlayerMusicData, music: Music, amateras: Amateras) {
+    constructor(data: PlayerMusicObj, music: Music, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = amateras.db.collection('player_music')
         this.id = data.id
@@ -93,10 +93,18 @@ export class PlayerMusic {
     }
 }
 
-export interface PlayerMusicData {
+export interface PlayerMusicObj {
     id: string,
     counts: number,
     player: Player,
+    like: boolean
+    dislike: boolean
+}
+
+export interface PlayerMusicData {
+    id: string,
+    counts: number,
+    player: string,
     like: boolean
     dislike: boolean
 }

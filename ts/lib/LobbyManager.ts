@@ -11,7 +11,7 @@ import { _lobby_init_ } from '../lang.json'
 
 export class LobbyManager {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<LobbyData>;
     #_guild: _Guild;
     #data?: LobbyManagerData;
     channel?: TextChannel | NewsChannel;
@@ -23,7 +23,7 @@ export class LobbyManager {
     enabled: boolean
     constructor(data: LobbyManagerData | undefined, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('lobbies')
+        this.#collection = amateras.db.collection<LobbyData>('lobbies')
         this.#_guild = _guild
         this.#data = data
         this.cache = new Map
@@ -67,7 +67,7 @@ export class LobbyManager {
             }
             if (this.#data.lobbies && this.#data.lobbies[0]) {
                 for (const lobbyId of this.#data.lobbies) {
-                    const lobbyData = <LobbyData>await this.#collection.findOne({owner: lobbyId, state: "OPEN"})
+                    const lobbyData = await this.#collection.findOne({owner: lobbyId, state: "OPEN"})
                     if (lobbyData) {
                         const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
                         this.cache.set(lobbyId, lobby)
@@ -128,7 +128,7 @@ export class LobbyManager {
         } else if (lobby && lobby.state === 'CLOSED') {
             return 101
         }
-        const lobbyData = <LobbyData>await this.#collection.findOne({owner: id, state: "OPEN", guild: this.#_guild.id})
+        const lobbyData = await this.#collection.findOne({owner: id, state: "OPEN", guild: this.#_guild.id})
         if (lobbyData) {
             const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
             this.cache.set(id, lobby)
@@ -145,7 +145,7 @@ export class LobbyManager {
         } else if (lobby && lobby.state === 'CLOSED') {
             return
         }
-        let lobbyData = <LobbyData>await this.#collection.findOne({categoryChannel: id, state: "OPEN", guild: this.#_guild.id})
+        let lobbyData = await this.#collection.findOne({categoryChannel: id, state: "OPEN", guild: this.#_guild.id})
         if (lobbyData) {
             const lobby = new Lobby(lobbyData, this.#_guild, this, this.#amateras)
             this.cache.set(lobby.owner.id, lobby)

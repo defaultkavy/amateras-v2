@@ -11,7 +11,7 @@ import { _Message } from "./_Message";
 
 export class Lobby {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<LobbyData>;
     #data: LobbyData
     #_guild: _Guild;
     categoryChannel?: CategoryChannel;
@@ -31,7 +31,7 @@ export class Lobby {
     lobbyMessage?: Message
     constructor(data: LobbyData, _guild: _Guild, manager: LobbyManager, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('lobbies')
+        this.#collection = amateras.db.collection<LobbyData>('lobbies')
         this.#data = data
         this.#_guild = _guild
         this.#owner = data.owner
@@ -136,7 +136,7 @@ export class Lobby {
         if (this.state !== 'CLOSED') for (const id of this.messages.keys()) {
             data.messages[id] = this.messages.get(id)!.id
         }
-        const lobby = <_GuildData>await this.#collection.findOne({ owner: this.owner.id, guild: this.#_guild.id } )
+        const lobby = await this.#collection.findOne({ owner: this.owner.id, guild: this.#_guild.id } )
         if (lobby) {
             await this.#collection.replaceOne({ owner: this.owner.id}, data)
         } else {

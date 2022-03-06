@@ -2,17 +2,18 @@ import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Music } from "./Music";
 import { Player } from "./Player";
-import { PlayerMusic, PlayerMusicData } from "./PlayerMusic";
+import { PlayerMusic, PlayerMusicData, PlayerMusicObj } from "./PlayerMusic";
+import { cloneObj } from "./terminal";
 
 export class PlayerMusicManager {
     #amateras: Amateras;
-    #collection: Collection;
+    #collection: Collection<PlayerMusicData>;
     #data?: PlayerMusicData[]
     player: Player;
     cache: Map<string, PlayerMusic>
     constructor(player: Player, amateras: Amateras) {
         this.#amateras = amateras
-        this.#collection = amateras.db.collection('player_music')
+        this.#collection = amateras.db.collection<PlayerMusicData>('player_music')
         this.player = player
         this.cache = new Map
     }
@@ -21,7 +22,7 @@ export class PlayerMusicManager {
         const cursor = this.#collection.find({player: this.player.id})
         const data = await cursor.toArray()
         if (data) {
-            this.#data = <PlayerMusicData[]>data
+            this.#data = data
         }
     }
 
@@ -30,10 +31,11 @@ export class PlayerMusicManager {
         if (get) return get
         const music = await this.#amateras.musics.fetch(id)
         if (music === 404) return 404 
-        const data = <PlayerMusicData>await this.#collection.findOne({id: id, player: this.player.id})
+        const data = await this.#collection.findOne({id: id, player: this.player.id})
         if (data) {
-            data.player = this.player
-            const playerMusic = new PlayerMusic(data, music, this.#amateras)
+            const obj: PlayerMusicObj = cloneObj(data)
+            obj.player = this.player
+            const playerMusic = new PlayerMusic(obj, music, this.#amateras)
             this.cache.set(id, playerMusic)
             await playerMusic.init()
             return playerMusic
@@ -48,14 +50,14 @@ export class PlayerMusicManager {
      */
     async create(music: Music) {
         if (this.cache.has(music.id)) return 101
-        const data: PlayerMusicData = {
+        const obj: PlayerMusicObj = {
             id: music.id,
             counts: 0,
             player: this.player,
             like: false,
             dislike: false
         }
-        const playerMusic = new PlayerMusic(data, music, this.#amateras)
+        const playerMusic = new PlayerMusic(obj, music, this.#amateras)
         this.cache.set(music.id, playerMusic)
         await playerMusic.init()
         await playerMusic.save()
