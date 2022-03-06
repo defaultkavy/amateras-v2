@@ -274,7 +274,7 @@ export class Lobby {
 
     lobbyMessageEmbed() {
         const embed: MessageEmbedOptions = {
-            description: `${this.owner.mention()} 的房间`,
+            description: `${this.owner.mention} 的房间`,
             thumbnail: {
                 url: this.owner.get ? this.owner.get.displayAvatarURL({format: "jpg", size: 512}) : undefined
             },

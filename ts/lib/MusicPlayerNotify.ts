@@ -18,7 +18,7 @@ export class MusicPlayerNotify {
     async init() {
         let description = ''
         for (const notification of this.notifications) {
-            description += `${notification.player.mention()} - ${notification.content}\n`
+            description += `${notification.player.mention} - ${notification.content}\n`
         }
         const embed: MessageEmbedOptions = {
             description: description,

@@ -444,7 +444,7 @@ export class Player {
         this.save()
     }
 
-    mention() {
+    get mention() {
         if (!this.get) return this.id
         let result: User | string = this.get
         if (!result) {

@@ -25,7 +25,7 @@ module.exports = {
                 const member = await _guild.member(player.id)
                 const _channel = _guild.channels.welcomeChannel
                     if (_channel instanceof _TextChannel && member instanceof GuildMember) {
-                    _channel.get.send({content: `${player.mention()} 欢迎加入`, embeds: [await player.infoEmbed(member)]})
+                    _channel.get.send({content: `${player.mention} 欢迎加入`, embeds: [await player.infoEmbed(member)]})
                 }
             }
         }

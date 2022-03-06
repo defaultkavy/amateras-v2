@@ -207,7 +207,7 @@ export class LobbyManager {
         // Lobby hint
         const embed: MessageEmbedOptions = {
             title: `欢迎`,
-            description: `这里是 ${lobby.owner.mention()} 的房间。\n这里只有房主和被房主邀请的对象以及伺服器管理员可见。房主能够自行创建更多的文字和语音频道，但是无法删除初始设定的三个频道。\n\n每当新的V成员加入房间时，${infoChannel} 将会更新成员的V身份资料，包含了简介、人物立绘、跳图链接等。`,
+            description: `这里是 ${lobby.owner.mention} 的房间。\n这里只有房主和被房主邀请的对象以及伺服器管理员可见。房主能够自行创建更多的文字和语音频道，但是无法删除初始设定的三个频道。\n\n每当新的V成员加入房间时，${infoChannel} 将会更新成员的V身份资料，包含了简介、人物立绘、跳图链接等。`,
             fields: [
                 {
                     name: `房主可使用的请求`,

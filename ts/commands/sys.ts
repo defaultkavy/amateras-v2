@@ -115,17 +115,17 @@ export default async function execute(interact: CommandInteraction, amateras: Am
                                 if (player === 404) return interact.followUp({content: `Error: Player fetch failed`})
                                 // Check parameter Enable filled / No -> followUp permission status
                                 if (enable === undefined) {
-                                    return interact.followUp({content: `${player.mention()} V 状态为 ${ player.v ? '开' : '关'}`, ephemeral: true})
+                                    return interact.followUp({content: `${player.mention} V 状态为 ${ player.v ? '开' : '关'}`, ephemeral: true})
                                 }
                                 // Check if permission not change
                                 if (enable) {
                                     const set = await player.setVTuber()
-                                    if (set === 101) return interact.followUp({content: `${player.mention()} VTuber 状态保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                                    if (set === 101) return interact.followUp({content: `${player.mention} VTuber 状态保持为：${enable ? '开' : '关'}`, ephemeral: true})
                                     if (set === 102) return interact.followUp({content: `Error: Player fetch failed`, ephemeral: true})
                                 } else if (enable === false && await player.unsetVTuber() === 101)
-                                    return interact.followUp({content: `${player.mention()} V 状态保持为：${enable ? '开' : '关'}`, ephemeral: true})
+                                    return interact.followUp({content: `${player.mention} V 状态保持为：${enable ? '开' : '关'}`, ephemeral: true})
                                 // followUp permission change message
-                                return interact.followUp({content: `${player.mention()} V 状态更改为：${enable ? '开' : '关'}`, ephemeral: true})
+                                return interact.followUp({content: `${player.mention} V 状态更改为：${enable ? '开' : '关'}`, ephemeral: true})
                             }
                             if (role) {
                                 if (!interact.guildId) return interact.followUp({content: `\`role 参数只能在伺服器中使用\``, ephemeral: true})
