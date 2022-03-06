@@ -137,7 +137,7 @@ export class MusicPlayer {
                     color: this.state === 'PLAYING' ? 'GREEN' : this.state === 'PAUSE' ? 'DARKER_GREY' : 'DARK_BUT_NOT_BLACK',
                     title: music.title,
                     url: music.url,
-                    description: `${this.queue[0].player.mention()} ${_music_message_.play_song[lang]}`, // 点了这首歌
+                    description: `${this.queue[0].player.mention} ${_music_message_.play_song[lang]}`, // 点了这首歌
                     image: {
                         height: music.thumbnail ? music.thumbnail.height : undefined,
                         width: music.thumbnail ? music.thumbnail.width : undefined,
@@ -252,7 +252,7 @@ export class MusicPlayer {
                 }
             })
             // Set listener when song is end
-            this.audioPlayer.on('stateChange', (oldState, newState) => {
+            this.audioPlayer.on(AudioPlayerStatus.Idle, (oldState, newState) => {
                 if (this.state === 'CHANGING') {
                     this.control.play()
                     return 
