@@ -26,7 +26,7 @@ module.exports = {
                 }
             }
             // Check command file exist
-            if (fs.existsSync(`./commands/${interaction.commandName}.js`)) {
+            if (fs.existsSync(`./js/commands/${interaction.commandName}.js`)) {
                 // Import command function
                 const commandFn = require(`../commands/${interaction.commandName}.js`);
                 // Call command Function
@@ -69,7 +69,7 @@ module.exports = {
             }
             consoleText += `${ interaction.customId }\n${ interaction.values }`
             // Check function file exist
-            if (fs.existsSync(`./reacts/${SelectFn}.js`)) {
+            if (fs.existsSync(`./js/reacts/${SelectFn}.js`)) {
                 // Import function
                 const fn = require(`../reacts/${SelectFn}.js`);
                 // Call Function
@@ -83,7 +83,7 @@ module.exports = {
         } else if (interaction.isContextMenu()) { // If context menu clicked
             if (!amateras.ready) return interaction.reply({content: '天照进入休眠中，无法使用请求', ephemeral: true})
             if (_guild && _guild.ready === false) return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true })
-            if (fs.existsSync(`./context/${interaction.commandName}.js`)) {
+            if (fs.existsSync(`./js/context/${interaction.commandName}.js`)) {
                 // Import command function
                 const contextFn = require(`../context/${interaction.commandName}.js`);
                 // Call command Function
@@ -116,7 +116,7 @@ module.exports = {
             }
             consoleText += `${ customId }`
             // Check function file exist
-            if (fs.existsSync(`./reacts/${buttonFn}.js`)) {
+            if (fs.existsSync(`./js/reacts/${buttonFn}.js`)) {
                 // Import function
                 const fn = require(`../reacts/${buttonFn}.js`);
                 // Call Function
