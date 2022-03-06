@@ -4,7 +4,7 @@
   "description": "Discord Bot for Isekai Guild",
   "main": "bot.js",
   "scripts": {
-    "bot": "tsc && node bot.js"
+    "bot": "tsc && node ./js/bot.js"
   },
   "author": "defaultkavy",
   "license": "ISC",

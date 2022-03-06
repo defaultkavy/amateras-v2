@@ -16,7 +16,7 @@ import { Log } from "./Log";
 import { System } from './System';
 import { CommandManager } from './CommandManager';
 import { MusicManager } from './MusicManager';
-const { system } = require('../bot_config.json')
+const { system } = require('../../bot_config.json')
 import { _system_ } from '../lang.json' 
 
 // This is Bot Object, collect all the bot informations.

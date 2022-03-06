@@ -2,7 +2,7 @@ import { CommandInteraction } from "discord.js";
 import Amateras from "../lib/Amateras";
 import Wallet from "../lib/Wallet";
 import { GoogleSpreadsheet } from 'google-spreadsheet'
-const config = require('../bot_config.json')
+const config = require('../../bot_config.json')
 
 export default async function execute(interact: CommandInteraction, amateras: Amateras) {
     await interact.deferReply({ephemeral: true})

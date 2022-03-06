@@ -4,7 +4,7 @@ import { Collection } from "mongodb";
 import Amateras from "./Amateras";
 import { Command } from "./Command";
 import { removeArrayItem } from "./terminal";
-const { global_commands } = require('../command_list.json')
+const { global_commands } = require('../../command_list.json')
 
 export class CommandManager {
     #amateras: Amateras;

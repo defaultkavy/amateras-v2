@@ -1,7 +1,7 @@
 import { User } from "discord.js";
 import { Collection } from "mongodb";
 import Amateras from "./Amateras";
-const { system } = require('../bot_config.json')
+const { system } = require('../../bot_config.json')
 
 export class System {
     #amateras: Amateras;

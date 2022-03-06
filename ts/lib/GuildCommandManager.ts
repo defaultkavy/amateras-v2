@@ -5,7 +5,7 @@ import Amateras from "./Amateras";
 import { GuildCommand } from "./GuildCommand";
 import { cloneObj, objectEqual, removeArrayItem } from "./terminal";
 import { _Guild } from "./_Guild";
-const { commands } = require('../command_list.json')
+const { commands } = require('../../command_list.json')
 
 export class GuildCommandManager {
     #amateras: Amateras;
