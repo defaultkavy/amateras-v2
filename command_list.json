@@ -336,6 +336,69 @@
             "description": "查看你的奖励详情 - Check your reward infomation"
         },
         {
+            "name": "game",
+            "description": "创建游戏",
+            "options": [
+                {
+                    "name": "choose",
+                    "description": "选择游戏",
+                    "type": 3,
+                    "required": true,
+                    "choices": [
+                        {
+                            "name": "Blackjack",
+                            "description": "21点",
+                            "value": "blackjack"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "bj",
+            "description": "游戏：21点",
+            "options": [
+                {
+                    "name": "join",
+                    "description": "入场",
+                    "type": 1,
+                    "options": [
+                        {
+                            "name": "bet",
+                            "description": "下注金额",
+                            "type": 4,
+                            "required": true
+                        }
+                    ]
+                },
+                {
+                    "name": "seek",
+                    "description": "看牌",
+                    "type": 1
+                },
+                {
+                    "name": "start",
+                    "description": "开局",
+                    "type": 1
+                },
+                {
+                    "name": "leave",
+                    "description": "离场",
+                    "type": 1
+                },
+                {
+                    "name": "hit",
+                    "description": "拿牌",
+                    "type": 1
+                },
+                {
+                    "name": "stand",
+                    "description": "停牌",
+                    "type": 1
+                }
+            ]
+        },
+        {
             "name": "mod",
             "description": "伺服器管理 - Server manage",
             "default_permission": false,

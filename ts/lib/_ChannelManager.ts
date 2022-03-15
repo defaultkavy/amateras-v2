@@ -1,17 +1,18 @@
-import { Channel, TextChannel, WelcomeChannel } from "discord.js";
+import { Channel, TextChannel, ThreadChannel, WelcomeChannel } from "discord.js";
 import Amateras from "./Amateras";
 import { Err } from "./Err";
 import { cloneObj } from "./terminal";
 import { _Channel } from "./_Channel";
 import { _Guild } from "./_Guild";
 import { _TextChannel } from "./_TextChannel";
+import { _ThreadChannel } from "./_ThreadChannel";
 import { _WelcomeChannel, _WelcomeChannelData } from "./_WelcomeChannel";
 
 export class _ChannelManager {
     #amateras: Amateras;
     #_guild: _Guild;
     #data?: _ChannelManagerData;
-    cache: Map<string, _Channel | _TextChannel | _WelcomeChannel>;
+    cache: Map<string, _Channel | _TextChannel | _WelcomeChannel | _ThreadChannel>;
     welcomeChannel?: _TextChannel;
     constructor(data: _ChannelManagerData | undefined, _guild: _Guild, amateras: Amateras) {
         this.#amateras = amateras
@@ -25,6 +26,8 @@ export class _ChannelManager {
             let _channel
             if (channel.isText() && !channel.isThread()) {
                 _channel = new _TextChannel(channel, this.#amateras)
+            } else if (channel.isText() && channel.isThread()) {
+                _channel = new _ThreadChannel(channel, this.#amateras)
             }
             if (!_channel) continue
             this.cache.set(channel.id, _channel)
@@ -59,6 +62,8 @@ export class _ChannelManager {
             let _channel
             if (channel instanceof TextChannel) {
                 _channel = new _TextChannel(channel, this.#amateras)
+            } else if (channel instanceof ThreadChannel) {
+                _channel = new _ThreadChannel(channel, this.#amateras)
             }
             if (!_channel) return 404
             this.cache.set(id, _channel)

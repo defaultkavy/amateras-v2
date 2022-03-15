@@ -12,6 +12,7 @@ import { Err } from "./Err";
 import { MusicPlayer } from "./MusicPlayer";
 import { _GuildManager } from "./_GuildManager";
 import cmd from "./cmd";
+import { GameManager } from "./GameManager";
 
 export class _Guild {
     #amateras: Amateras;
@@ -31,6 +32,7 @@ export class _Guild {
     ready: boolean;
     amateras?: GuildMember;
     lang: 'zh-s' | 'en';
+    games: GameManager;
     constructor(data: _GuildData, guild: Guild, manager: _GuildManager, amateras: Amateras) {
         this.#amateras = amateras
         this.#collection = this.#amateras.db.collection('guilds')
@@ -48,6 +50,7 @@ export class _Guild {
         this.available = data.available ? data.available : true
         this.ready = false
         this.lang = data.lang ? data.lang : amateras.system.lang
+        this.games = new GameManager(this, amateras)
     }
 
     async init() {
@@ -80,7 +83,7 @@ export class _Guild {
     }
 
     async save() {
-        const data = cloneObj(this, ['get', 'roles', 'musicPlayer', 'ready', 'amateras'])
+        const data = cloneObj(this, ['get', 'roles', 'musicPlayer', 'ready', 'amateras', 'games'])
         data.commands = this.commands.toData()
         data.log = this.log.toData()
         data.lobby = this.lobby.toData()

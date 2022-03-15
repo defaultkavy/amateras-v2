@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "sourceMaps": true,
-            "program": "${workspaceFolder}\\bot.js",
+            "program": "${workspaceFolder}\\js/bot.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]

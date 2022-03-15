@@ -13,7 +13,7 @@ import Wallet from "./Wallet";
 export class Player {
     #amateras: Amateras
     id: string;
-    name?: string;
+    name: string;
     exp?: number | null;
     description?: string | null;
     color?: ColorResolvable | null;
@@ -31,7 +31,7 @@ export class Player {
     joinedLobbies: Map<string, Lobby>;
     #rewards?: string[];
     rewards: Map<string, Reward>;
-    get?: User
+    get: User
     musics: PlayerMusicManager;
     bot: boolean;
     joinedDate: number;
@@ -40,9 +40,10 @@ export class Player {
      * @param player The player data object.
      * @param amateras The amateras object.
      */
-    constructor(data: PlayerData, amateras: Amateras) {
+    constructor(user: User, data: PlayerData, amateras: Amateras) {
         this.#amateras = amateras
         this.id = data.id
+        this.get = user
         this.exp = data.exp ? data.exp : 0
         this.description = data.description
         this.color = data.color,
@@ -61,21 +62,12 @@ export class Player {
         this.#rewards = data.rewards
         this.rewards = new Map
         this.musics = new PlayerMusicManager(this, amateras)
-        this.bot = data.bot ? data.bot : false
+        this.name = this.get.username
+        this.bot = this.get.bot
         this.joinedDate = data.joinedDate ? data.joinedDate : + new Date
     }
 
     async init() {
-        try {
-            this.get = await this.#amateras.client.users.fetch(this.id)
-            if (this.get) {
-                this.bot = this.get.bot
-                this.name = this.get.username
-            }
-        } catch(err) {
-            new Err(`Player fetch failed: (User)${ this.id }`)
-            return 404
-        }
         // Init wallet
         this.wallets = await this.walletInit()
         this.missions = {

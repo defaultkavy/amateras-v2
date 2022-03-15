@@ -255,10 +255,10 @@ export class Lobby {
             if (!await unsetThreadArchived()) return
             if (this.lobbyMessage) {
                 if (await this.lobbyMessage.fetch().catch(() => undefined)) {
+                    await this.lobbyMessage.edit({embeds: [this.lobbyMessageEmbed()]})
+                } else {
                     this.lobbyMessage = await this.#manager.thread.send({embeds: [this.lobbyMessageEmbed()]})
                     await this.save()
-                } else {
-                    await this.lobbyMessage.edit({embeds: [this.lobbyMessageEmbed()]})
                 }
             } else {
                 if (this.#data.lobbyMessage) {

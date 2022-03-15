@@ -1,5 +1,6 @@
 import { WithId } from "mongodb";
 import Amateras from "./Amateras";
+import { Err } from "./Err";
 import { Player, PlayerData } from "./Player";
 import { VManager } from "./VManager";
 
@@ -28,14 +29,20 @@ export class PlayerManager {
         if (!playerData) {
             playerData = { id: id }
         }
-        const player = new Player(playerData, this.#amateras)
-        this.cache.set(id, player)
-        if (await player.init() === 404) {
-            this.cache.delete(id)
+        try {
+             const user = await this.#amateras.client.users.fetch(id)
+             const player = new Player(user, playerData, this.#amateras)
+             this.cache.set(id, player)
+             if (await player.init() === 404) {
+                 this.cache.delete(id)
+                 return 404
+             }
+             if (callback) callback(player)
+             return player
+        } catch(err) {
+            new Err(`Player fetch failed: (User)${ id }`)
             return 404
         }
-        if (callback) callback(player)
-        return player
     }
 
     /**

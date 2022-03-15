@@ -1,4 +1,4 @@
-import { CommandInteraction, ContextMenuInteraction, GuildEmoji, MessageEmbed, MessageEmbedOptions } from 'discord.js'
+import { CommandInteraction, ContextMenuInteraction, GuildEmoji, Interaction, MessageEmbed, MessageEmbedOptions } from 'discord.js'
 import Amateras from './Amateras'
 import { Mission } from './Mission'
 import { Player } from './Player'
@@ -219,4 +219,26 @@ export function msTime(duration: number) {
 export function timestampDate(timestamp: number) {
     const date = new Date(timestamp)
     return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`
+}
+
+export function reply(interact: CommandInteraction, content: string) {
+    interact.reply({content: content, ephemeral: true})
+}
+
+export function arrayShuffle(array: any[]) {
+    var m = array.length, t, i;
+  
+    // While there remain elements to shuffle…
+    while (m) {
+  
+      // Pick a remaining element…
+      i = Math.floor(Math.random() * m--);
+  
+      // And swap it with the current element.
+      t = array[m];
+      array[m] = array[i];
+      array[i] = t;
+    }
+  
+    return array;
 }
