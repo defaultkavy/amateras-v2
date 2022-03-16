@@ -115,6 +115,7 @@ module.exports = {
                 buttonFn = interaction.customId
             }
             consoleText += `${ customId }`
+            console.debug(buttonFn)
             // Check function file exist
             if (fs.existsSync(`./js/reacts/${buttonFn}.js`)) {
                 // Import function
