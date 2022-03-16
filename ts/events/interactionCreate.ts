@@ -1,4 +1,4 @@
-import { Interaction, Message, MessageFlags } from "discord.js";
+import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, Interaction, Message, MessageFlags, SelectMenuInteraction } from "discord.js";
 import Amateras from "../lib/Amateras";
 import fs from 'fs';
 
@@ -6,40 +6,19 @@ module.exports = {
     name: 'interactionCreate',
     once: false,
     async execute(interaction: Interaction, amateras: Amateras) {
-        let consoleText = `command received: ${interaction.user.username} - `;
+        let consoleText = `${interaction.user.username} - `;
         const guild = interaction.guild
         const _guild = guild ? amateras.guilds.cache.get(guild.id) : undefined
-        if (interaction.isCommand()) { // If slash command message sent
-            if (!amateras.ready && interaction.commandName !== 'sys') return interaction.reply({content: '天照进入休眠中，无法使用请求', ephemeral: true})
-            // Check _guild init ready
-            if (_guild && _guild.ready === false) return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true })
-            // Return when command run in special channel
-            if (guild && interaction.commandName !== 'mod' && interaction.commandName !== 'sys') {
-                if (_guild) {
-                    if (interaction.channelId) {
-                        if (_guild.lobby.channel && interaction.channelId === _guild.lobby.channel.id ||
-                            _guild.musicPlayer.channel && interaction.channelId === _guild.musicPlayer.channel.id ||
-                            _guild.forums.cache.has(interaction.channelId)) {
-                                return interaction.reply({content: `你无法在这里发布请求指令`, ephemeral: true})
-                            }
-                    }
-                }
-            }
-            // Check command file exist
-            if (fs.existsSync(`./js/commands/${interaction.commandName}.js`)) {
-                // Import command function
-                const commandFn = require(`../commands/${interaction.commandName}.js`);
-                // Call command Function
-                commandFn.default(interaction, amateras);
-                consoleText += `${ interaction.commandName }\n${ interaction.options.data }`
-            } else {
-                // If command file not exist
-                console.error('Command not exist. Function file not found. (Amateras.js)')
-                return;
-            }
-        } else if (interaction.isSelectMenu()) { // If menu selected
-            if (!amateras.ready) return interaction.reply({content: '天照进入休眠中，无法使用请求', ephemeral: true})
-            if (_guild && _guild.ready === false) return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true })
+
+        if (interaction.isCommand()) { 
+
+            if (!checkCommand(interaction)) return 
+            executeCommand(`commands/${interaction.commandName}`)
+
+        } else if (interaction.isSelectMenu()) { 
+            
+            if (!checkCommand(interaction)) return 
+
             const flags = <MessageFlags>interaction.message.flags
             if (flags.toArray().includes('EPHEMERAL')) return
             const msg = (await amateras.messages?.fetch(interaction.message.id))
@@ -67,32 +46,17 @@ module.exports = {
                 //console.error(`Select menu "${interaction.customId}" not found in msg "${msg.id}" or type is uncorrect. (Amateras.js)`)
                 return
             }
-            consoleText += `${ interaction.customId }\n${ interaction.values }`
-            // Check function file exist
-            if (fs.existsSync(`./js/reacts/${SelectFn}.js`)) {
-                // Import function
-                const fn = require(`../reacts/${SelectFn}.js`);
-                // Call Function
-                fn.default(interaction, amateras, msg.get);
-            } else {
-                // If Function not exist
-                console.error(`Select menu "${interaction.customId}" function file not found. (Amateras.js)`)
-                return;
-            }
 
-        } else if (interaction.isContextMenu()) { // If context menu clicked
-            if (!amateras.ready) return interaction.reply({content: '天照进入休眠中，无法使用请求', ephemeral: true})
-            if (_guild && _guild.ready === false) return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true })
-            if (fs.existsSync(`./js/context/${interaction.commandName}.js`)) {
-                // Import command function
-                const contextFn = require(`../context/${interaction.commandName}.js`);
-                // Call command Function
-                contextFn.default(interaction, amateras);
-                consoleText += `${ interaction.commandName }`
-            }
+            executeCommand(`reacts/${SelectFn}`)
+
+        } else if (interaction.isContextMenu()) {
+
+            if (!checkCommand(interaction)) return 
+            executeCommand(`context/${interaction.commandName}`)
+
         } else if (interaction.isButton()) { // If button clicked
-            if (!amateras.ready) return interaction.reply({content: '天照进入休眠中，无法使用请求', ephemeral: true})
-            if (_guild && _guild.ready === false) return interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true })
+
+            if (!checkCommand(interaction)) return 
             const flags = <MessageFlags>interaction.message.flags
             if (flags.toArray().includes('EPHEMERAL')) return
             const msg = (await amateras.messages?.fetch(interaction.message.id))
@@ -116,20 +80,68 @@ module.exports = {
             }
             consoleText += `${ customId }`
             console.debug(buttonFn)
-            // Check function file exist
-            if (fs.existsSync(`./js/reacts/${buttonFn}.js`)) {
-                // Import function
-                const fn = require(`../reacts/${buttonFn}.js`);
-                // Call Function
-                fn.default(interaction, amateras);
-            } else {
-                // If Function not exist
-                console.error(`"${interaction.customId}" function file not found.`)
-                return;
-            }
+            executeCommand(`reacts/${buttonFn}`)
             
         } else return;
-        console.log(true, consoleText)
 
+        /**
+         * Find file and execute command file
+         * @param path Path to command files list
+         */
+        function executeCommand(path: string) {
+            // Check command file exist
+            if (fs.existsSync(`./js/${path}.js`)) {
+                const commandFn = require(`../${path}.js`);
+                commandFn.default(interaction, amateras);
+                consoleText += `${ path }`
+                console.log(consoleText)
+            } else {
+                throw new Error('Command not exist. Function file not found.')
+            }
+        }
+
+        function checkCommand(interaction: Interaction) {
+
+            if (interaction instanceof CommandInteraction) {
+
+                if (!amateras.ready && interaction.commandName !== 'sys') {
+                    interaction.reply({content: '天照进入休眠中，无法使用请求', ephemeral: true})
+                    return false
+                }
+
+                // Check _guild init ready
+                if (_guild && _guild.ready === false) {
+                    interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true })
+                    return false
+                }
+    
+                // Command channel error
+                if (guild && interaction.commandName !== 'mod' && interaction.commandName !== 'sys' && _guild && interaction.channelId) {
+                    if (_guild.lobby.channel && interaction.channelId === _guild.lobby.channel.id ||
+                        _guild.musicPlayer.channel && interaction.channelId === _guild.musicPlayer.channel.id ||
+                        _guild.forums.cache.has(interaction.channelId)) {
+                            interaction.reply({content: `你无法在这里发布请求指令`, ephemeral: true})
+                            return false
+                        }
+                }
+
+            } else if (interaction instanceof SelectMenuInteraction ||
+                    interaction instanceof ContextMenuInteraction ||
+                    interaction instanceof ButtonInteraction) {
+                if (!amateras.ready) {
+                    interaction.reply({content: '天照进入休眠中，无法使用请求', ephemeral: true})
+                    return false
+                }
+    
+                if (_guild && _guild.ready === false) {
+                    interaction.reply({ content: '伺服器初始化中，无法执行请求', ephemeral: true })
+                    return false
+                }
+
+            } else { // unhandle interaction type
+                return false
+            }
+            return true
+        }
     }
 }
